@@ -1,0 +1,186 @@
+/* Header Container */
+.header {
+    display: flex;
+    justify-content: space-between;
+    /* Space out left and right items */
+    align-items: center;
+    gap: 24px;
+    padding: 16px 24px;
+    background: transparent;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    /* Subtle border like sidebar 
+    margin-bottom: 24px; */
+}
+
+.header-right-group {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.header-spacer {
+    flex: 1;
+    /* Pushes content if needed, but space-between handles it */
+}
+
+/* Premium Menu Toggle Button */
+.menu-toggle-btn {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    /* Rounded Square */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    color: #475569;
+}
+
+.menu-toggle-btn:hover {
+    background: #f8fafc;
+    color: #0f172a;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: #cbd5e1;
+    transform: translateY(-1px);
+}
+
+.menu-toggle-btn:active {
+    transform: scale(0.95);
+}
+
+.menu-icon-btn {
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    /* Bouncy rotation */
+}
+
+/* Rotate icon when sidebar is closed */
+.rotate-180 {
+    transform: rotate(180deg);
+}
+
+/* Search Bar */
+.search-container {
+    display: flex;
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 99px;
+    /* Pill shape */
+    padding: 8px 16px;
+    width: 320px;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.search-container:focus-within {
+    border-color: #cbd5e1;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.search-icon {
+    color: #94a3b8;
+    margin-right: 8px;
+}
+
+.search-input {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 14px;
+    width: 100%;
+    color: #1e293b;
+}
+
+.search-input::placeholder {
+    color: #94a3b8;
+    font-style: italic;
+    transition: color 0.3s ease;
+}
+
+/* Notification Bell */
+.notifications {
+    position: relative;
+    cursor: pointer;
+    background: #ffffff;
+    padding: 10px;
+    border-radius: 50%;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.notifications:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+
+.bell-icon {
+    color: #64748b;
+}
+
+.notification-dot {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 8px;
+    height: 8px;
+    background: #ef4444;
+    border-radius: 50%;
+    border: 2px solid #ffffff;
+}
+
+/* User Profile Header */
+.user-profile-header {
+    cursor: pointer;
+    display: flex;
+    /* Align name and avatar */
+    align-items: center;
+    gap: 12px;
+}
+
+.header-user-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #334155;
+    transition: color 0.3s ease;
+}
+
+.user-profile-header:hover .header-user-name {
+    color: #0f172a;
+}
+
+.user-avatar-header {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e0f2fe;
+    /* Light blue default */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #bae6fd;
+    color: #0284c7;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Premium Navy Variant */
+.user-avatar-header.premium-navy {
+    background: #0f172a;
+    /* Dark Navy */
+    border-color: #1e293b;
+    color: #ffffff;
+    /* White Icon */
+}
+
+.user-avatar-header.premium-navy:hover {
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.3);
+    transform: translateY(-2px);
+    background: #1e293b;
+}

@@ -1,0 +1,298 @@
+/* Dashboard Layout */
+.dashboard-container {
+    display: flex;
+    gap: 24px;
+    padding: 24px;
+    min-height: 100%;
+    /* Allow growth */
+    background: #f8fafc;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Dashboard Main */
+.dashboard-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    min-width: 0;
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+.stat-card {
+    background: #e3e8ef;
+    padding: 20px;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: transform 0.2s;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+}
+
+.stat-title {
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.stat-value-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.stat-value {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.stat-change {
+    font-size: 12px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.stat-change.positive {
+    color: #10b981;
+}
+
+.stat-change.negative {
+    color: #ef4444;
+}
+
+/* Charts Section */
+.charts-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+}
+
+.charts-row.two-equ {
+    grid-template-columns: 1fr 1fr;
+}
+
+.chart-card {
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 20px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.chart-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+/* Traffic List */
+.traffic-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.traffic-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.traffic-name {
+    flex: 1;
+    font-size: 14px;
+    color: #475569;
+}
+
+.traffic-bar-bg {
+    width: 80px;
+    height: 4px;
+    background: #f1f5f9;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.traffic-bar-fill {
+    height: 100%;
+    background: #1e293b;
+    border-radius: 2px;
+}
+
+/* Right Panel */
+.dashboard-right {
+    width: 380px;
+    flex-shrink: 0;
+    /* Prevent resizing */
+    background: #ffffff;
+    border-left: 1px solid #f1f5f9;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    /*gap: 32px;*/
+    border-radius: 20px;
+    min-height: 100%;
+    /* Stretch to match main */
+}
+
+.section-header {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 16px;
+}
+
+/* Notification Items */
+.notification-item {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    align-items: flex-start;
+}
+
+.notif-icon-box {
+    width: 24px;
+    height: 24px;
+    background: #f1f5f9;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+.notif-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.notif-text {
+    font-size: 13px;
+    color: #334155;
+    font-weight: 500;
+}
+
+.notif-time {
+    font-size: 11px;
+    color: #94a3b8;
+}
+
+/* Activities */
+.activity-item {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.user-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #cbd5e1;
+}
+
+/* Contacts */
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.contact-name {
+    font-size: 13px;
+    color: #334155;
+    font-weight: 500;
+}
+
+/* Attendance Grid Styles */
+.attendance-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.attendance-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.attendance-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    /* Nice lift shadow */
+    border-color: #cbd5e1;
+    background: #f8fafc;
+    /* Subtle tint on hover */
+}
+
+/* Icon Box - Small Black & White */
+.attn-icon-box {
+    width: 28px;
+    height: 28px;
+    background: #ffffff;
+    border: 1px solid #0f172a;
+    /* Black border */
+    border-radius: 8px;
+    /* Rounded square */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #0f172a;
+    /* Black icon */
+    transition: all 0.3s ease;
+}
+
+.attendance-card:hover .attn-icon-box {
+    background: #0f172a;
+    color: #ffffff;
+}
+
+.attn-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.attn-label {
+    font-size: 11px;
+    color: #64748b;
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+.attn-value {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f172a;
+}
