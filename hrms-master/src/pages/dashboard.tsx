@@ -1,9 +1,6 @@
 import "./dashboard.css";
 import {
-    AreaChart,
-    Area,
     XAxis,
-    YAxis,
     CartesianGrid,
     Tooltip,
     ResponsiveContainer,
@@ -14,182 +11,328 @@ import {
     Cell
 } from 'recharts';
 import {
-    UserCheck,
-    Clock,
-    UserX,
-    CalendarOff,
-    FileQuestion,
-    MapPinOff,
-    LogOut,
-    Receipt,
-    Shuffle,
-    Landmark,
-    Smartphone,
-    Home,
-    History,
-    ScanFace,
-    UserCog,
-    PlusCircle,
-    Hourglass,
-    FileText
+    UserCheck, Clock, UserX, CalendarOff, FileQuestion, MapPinOff, LogOut,
+    Receipt, Shuffle, Landmark, Smartphone, Home, History, ScanFace, UserCog,
+    PlusCircle, Hourglass, FileText, Users, Briefcase, IndianRupee, ArrowUpRight,
+    ArrowDownRight, CheckCircle2, UserPlus, Plus, FileBarChart
 } from 'lucide-react';
 
-const data = [
-    { name: 'Jan', uv: 4000, pv: 2400, amt: 2400 },
-    { name: 'Feb', uv: 3000, pv: 1398, amt: 2210 },
-    { name: 'Mar', uv: 2000, pv: 9800, amt: 2290 },
-    { name: 'Apr', uv: 2780, pv: 3908, amt: 2000 },
-    { name: 'May', uv: 1890, pv: 4800, amt: 2181 },
-    { name: 'Jun', uv: 2390, pv: 3800, amt: 2500 },
-    { name: 'Jul', uv: 3490, pv: 4300, amt: 2100 },
+const hiringData = [
+    { name: 'Jan', new: 80, exit: -25 },
+    { name: 'Feb', new: 110, exit: -35 },
+    { name: 'Mar', new: 70, exit: -40 },
+    { name: 'Apr', new: 130, exit: -15 },
+    { name: 'May', new: 90, exit: -20 },
+    { name: 'Jun', new: 120, exit: -30 },
+    { name: 'Jul', new: 140, exit: -10 },
+    { name: 'Aug', new: 100, exit: -45 },
 ];
 
-const trafficData = [
-    { name: 'Google', value: 80 },
-    { name: 'YouTube', value: 65 },
-    { name: 'Instagram', value: 45 },
-    { name: 'Pinterest', value: 30 },
-    { name: 'Facebook', value: 20 },
-    { name: 'Twitter', value: 15 },
+const deptData = [
+    { name: 'Engineering', value: 35 },
+    { name: 'Sales', value: 25 },
+    { name: 'HR & Admin', value: 20 },
+    { name: 'Marketing', value: 12 },
+    { name: 'Others', value: 8 },
 ];
+const DEPT_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#94a3b8'];
 
-const deviceData = [
-    { name: 'Linux', uv: 4000 },
-    { name: 'Mac', uv: 3000 },
-    { name: 'iOS', uv: 2000 },
-    { name: 'Win', uv: 2780 },
-    { name: 'Android', uv: 1890 },
-    { name: 'Other', uv: 2390 },
+const recentEmployees = [
+    { id: '1', name: 'Rohit Sharma', role: 'Frontend Dev', dept: 'Engineering', status: 'Active', statusColor: '#10b981', avatarColor: '#3b82f6', initials: 'RS' },
+    { id: '2', name: 'Priya Kumar', role: 'HR Manager', dept: 'HR & Admin', status: 'Remote', statusColor: '#3b82f6', avatarColor: '#10b981', initials: 'PK' },
+    { id: '3', name: 'Arjun Mehta', role: 'Sales Lead', dept: 'Sales', status: 'On Leave', statusColor: '#f59e0b', avatarColor: '#f59e0b', initials: 'AM' },
+    { id: '4', name: 'Sneha Gupta', role: 'UX/UI Designer', dept: 'Marketing', status: 'Active', statusColor: '#10b981', avatarColor: '#ef4444', initials: 'SG' },
+    { id: '5', name: 'Vikram Rao', role: 'Backend Dev', dept: 'Engineering', status: 'Active', statusColor: '#10b981', avatarColor: '#8b5cf6', initials: 'VR' },
 ];
-
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
 function Dashboard() {
     return (
         <div className="dashboard-container">
             {/* Main Content Area */}
             <div className="dashboard-main">
-                <div className="dashboard-header">
-                    <h2>Overview</h2>
+
+                {/* Top Black Nav */}
+                <div className="services-navbar">
+                    <span className="services-emoji">🚀</span>
+                    <span className="services-label">Services:</span>
+                    <div className="services-badges">
+                        <span className="service-badge active">HRMS</span>
+                        <span className="service-badge">Payroll</span>
+                        <span className="service-badge">Recruitment</span>
+                        <span className="service-badge">End-to-End HR</span>
+                        <span className="service-badge">CRM</span>
+                        <span className="service-badge">Web Dev</span>
+                        <span className="service-badge">Branding</span>
+                        <span className="service-badge">Custom Software</span>
+                        <span className="service-badge">IT Support</span>
+                    </div>
                 </div>
 
                 {/* Stats Grid */}
-                <div className="stats-grid">
-                    <div className="stat-card" style={{ background: '#e3f2fd' }}>
-                        <div className="stat-title">Views</div>
-                        <div className="stat-value-row">
-                            <div className="stat-value">7,265</div>
-                            <div className="stat-change positive">+11.01% ↗</div>
+                <div className="main-stats-grid">
+                    <div className="new-stat-card">
+                        <div className="ns-header">
+                            <div className="ns-icon ns-blue"><Users size={16} /></div>
+                            <div className="ns-change positive"><ArrowUpRight size={12} strokeWidth={3} /> 4.2%</div>
                         </div>
+                        <div className="ns-body">
+                            <div className="ns-value">248</div>
+                            <div className="ns-title">Total Employees</div>
+                        </div>
+                        <div className="ns-progress"><div className="ns-progress-fill bg-blue" style={{ width: '70%' }}></div></div>
                     </div>
-                    <div className="stat-card" style={{ background: '#e0f2f1' }}>
-                        <div className="stat-title">Visits</div>
-                        <div className="stat-value-row">
-                            <div className="stat-value">3,671</div>
-                            <div className="stat-change negative">-0.03% ↘</div>
+
+                    <div className="new-stat-card">
+                        <div className="ns-header">
+                            <div className="ns-icon ns-green"><UserCheck size={16} /></div>
+                            <div className="ns-change positive"><ArrowUpRight size={12} strokeWidth={3} /> 2.1%</div>
                         </div>
+                        <div className="ns-body">
+                            <div className="ns-value">214</div>
+                            <div className="ns-title">Present Today</div>
+                        </div>
+                        <div className="ns-progress"><div className="ns-progress-fill bg-green" style={{ width: '85%' }}></div></div>
                     </div>
-                    <div className="stat-card" style={{ background: '#f5f5f5' }}>
-                        <div className="stat-title">New Users</div>
-                        <div className="stat-value-row">
-                            <div className="stat-value">256</div>
-                            <div className="stat-change positive">+15.03% ↗</div>
+
+                    <div className="new-stat-card">
+                        <div className="ns-header">
+                            <div className="ns-icon ns-orange"><Briefcase size={16} /></div>
+                            <div className="ns-change positive"><ArrowUpRight size={12} strokeWidth={3} /> 6.5%</div>
                         </div>
+                        <div className="ns-body">
+                            <div className="ns-value">38</div>
+                            <div className="ns-title">Open Positions</div>
+                        </div>
+                        <div className="ns-progress"><div className="ns-progress-fill bg-orange" style={{ width: '60%' }}></div></div>
                     </div>
-                    <div className="stat-card" style={{ background: '#ede7f6' }}>
-                        <div className="stat-title">Active Users</div>
-                        <div className="stat-value-row">
-                            <div className="stat-value">2,318</div>
-                            <div className="stat-change positive">+6.08% ↗</div>
+
+                    <div className="new-stat-card">
+                        <div className="ns-header">
+                            <div className="ns-icon ns-red"><IndianRupee size={16} /></div>
+                            <div className="ns-change negative"><ArrowDownRight size={12} strokeWidth={3} /> 1.3%</div>
                         </div>
+                        <div className="ns-body">
+                            <div className="ns-value">₹24.6L</div>
+                            <div className="ns-title">Monthly Payroll</div>
+                        </div>
+                        <div className="ns-progress"><div className="ns-progress-fill bg-red" style={{ width: '75%' }}></div></div>
                     </div>
                 </div>
 
-                {/* Charts Row 1: Total Users & Traffic source */}
+                {/* Charts Row */}
                 <div className="charts-row">
-                    <div className="chart-card">
-                        <div className="chart-header">
-                            <div className="chart-title">Total Users</div>
-                            <div style={{ fontSize: '12px', color: '#64748b' }}>● This year ● Last year</div>
+                    <div className="chart-card hiring-card">
+                        <div className="chart-header-new">
+                            <div className="ch-info">
+                                <h3>Employee Hiring Overview</h3>
+                                <p>Monthly hires vs exits</p>
+                            </div>
+                            <a href="#" className="ch-link">View Report &rarr;</a>
                         </div>
-                        <div style={{ width: '100%', height: 300 }}>
+                        <div style={{ width: '100%', height: 200, marginTop: '24px' }}>
                             <ResponsiveContainer width="100%" height="100%">
-                                <AreaChart data={data}>
-                                    <defs>
-                                        <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
-                                            <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
-                                        </linearGradient>
-                                    </defs>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                                    <XAxis dataKey="name" axisLine={false} tickLine={false} />
-                                    <YAxis axisLine={false} tickLine={false} />
-                                    <Tooltip />
-                                    <Area type="monotone" dataKey="uv" stroke="#8884d8" fillOpacity={1} fill="url(#colorUv)" />
-                                    <Area type="monotone" dataKey="pv" stroke="#82ca9d" fillOpacity={0} fill="url(#colorPv)" />
-                                </AreaChart>
-                            </ResponsiveContainer>
-                        </div>
-                    </div>
-
-                    <div className="chart-card">
-                        <div className="chart-title">Traffic by Website</div>
-                        <div className="traffic-list">
-                            {trafficData.map((item, index) => (
-                                <div key={index} className="traffic-item">
-                                    <div className="traffic-name">{item.name}</div>
-                                    <div className="traffic-bar-bg">
-                                        <div
-                                            className="traffic-bar-fill"
-                                            style={{ width: `${item.value}%` }}
-                                        />
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Charts Row 2: Traffic by Device & Traffic by Location */}
-                <div className="charts-row two-equ">
-                    <div className="chart-card">
-                        <div className="chart-title">Traffic by Device</div>
-                        <div style={{ width: '100%', height: 250 }}>
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={deviceData}>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                                    <XAxis dataKey="name" axisLine={false} tickLine={false} />
-                                    <Tooltip />
-                                    <Bar dataKey="uv" fill="#8884d8" radius={[4, 4, 0, 0]} barSize={20} />
+                                <BarChart data={hiringData} stackOffset="sign">
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f8fafc" />
+                                    <XAxis dataKey="name" axisLine={{ stroke: '#e2e8f0' }} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} />
+                                    <Tooltip cursor={{ fill: 'transparent' }} />
+                                    <Bar dataKey="new" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={35} />
+                                    <Bar dataKey="exit" fill="#ef4444" radius={[0, 0, 4, 4]} barSize={35} />
                                 </BarChart>
                             </ResponsiveContainer>
                         </div>
+                        <div className="chart-legend">
+                            <span className="legend-item"><span className="dot bg-blue"></span> New Hires</span>
+                            <span className="legend-item"><span className="dot bg-red"></span> Exits</span>
+                        </div>
                     </div>
 
-                    <div className="chart-card">
-                        <div className="chart-title">Traffic by Location</div>
-                        <div style={{ width: '100%', height: 250 }}>
-                            <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                    <Pie
-                                        data={data}
-                                        cx="50%"
-                                        cy="50%"
-                                        innerRadius={60}
-                                        outerRadius={80}
-                                        fill="#8884d8"
-                                        paddingAngle={5}
-                                        dataKey="uv"
-                                    >
-                                        {data.map((_entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                        ))}
-                                    </Pie>
-                                </PieChart>
-                            </ResponsiveContainer>
+                    <div className="chart-card split-card">
+                        <div className="chart-header-new">
+                            <h3>Department Split</h3>
+                            <a href="#" className="ch-link">Details &rarr;</a>
+                        </div>
+                        <div className="split-body">
+                            <div className="donut-container">
+                                <ResponsiveContainer width={130} height={130}>
+                                    <PieChart>
+                                        <Pie
+                                            data={deptData}
+                                            innerRadius={45}
+                                            outerRadius={65}
+                                            paddingAngle={2}
+                                            dataKey="value"
+                                            stroke="none"
+                                        >
+                                            {deptData.map((_entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={DEPT_COLORS[index % DEPT_COLORS.length]} />
+                                            ))}
+                                        </Pie>
+                                    </PieChart>
+                                </ResponsiveContainer>
+                                <div className="donut-center">
+                                    <span>248</span>
+                                </div>
+                            </div>
+                            <div className="split-legend">
+                                {deptData.map((dept, i) => (
+                                    <div className="split-legend-item" key={i}>
+                                        <div className="sl-left">
+                                            <span className="sl-dot" style={{ backgroundColor: DEPT_COLORS[i] }}></span>
+                                            <span className="sl-name">{dept.name}</span>
+                                        </div>
+                                        <span className="sl-val">{dept.value}%</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="split-bottom-badges">
+                            <div className="s-badge"><div className="sb-val" style={{ color: '#3b82f6' }}>18</div><div className="sb-lbl">On Leave</div></div>
+                            <div className="s-badge"><div className="sb-val" style={{ color: '#10b981' }}>16</div><div className="sb-lbl">Remote</div></div>
+                            <div className="s-badge"><div className="sb-val" style={{ color: '#f59e0b' }}>12</div><div className="sb-lbl">New Joining</div></div>
+                            <div className="s-badge"><div className="sb-val" style={{ color: '#ef4444' }}>4</div><div className="sb-lbl">Probation</div></div>
                         </div>
                     </div>
                 </div>
+
+                {/* Bottom Row */}
+                <div className="bottom-row">
+                    {/* Recent Employees */}
+                    <div className="bottom-card recent-employees-card">
+                        <div className="chart-header-new">
+                            <h3>Recent Employees</h3>
+                            <a href="#" className="ch-link">View All &rarr;</a>
+                        </div>
+                        <div className="re-table-wrapper">
+                            <table className="re-table">
+                                <thead>
+                                    <tr>
+                                        <th>EMPLOYEE</th>
+                                        <th>DEPT</th>
+                                        <th>STATUS</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {recentEmployees.map((emp) => (
+                                        <tr key={emp.id}>
+                                            <td>
+                                                <div className="emp-info">
+                                                    <div className="emp-avatar" style={{ backgroundColor: emp.avatarColor }}>{emp.initials}</div>
+                                                    <div className="emp-name-role">
+                                                        <div className="emp-name">{emp.name}</div>
+                                                        <div className="emp-role">{emp.role}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td><span className="emp-dept">{emp.dept}</span></td>
+                                            <td><span className="emp-status" style={{ color: emp.statusColor }}>{emp.status}</span></td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    {/* Payroll Summary */}
+                    <div className="bottom-card payroll-card">
+                        <div className="chart-header-new">
+                            <h3>Payroll Summary</h3>
+                            <a href="#" className="ch-link">Run Payroll &rarr;</a>
+                        </div>
+                        <div className="ps-list">
+                            <div className="ps-item">
+                                <span className="ps-label"><span className="ps-dot bg-blue"></span> Gross Salary</span>
+                                <span className="ps-value">₹28,50,000</span>
+                            </div>
+                            <div className="ps-item">
+                                <span className="ps-label"><span className="ps-dot bg-red"></span> Deductions</span>
+                                <span className="ps-value" style={{ color: '#ef4444' }}>- ₹3,90,000</span>
+                            </div>
+                            <div className="ps-item">
+                                <span className="ps-label"><span className="ps-dot bg-green"></span> Net Payable</span>
+                                <span className="ps-value" style={{ color: '#10b981' }}>₹24,60,000</span>
+                            </div>
+                            <div className="ps-item">
+                                <span className="ps-label"><span className="ps-dot bg-orange"></span> Tax (TDS)</span>
+                                <span className="ps-value" style={{ color: '#f59e0b' }}>₹2,40,000</span>
+                            </div>
+                            <div className="ps-item">
+                                <span className="ps-label"><span className="ps-dot bg-slate"></span> PF / ESI</span>
+                                <span className="ps-value">₹1,50,000</span>
+                            </div>
+                        </div>
+                        <div className="ps-action">
+                            <div className="ps-action-info">
+                                <span className="ps-nxt">Next Payroll</span>
+                                <span className="ps-date">March 1, 2026</span>
+                            </div>
+                            <button className="ps-btn">Process Now</button>
+                        </div>
+                    </div>
+
+                    {/* Rightmost column in the bottom row (Recent Activity + Quick Actions) */}
+                    <div className="bottom-right-col">
+                        <div className="bottom-card activity-card">
+                            <div className="chart-header-new" style={{ marginBottom: '16px' }}>
+                                <h3>Recent Activity</h3>
+                            </div>
+                            <div className="ra-list">
+                                <div className="ra-item">
+                                    <div className="ra-icon bg-light-blue"><UserCheck size={14} color="#3b82f6" /></div>
+                                    <div className="ra-info">
+                                        <p><strong>Rohit Sharma</strong> submitted leave</p>
+                                        <span>10 min ago</span>
+                                    </div>
+                                </div>
+                                <div className="ra-item">
+                                    <div className="ra-icon bg-light-green"><CheckCircle2 size={14} color="#10b981" /></div>
+                                    <div className="ra-info">
+                                        <p><strong>Payroll Feb 2026</strong> approved</p>
+                                        <span>1 hr ago</span>
+                                    </div>
+                                </div>
+                                <div className="ra-item">
+                                    <div className="ra-icon bg-light-orange"><Briefcase size={14} color="#f59e0b" /></div>
+                                    <div className="ra-info">
+                                        <p>New job: <strong>React Developer</strong></p>
+                                        <span>3 hr ago</span>
+                                    </div>
+                                </div>
+                                <div className="ra-item">
+                                    <div className="ra-icon bg-light-slate"><UserPlus size={14} color="#64748b" /></div>
+                                    <div className="ra-info">
+                                        <p><strong>Sneha Gupta</strong> joined today</p>
+                                        <span>9:00 AM</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bottom-card quick-actions-card">
+                            <div className="chart-header-new" style={{ marginBottom: '16px' }}>
+                                <h3>Quick Actions</h3>
+                            </div>
+                            <div className="qa-grid">
+                                <button className="qa-btn">
+                                    <Plus size={16} color="#64748b" />
+                                    <span>Add Employee</span>
+                                </button>
+                                <button className="qa-btn">
+                                    <IndianRupee size={16} color="#64748b" />
+                                    <span>Run Payroll</span>
+                                </button>
+                                <button className="qa-btn">
+                                    <Briefcase size={16} color="#64748b" />
+                                    <span>Post Job</span>
+                                </button>
+                                <button className="qa-btn">
+                                    <FileBarChart size={16} color="#64748b" />
+                                    <span>Reports</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
             {/* Right Panel: Attendance Status */}
