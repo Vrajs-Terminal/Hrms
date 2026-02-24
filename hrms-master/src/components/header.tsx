@@ -39,7 +39,6 @@ function Header({ toggleSidebar, isSidebarOpen }: HeaderProps) {
                     className={`menu-icon-btn ${!isSidebarOpen ? 'rotate-180' : ''}`}
                 />
             </button>
-            <div className="header-spacer"></div>
             {/* Search Bar - Rotates services */}
             <div className="search-container">
                 <Search size={18} className="search-icon" />
@@ -49,6 +48,8 @@ function Header({ toggleSidebar, isSidebarOpen }: HeaderProps) {
                     className="search-input"
                 />
             </div>
+
+            <div className="header-spacer"></div>
 
             {/* Notification Menu */}
             <div className="notifications">

@@ -51,22 +51,6 @@ function Dashboard() {
             {/* Main Content Area */}
             <div className="dashboard-main">
 
-                {/* Top Black Nav */}
-                <div className="services-navbar">
-                    <span className="services-emoji">🚀</span>
-                    <span className="services-label">Services:</span>
-                    <div className="services-badges">
-                        <span className="service-badge active">HRMS</span>
-                        <span className="service-badge">Payroll</span>
-                        <span className="service-badge">Recruitment</span>
-                        <span className="service-badge">End-to-End HR</span>
-                        <span className="service-badge">CRM</span>
-                        <span className="service-badge">Web Dev</span>
-                        <span className="service-badge">Branding</span>
-                        <span className="service-badge">Custom Software</span>
-                        <span className="service-badge">IT Support</span>
-                    </div>
-                </div>
 
                 {/* Stats Grid */}
                 <div className="main-stats-grid">
@@ -153,12 +137,12 @@ function Dashboard() {
                         </div>
                         <div className="split-body">
                             <div className="donut-container">
-                                <ResponsiveContainer width={130} height={130}>
+                                <ResponsiveContainer width="100%" height="100%">
                                     <PieChart>
                                         <Pie
                                             data={deptData}
-                                            innerRadius={45}
-                                            outerRadius={65}
+                                            innerRadius={35}
+                                            outerRadius={55}
                                             paddingAngle={2}
                                             dataKey="value"
                                             stroke="none"
@@ -269,66 +253,64 @@ function Dashboard() {
                         </div>
                     </div>
 
-                    {/* Rightmost column in the bottom row (Recent Activity + Quick Actions) */}
-                    <div className="bottom-right-col">
-                        <div className="bottom-card activity-card">
-                            <div className="chart-header-new" style={{ marginBottom: '16px' }}>
-                                <h3>Recent Activity</h3>
+                    {/* Recent Activity */}
+                    <div className="bottom-card activity-card">
+                        <div className="chart-header-new" style={{ marginBottom: '16px' }}>
+                            <h3>Recent Activity</h3>
+                        </div>
+                        <div className="ra-list">
+                            <div className="ra-item">
+                                <div className="ra-icon bg-light-blue"><UserCheck size={14} color="#3b82f6" /></div>
+                                <div className="ra-info">
+                                    <p><strong>Rohit Sharma</strong> submitted leave</p>
+                                    <span>10 min ago</span>
+                                </div>
                             </div>
-                            <div className="ra-list">
-                                <div className="ra-item">
-                                    <div className="ra-icon bg-light-blue"><UserCheck size={14} color="#3b82f6" /></div>
-                                    <div className="ra-info">
-                                        <p><strong>Rohit Sharma</strong> submitted leave</p>
-                                        <span>10 min ago</span>
-                                    </div>
+                            <div className="ra-item">
+                                <div className="ra-icon bg-light-green"><CheckCircle2 size={14} color="#10b981" /></div>
+                                <div className="ra-info">
+                                    <p><strong>Payroll Feb 2026</strong> approved</p>
+                                    <span>1 hr ago</span>
                                 </div>
-                                <div className="ra-item">
-                                    <div className="ra-icon bg-light-green"><CheckCircle2 size={14} color="#10b981" /></div>
-                                    <div className="ra-info">
-                                        <p><strong>Payroll Feb 2026</strong> approved</p>
-                                        <span>1 hr ago</span>
-                                    </div>
+                            </div>
+                            <div className="ra-item">
+                                <div className="ra-icon bg-light-orange"><Briefcase size={14} color="#f59e0b" /></div>
+                                <div className="ra-info">
+                                    <p>New job: <strong>React Developer</strong></p>
+                                    <span>3 hr ago</span>
                                 </div>
-                                <div className="ra-item">
-                                    <div className="ra-icon bg-light-orange"><Briefcase size={14} color="#f59e0b" /></div>
-                                    <div className="ra-info">
-                                        <p>New job: <strong>React Developer</strong></p>
-                                        <span>3 hr ago</span>
-                                    </div>
-                                </div>
-                                <div className="ra-item">
-                                    <div className="ra-icon bg-light-slate"><UserPlus size={14} color="#64748b" /></div>
-                                    <div className="ra-info">
-                                        <p><strong>Sneha Gupta</strong> joined today</p>
-                                        <span>9:00 AM</span>
-                                    </div>
+                            </div>
+                            <div className="ra-item">
+                                <div className="ra-icon bg-light-slate"><UserPlus size={14} color="#64748b" /></div>
+                                <div className="ra-info">
+                                    <p><strong>Sneha Gupta</strong> joined today</p>
+                                    <span>9:00 AM</span>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        <div className="bottom-card quick-actions-card">
-                            <div className="chart-header-new" style={{ marginBottom: '16px' }}>
-                                <h3>Quick Actions</h3>
-                            </div>
-                            <div className="qa-grid">
-                                <button className="qa-btn">
-                                    <Plus size={16} color="#64748b" />
-                                    <span>Add Employee</span>
-                                </button>
-                                <button className="qa-btn">
-                                    <IndianRupee size={16} color="#64748b" />
-                                    <span>Run Payroll</span>
-                                </button>
-                                <button className="qa-btn">
-                                    <Briefcase size={16} color="#64748b" />
-                                    <span>Post Job</span>
-                                </button>
-                                <button className="qa-btn">
-                                    <FileBarChart size={16} color="#64748b" />
-                                    <span>Reports</span>
-                                </button>
-                            </div>
+                    <div className="bottom-card quick-actions-card">
+                        <div className="chart-header-new" style={{ marginBottom: '16px' }}>
+                            <h3>Quick Actions</h3>
+                        </div>
+                        <div className="qa-grid">
+                            <button className="qa-btn">
+                                <Plus size={16} color="#64748b" />
+                                <span>Add Employee</span>
+                            </button>
+                            <button className="qa-btn">
+                                <IndianRupee size={16} color="#64748b" />
+                                <span>Run Payroll</span>
+                            </button>
+                            <button className="qa-btn">
+                                <Briefcase size={16} color="#64748b" />
+                                <span>Post Job</span>
+                            </button>
+                            <button className="qa-btn">
+                                <FileBarChart size={16} color="#64748b" />
+                                <span>Reports</span>
+                            </button>
                         </div>
                     </div>
                 </div>

@@ -58,10 +58,6 @@ function Sidebar({ isOpen }: SidebarProps) {
                             <span className="company-text">{companyName}</span>
                         </div>
                     </div>
-
-                    <button className="btn-add-change">
-                        ADD MORE / CHANGE COMPANY
-                    </button>
                 </div>
 
                 {/* Menu Section */}
@@ -70,7 +66,7 @@ function Sidebar({ isOpen }: SidebarProps) {
                         {menuItems.map((item, index) => (
                             <li key={index} className={item.active ? "active" : ""}>
                                 <div className="menu-item-content">
-                                    <item.icon size={20} className="menu-icon" />
+                                    <item.icon size={18} className="menu-icon" />
                                     <span>{item.name}</span>
                                 </div>
                                 <ChevronRight size={16} className="arrow-icon" />
