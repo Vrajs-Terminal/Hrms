@@ -28,7 +28,7 @@ function Sidebar({ isOpen }: SidebarProps) {
 
     const menuItems = [
         { name: "Dashboard", icon: LayoutDashboard, active: true },
-        { name: "Setup & Configuration", icon: Settings },
+        { name: "Company Settings", icon: Settings },
         { name: "Core HRMS", icon: Users },
         { name: "Finance & Accounting", icon: Calculator },
         { name: "Productivity & Tracking", icon: Activity },
