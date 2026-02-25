@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import {
-    Save, Building, MapPin, Phone,
-    Mail, Briefcase, Globe,
-    Image as ImageIcon, Monitor, Link as LinkIcon
+    Save, Building, Phone,
+    Briefcase, Globe,
+    Image as ImageIcon, Monitor
 } from 'lucide-react';
 import './company-setup.css';
 

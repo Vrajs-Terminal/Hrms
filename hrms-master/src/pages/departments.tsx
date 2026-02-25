@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import {
-    Plus, Map, GripVertical, Building2, Layers
+    Plus, GripVertical, Building2, Layers
 } from 'lucide-react';
 import './departments.css';
 
@@ -104,7 +104,7 @@ export default function Departments() {
                     <p>Organize internal departments linked to specific branches</p>
                 </div>
                 <div className="actions-row">
-                    <button className={`btn-secondary ${isReordering ? 'active-reorder' : ''}`} onClick={() => setIsReordering(!isReordering)}>
+                    <button className={`btn - secondary ${isReordering ? 'active-reorder' : ''} `} onClick={() => setIsReordering(!isReordering)}>
                         <GripVertical size={16} />
                         {isReordering ? 'Done Reordering' : 'Change Order'}
                     </button>
@@ -183,7 +183,7 @@ export default function Departments() {
                                     <span>{index + 1}</span>
                                     <input
                                         type="text"
-                                        placeholder={`e.g. Sales Team ${index + 1}`}
+                                        placeholder={`e.g.Sales Team ${index + 1} `}
                                         value={deptName}
                                         onChange={(e) => handleDeptNameChange(index, e.target.value)}
                                         required
