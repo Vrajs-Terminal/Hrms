@@ -50,7 +50,13 @@ function Dashboard() {
         <div className="dashboard-container">
             {/* Main Content Area */}
             <div className="dashboard-main">
-
+                {/* Dashboard Header */}
+                <div className="dashboard-header-title">
+                    <div>
+                        <h1>Dashboard Overview</h1>
+                        <p>Welcome back! Here is what's happening today across your organization.</p>
+                    </div>
+                </div>
 
                 {/* Stats Grid */}
                 <div className="main-stats-grid">

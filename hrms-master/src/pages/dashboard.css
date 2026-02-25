@@ -23,6 +23,28 @@
     min-width: 0;
 }
 
+/* Dashboard Title Header */
+.dashboard-header-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: transparent;
+    padding-bottom: 8px;
+}
+
+.dashboard-header-title h1 {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+    color: #0f172a;
+}
+
+.dashboard-header-title p {
+    color: #64748b;
+    margin: 4px 0 0 0;
+    font-size: 14px;
+}
+
 /* Services Navbar */
 .services-navbar {
     background: #0f172a;

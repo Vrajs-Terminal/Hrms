@@ -17,14 +17,14 @@ function Header({ toggleSidebar, isSidebarOpen }: HeaderProps) {
     const profileRef = useRef<HTMLDivElement>(null);
     const notifRef = useRef<HTMLDivElement>(null);
 
-    const services = [
-        "Search Employees...",
-        "Search Payroll...",
-        "Search Recruitment...",
-        "Search Performance..."
-    ];
-
     useEffect(() => {
+        const services = [
+            "Search Employees...",
+            "Search Payroll...",
+            "Search Recruitment...",
+            "Search Performance..."
+        ];
+
         let index = 0;
         const intervalId = setInterval(() => {
             setPlaceholderText(services[index]);
@@ -94,14 +94,14 @@ function Header({ toggleSidebar, isSidebarOpen }: HeaderProps) {
                         </div>
                         <div className="dropdown-content">
                             <div className="dropdown-item notif-item unread">
-                                <div className="notif-icon bg-blue"><Bell size={14} /></div>
+                                <div className="notif-icon bg-blue"><Bell size={16} /></div>
                                 <div className="notif-text">
                                     <p>System update completed successfully</p>
                                     <span>2 mins ago</span>
                                 </div>
                             </div>
                             <div className="dropdown-item notif-item">
-                                <div className="notif-icon bg-green"><User size={14} /></div>
+                                <div className="notif-icon bg-green"><User size={16} /></div>
                                 <div className="notif-text">
                                     <p>New login from recognized device</p>
                                     <span>1 hour ago</span>
@@ -138,22 +138,22 @@ function Header({ toggleSidebar, isSidebarOpen }: HeaderProps) {
                         </div>
                         <div className="dropdown-content">
                             <button className="dropdown-item">
-                                <User size={16} />
+                                <User size={18} />
                                 <span>My Profile</span>
                             </button>
                             <button className="dropdown-item">
-                                <Settings size={16} />
+                                <Settings size={18} />
                                 <span>Account Settings</span>
                             </button>
                             <button className="dropdown-item">
-                                <Keyboard size={16} />
+                                <Keyboard size={18} />
                                 <span>Keyboard Shortcuts</span>
                             </button>
 
                             <div className="dropdown-divider"></div>
 
                             <button className="dropdown-item logout-action" onClick={logout}>
-                                <LogOut size={16} />
+                                <LogOut size={18} />
                                 <span>Sign out</span>
                             </button>
                         </div>

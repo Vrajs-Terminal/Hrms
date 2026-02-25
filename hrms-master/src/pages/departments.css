@@ -164,6 +164,31 @@
     border-radius: 50%;
 }
 
+.btn-secondary.active-reorder {
+    background: #eff6ff !important;
+    border-color: #3b82f6 !important;
+    color: #2563eb !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.sort-actions-hz {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.sort-actions-hz button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.sort-actions-hz button:hover:not(:disabled) {
+    background: #e2e8f0;
+}
+
 @media (max-width: 1024px) {
     .dept-layout {
         grid-template-columns: 1fr;

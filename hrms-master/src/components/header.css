@@ -185,6 +185,7 @@
     transform: translateY(-2px);
     background: #1e293b;
 }
+
 /* Logout Button */
 .logout-btn {
     display: flex;
@@ -205,7 +206,8 @@
 }
 
 /* Dropdown Shared Styles */
-.notifications-wrapper, .user-profile-wrapper {
+.notifications-wrapper,
+.user-profile-wrapper {
     position: relative;
 }
 
@@ -227,6 +229,7 @@
         opacity: 0;
         transform: translateY(-8px) scale(0.95);
     }
+
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -243,7 +246,7 @@
 
 .dropdown-header h4 {
     margin: 0;
-    font-size: 14px;
+    font-size: 16px;
     color: #0f172a;
 }
 
@@ -265,8 +268,8 @@
 .dropdown-item {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 10px 12px;
+    gap: 14px;
+    padding: 12px 16px;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s;
@@ -274,7 +277,7 @@
     border: none;
     width: 100%;
     color: #475569;
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 500;
 }
 
@@ -299,7 +302,7 @@
     background: transparent;
     border: none;
     color: #3b82f6;
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 500;
     cursor: pointer;
     text-align: center;
@@ -332,12 +335,19 @@
     flex-shrink: 0;
 }
 
-.notif-icon.bg-blue { background: #e0f2fe; color: #0284c7; }
-.notif-icon.bg-green { background: #dcfce3; color: #16a34a; }
+.notif-icon.bg-blue {
+    background: #e0f2fe;
+    color: #0284c7;
+}
+
+.notif-icon.bg-green {
+    background: #dcfce3;
+    color: #16a34a;
+}
 
 .notif-text p {
     margin: 0 0 4px 0;
-    font-size: 13px;
+    font-size: 15px;
     color: #0f172a;
     line-height: 1.4;
 }
@@ -362,13 +372,13 @@
     margin: 0;
     font-weight: 600;
     color: #0f172a;
-    font-size: 14px;
+    font-size: 16px;
 }
 
 .ph-email {
     margin: 0;
     color: #64748b;
-    font-size: 12px;
+    font-size: 14px;
 }
 
 .logout-action {

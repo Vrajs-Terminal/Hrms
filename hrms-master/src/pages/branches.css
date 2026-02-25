@@ -162,6 +162,13 @@
     opacity: 1;
 }
 
+.btn-secondary.active-reorder {
+    background: #eff6ff !important;
+    border-color: #3b82f6 !important;
+    color: #2563eb !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
 @media (max-width: 1024px) {
     .branches-layout {
         grid-template-columns: 1fr;

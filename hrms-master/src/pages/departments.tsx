@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import {
-    Plus, GripVertical, Building2, Layers
+    Plus, GripVertical, Building2, Layers, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import './departments.css';
 
@@ -47,6 +47,20 @@ export default function Departments() {
 
     // Toggle Reorder Mode
     const [isReordering, setIsReordering] = useState(false);
+
+    const moveDept = (branchId: number, deptIndex: number, direction: 'left' | 'right') => {
+        setBranchGroups(prevGroups => prevGroups.map(group => {
+            if (group.branchId !== branchId) return group;
+
+            const newDepts = [...group.departments];
+            if (direction === 'left' && deptIndex > 0) {
+                [newDepts[deptIndex - 1], newDepts[deptIndex]] = [newDepts[deptIndex], newDepts[deptIndex - 1]];
+            } else if (direction === 'right' && deptIndex < newDepts.length - 1) {
+                [newDepts[deptIndex + 1], newDepts[deptIndex]] = [newDepts[deptIndex], newDepts[deptIndex + 1]];
+            }
+            return { ...group, departments: newDepts };
+        }));
+    };
 
     const handleDeptCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const count = parseInt(e.target.value) || 1;
@@ -104,13 +118,9 @@ export default function Departments() {
                     <p>Organize internal departments linked to specific branches</p>
                 </div>
                 <div className="actions-row">
-                    <button className={`btn - secondary ${isReordering ? 'active-reorder' : ''} `} onClick={() => setIsReordering(!isReordering)}>
+                    <button className={`btn-secondary ${isReordering ? 'active-reorder' : ''}`} onClick={() => setIsReordering(!isReordering)}>
                         <GripVertical size={16} />
                         {isReordering ? 'Done Reordering' : 'Change Order'}
-                    </button>
-                    <button className="btn-save" onClick={() => document.getElementById('dept-form')?.scrollIntoView({ behavior: 'smooth' })}>
-                        <Plus size={18} />
-                        Add Department
                     </button>
                 </div>
             </div>
@@ -126,13 +136,30 @@ export default function Departments() {
                             </div>
 
                             <div className="dept-grid">
-                                {group.departments.map((dept) => (
+                                {group.departments.map((dept, deptIndex) => (
                                     <div className="dept-item-box" key={dept.id}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                             <Layers size={16} color="#94a3b8" />
                                             <span>{dept.name}</span>
                                         </div>
-                                        {isReordering && <GripVertical size={16} color="#cbd5e1" style={{ cursor: 'grab' }} />}
+                                        {isReordering && (
+                                            <div className="sort-actions-hz">
+                                                <button
+                                                    style={{ border: 'none', background: 'transparent', cursor: deptIndex === 0 ? 'not-allowed' : 'pointer', padding: '4px' }}
+                                                    onClick={() => moveDept(group.branchId, deptIndex, 'left')}
+                                                    disabled={deptIndex === 0}
+                                                >
+                                                    <ChevronLeft size={16} color={deptIndex === 0 ? '#cbd5e1' : '#64748b'} />
+                                                </button>
+                                                <button
+                                                    style={{ border: 'none', background: 'transparent', cursor: deptIndex === group.departments.length - 1 ? 'not-allowed' : 'pointer', padding: '4px' }}
+                                                    onClick={() => moveDept(group.branchId, deptIndex, 'right')}
+                                                    disabled={deptIndex === group.departments.length - 1}
+                                                >
+                                                    <ChevronRight size={16} color={deptIndex === group.departments.length - 1 ? '#cbd5e1' : '#64748b'} />
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
                                 ))}
                                 {group.departments.length === 0 && (

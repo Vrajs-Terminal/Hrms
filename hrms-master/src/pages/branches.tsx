@@ -59,10 +59,6 @@ export default function Branches() {
                         <GripVertical size={16} />
                         {isReordering ? 'Done Reordering' : 'Change Order'}
                     </button>
-                    <button className="btn-save" onClick={() => document.getElementById('branch-form')?.scrollIntoView({ behavior: 'smooth' })}>
-                        <Plus size={18} />
-                        Add Branch
-                    </button>
                 </div>
             </div>
 
