@@ -18,7 +18,11 @@ function App() {
   };
 
   if (!isAuthenticated) {
-    return <Login />;
+    return (
+      <Router>
+        <Login />
+      </Router>
+    );
   }
 
   return (

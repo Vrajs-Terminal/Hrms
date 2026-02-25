@@ -12,7 +12,8 @@ function Header({ toggleSidebar, isSidebarOpen }: HeaderProps) {
     const [placeholderText, setPlaceholderText] = useState("Search services...");
     const [showProfileMenu, setShowProfileMenu] = useState(false);
     const [showNotifications, setShowNotifications] = useState(false);
-    const { username, logout } = useAuthStore();
+    const user = useAuthStore(state => state.user);
+    const logout = useAuthStore(state => state.logout);
 
     const profileRef = useRef<HTMLDivElement>(null);
     const notifRef = useRef<HTMLDivElement>(null);
@@ -124,7 +125,7 @@ function Header({ toggleSidebar, isSidebarOpen }: HeaderProps) {
                         setShowNotifications(false);
                     }}
                 >
-                    <span className="header-user-name">{username || "User Name"}</span>
+                    <span className="header-user-name">{user?.name || "User Name"}</span>
                     <div className="user-avatar-header premium-navy">
                         <User size={20} />
                     </div>
@@ -133,8 +134,8 @@ function Header({ toggleSidebar, isSidebarOpen }: HeaderProps) {
                 {showProfileMenu && (
                     <div className="dropdown-menu profile-dropdown">
                         <div className="dropdown-header profile-header-info">
-                            <p className="ph-name">{username || "User Name"}</p>
-                            <p className="ph-email">admin@minehr.com</p>
+                            <p className="ph-name">{user?.name || "User Name"}</p>
+                            <p className="ph-email">{user?.email || "employee@minehr.com"}</p>
                         </div>
                         <div className="dropdown-content">
                             <button className="dropdown-item">

@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
-    Plus, GripVertical, Building2, Layers, ChevronLeft, ChevronRight
+    Plus, GripVertical, Building2, Layers, ChevronLeft, ChevronRight, Trash2
 } from 'lucide-react';
+import api from '../lib/axios';
 import './departments.css';
 
 interface Department {
@@ -18,30 +19,38 @@ interface BranchGroup {
 
 export default function Departments() {
     // Initial State: Departments linked within Branches
-    const [branchGroups, setBranchGroups] = useState<BranchGroup[]>([
-        {
-            branchId: 1,
-            branchName: 'Delhi Head Office',
-            branchCode: 'DEL-HQ-01',
-            departments: [
-                { id: 101, name: 'Human Resources' },
-                { id: 102, name: 'Engineering' },
-                { id: 103, name: 'Sales' }
-            ]
-        },
-        {
-            branchId: 2,
-            branchName: 'Mumbai Branch',
-            branchCode: 'MUM-02',
-            departments: [
-                { id: 201, name: 'Marketing' },
-                { id: 202, name: 'Operations' }
-            ]
+    const [branchGroups, setBranchGroups] = useState<BranchGroup[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const fetchDepartments = async () => {
+        try {
+            // The branches endpoint already includes the departments array
+            const res = await api.get('/branches');
+            const mappedGroups = res.data.map((b: any) => ({
+                branchId: b.id,
+                branchName: b.name,
+                branchCode: b.code,
+                departments: b.departments
+            }));
+            setBranchGroups(mappedGroups);
+
+            // Set default dropdown selection if possible
+            if (mappedGroups.length > 0 && selectedBranchId === 0) {
+                setSelectedBranchId(mappedGroups[0].branchId);
+            }
+        } catch (error) {
+            console.error('Failed to fetch departments', error);
+        } finally {
+            setIsLoading(false);
         }
-    ]);
+    };
+
+    useEffect(() => {
+        fetchDepartments();
+    }, []);
 
     // Form State
-    const [selectedBranchId, setSelectedBranchId] = useState<number>(branchGroups[0]?.branchId || 0);
+    const [selectedBranchId, setSelectedBranchId] = useState<number>(0);
     const [deptCount, setDeptCount] = useState<number>(1);
     const [newDepartments, setNewDepartments] = useState<string[]>(['']);
 
@@ -81,7 +90,7 @@ export default function Departments() {
         setNewDepartments(updated);
     };
 
-    const handleAddDepartments = (e: React.FormEvent) => {
+    const handleAddDepartments = async (e: React.FormEvent) => {
         e.preventDefault();
 
         // Filter out empty names
@@ -91,24 +100,37 @@ export default function Departments() {
             return;
         }
 
-        const updatedGroups = branchGroups.map(group => {
-            if (group.branchId === selectedBranchId) {
-                const newObjs = validNames.map((name, i) => ({
-                    id: Date.now() + i, // Generate unique IDs
-                    name: name.trim()
-                }));
-                return { ...group, departments: [...group.departments, ...newObjs] };
-            }
-            return group;
-        });
+        try {
+            // Execute multiple POST requests in parallel
+            await Promise.all(validNames.map(name =>
+                api.post('/departments', { name, branch_id: selectedBranchId })
+            ));
 
-        setBranchGroups(updatedGroups);
+            // Refresh the groups to ensure DB parity
+            await fetchDepartments();
 
-        // Reset form
-        setDeptCount(1);
-        setNewDepartments(['']);
-        alert("Departments Added Successfully");
+            // Reset form
+            setDeptCount(1);
+            setNewDepartments(['']);
+            alert("Departments Added Successfully");
+        } catch (error: any) {
+            alert(error.response?.data?.error || "Failed to add departments");
+        }
     };
+
+    const handleDeleteDept = async (id: number) => {
+        if (!window.confirm("Are you sure you want to delete this department?")) return;
+        try {
+            await api.delete(`/departments/${id}`);
+            fetchDepartments(); // refresh list
+        } catch (error: any) {
+            alert(error.response?.data?.error || "Failed to delete department");
+        }
+    };
+
+    if (isLoading) {
+        return <div className="dept-container setup-container" style={{ padding: '2rem' }}>Loading departments...</div>;
+    }
 
     return (
         <div className="dept-container setup-container">
@@ -142,7 +164,7 @@ export default function Departments() {
                                             <Layers size={16} color="#94a3b8" />
                                             <span>{dept.name}</span>
                                         </div>
-                                        {isReordering && (
+                                        {isReordering ? (
                                             <div className="sort-actions-hz">
                                                 <button
                                                     style={{ border: 'none', background: 'transparent', cursor: deptIndex === 0 ? 'not-allowed' : 'pointer', padding: '4px' }}
@@ -159,6 +181,14 @@ export default function Departments() {
                                                     <ChevronRight size={16} color={deptIndex === group.departments.length - 1 ? '#cbd5e1' : '#64748b'} />
                                                 </button>
                                             </div>
+                                        ) : (
+                                            <button
+                                                onClick={() => handleDeleteDept(dept.id)}
+                                                style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: '#ef4444', padding: '4px' }}
+                                                title="Delete Department"
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
                                         )}
                                     </div>
                                 ))}

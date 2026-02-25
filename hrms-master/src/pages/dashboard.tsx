@@ -14,8 +14,10 @@ import {
     UserCheck, Clock, UserX, CalendarOff, FileQuestion, MapPinOff, LogOut,
     Receipt, Shuffle, Landmark, Smartphone, Home, History, ScanFace, UserCog,
     PlusCircle, Hourglass, FileText, Users, Briefcase, IndianRupee, ArrowUpRight,
-    ArrowDownRight, CheckCircle2, UserPlus, Plus, FileBarChart
+    CheckCircle2, Plus, FileBarChart, Building, Layers
 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import api from '../lib/axios';
 
 const hiringData = [
     { name: 'Jan', new: 80, exit: -25 },
@@ -46,6 +48,20 @@ const recentEmployees = [
 ];
 
 function Dashboard() {
+    const [stats, setStats] = useState<any>(null);
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const res = await api.get('/dashboard/stats');
+                setStats(res.data);
+            } catch (error) {
+                console.error("Failed to fetch dashboard stats", error);
+            }
+        };
+        fetchStats();
+    }, []);
+
     return (
         <div className="dashboard-container">
             {/* Main Content Area */}
@@ -63,49 +79,49 @@ function Dashboard() {
                     <div className="new-stat-card">
                         <div className="ns-header">
                             <div className="ns-icon ns-blue"><Users size={16} /></div>
-                            <div className="ns-change positive"><ArrowUpRight size={12} strokeWidth={3} /> 4.2%</div>
+                            <div className="ns-change positive"><ArrowUpRight size={12} strokeWidth={3} /> Active</div>
                         </div>
                         <div className="ns-body">
-                            <div className="ns-value">248</div>
+                            <div className="ns-value">{stats?.overview?.totalEmployees || 0}</div>
                             <div className="ns-title">Total Employees</div>
                         </div>
-                        <div className="ns-progress"><div className="ns-progress-fill bg-blue" style={{ width: '70%' }}></div></div>
+                        <div className="ns-progress"><div className="ns-progress-fill bg-blue" style={{ width: '100%' }}></div></div>
                     </div>
 
                     <div className="new-stat-card">
                         <div className="ns-header">
                             <div className="ns-icon ns-green"><UserCheck size={16} /></div>
-                            <div className="ns-change positive"><ArrowUpRight size={12} strokeWidth={3} /> 2.1%</div>
+                            <div className="ns-change positive"><ArrowUpRight size={12} strokeWidth={3} /> Today</div>
                         </div>
                         <div className="ns-body">
-                            <div className="ns-value">214</div>
+                            <div className="ns-value">{stats?.overview?.presentToday || 0}</div>
                             <div className="ns-title">Present Today</div>
                         </div>
-                        <div className="ns-progress"><div className="ns-progress-fill bg-green" style={{ width: '85%' }}></div></div>
+                        <div className="ns-progress"><div className="ns-progress-fill bg-green" style={{ width: '100%' }}></div></div>
                     </div>
 
                     <div className="new-stat-card">
                         <div className="ns-header">
-                            <div className="ns-icon ns-orange"><Briefcase size={16} /></div>
-                            <div className="ns-change positive"><ArrowUpRight size={12} strokeWidth={3} /> 6.5%</div>
+                            <div className="ns-icon ns-orange"><Building size={16} /></div>
+                            <div className="ns-change positive"><ArrowUpRight size={12} strokeWidth={3} /> Active</div>
                         </div>
                         <div className="ns-body">
-                            <div className="ns-value">38</div>
-                            <div className="ns-title">Open Positions</div>
+                            <div className="ns-value">{stats?.counts?.branches || 0}</div>
+                            <div className="ns-title">Total Branches</div>
                         </div>
-                        <div className="ns-progress"><div className="ns-progress-fill bg-orange" style={{ width: '60%' }}></div></div>
+                        <div className="ns-progress"><div className="ns-progress-fill bg-orange" style={{ width: '100%' }}></div></div>
                     </div>
 
                     <div className="new-stat-card">
                         <div className="ns-header">
-                            <div className="ns-icon ns-red"><IndianRupee size={16} /></div>
-                            <div className="ns-change negative"><ArrowDownRight size={12} strokeWidth={3} /> 1.3%</div>
+                            <div className="ns-icon ns-red"><Layers size={16} /></div>
+                            <div className="ns-change positive"><ArrowUpRight size={12} strokeWidth={3} /> Active</div>
                         </div>
                         <div className="ns-body">
-                            <div className="ns-value">₹24.6L</div>
-                            <div className="ns-title">Monthly Payroll</div>
+                            <div className="ns-value">{stats?.counts?.departments || 0}</div>
+                            <div className="ns-title">Total Departments</div>
                         </div>
-                        <div className="ns-progress"><div className="ns-progress-fill bg-red" style={{ width: '75%' }}></div></div>
+                        <div className="ns-progress"><div className="ns-progress-fill bg-red" style={{ width: '100%' }}></div></div>
                     </div>
                 </div>
 
@@ -265,34 +281,18 @@ function Dashboard() {
                             <h3>Recent Activity</h3>
                         </div>
                         <div className="ra-list">
-                            <div className="ra-item">
-                                <div className="ra-icon bg-light-blue"><UserCheck size={14} color="#3b82f6" /></div>
-                                <div className="ra-info">
-                                    <p><strong>Rohit Sharma</strong> submitted leave</p>
-                                    <span>10 min ago</span>
+                            {stats?.recentActivities?.map((activity: any) => (
+                                <div className="ra-item" key={activity.id}>
+                                    <div className="ra-icon bg-light-blue"><CheckCircle2 size={14} color="#3b82f6" /></div>
+                                    <div className="ra-info">
+                                        <p><strong>{activity.action}</strong></p>
+                                        <span>{activity.time}</span>
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="ra-item">
-                                <div className="ra-icon bg-light-green"><CheckCircle2 size={14} color="#10b981" /></div>
-                                <div className="ra-info">
-                                    <p><strong>Payroll Feb 2026</strong> approved</p>
-                                    <span>1 hr ago</span>
-                                </div>
-                            </div>
-                            <div className="ra-item">
-                                <div className="ra-icon bg-light-orange"><Briefcase size={14} color="#f59e0b" /></div>
-                                <div className="ra-info">
-                                    <p>New job: <strong>React Developer</strong></p>
-                                    <span>3 hr ago</span>
-                                </div>
-                            </div>
-                            <div className="ra-item">
-                                <div className="ra-icon bg-light-slate"><UserPlus size={14} color="#64748b" /></div>
-                                <div className="ra-info">
-                                    <p><strong>Sneha Gupta</strong> joined today</p>
-                                    <span>9:00 AM</span>
-                                </div>
-                            </div>
+                            ))}
+                            {(!stats?.recentActivities || stats.recentActivities.length === 0) && (
+                                <p style={{ color: '#94a3b8', fontSize: '13px' }}>No recent activity.</p>
+                            )}
                         </div>
                     </div>
 

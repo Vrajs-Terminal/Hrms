@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
-    Plus, Map, ArrowUp, ArrowDown, GripVertical
+    Plus, Map, ArrowUp, ArrowDown, GripVertical, Trash2
 } from 'lucide-react';
+import api from '../lib/axios';
 import './branches.css';
 
 interface Branch {
@@ -12,11 +13,23 @@ interface Branch {
 }
 
 export default function Branches() {
-    const [branches, setBranches] = useState<Branch[]>([
-        { id: 1, name: 'Delhi Head Office', code: 'DEL-HQ-01', type: 'Metro' },
-        { id: 2, name: 'Mumbai Branch', code: 'MUM-02', type: 'Metro' },
-        { id: 3, name: 'Pune Development Center', code: 'PUNE-03', type: 'Non-Metro' }
-    ]);
+    const [branches, setBranches] = useState<Branch[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const fetchBranches = async () => {
+        try {
+            const res = await api.get('/branches');
+            setBranches(res.data);
+        } catch (error) {
+            console.error('Failed to fetch branches', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchBranches();
+    }, []);
 
     const [newBranch, setNewBranch] = useState({
         name: '',
@@ -26,12 +39,26 @@ export default function Branches() {
 
     const [isReordering, setIsReordering] = useState(false);
 
-    const handleAddBranch = (e: React.FormEvent) => {
+    const handleAddBranch = async (e: React.FormEvent) => {
         e.preventDefault();
         if (newBranch.name && newBranch.code) {
-            setBranches([...branches, { id: Date.now(), ...newBranch }]);
-            setNewBranch({ name: '', code: '', type: 'Metro' });
-            alert("Branch Added Successfully");
+            try {
+                const res = await api.post('/branches', newBranch);
+                setBranches([...branches, res.data]);
+                setNewBranch({ name: '', code: '', type: 'Metro' });
+            } catch (error: any) {
+                alert(error.response?.data?.error || 'Failed to add branch');
+            }
+        }
+    };
+
+    const handleDelete = async (id: number) => {
+        if (!window.confirm("Are you sure you want to delete this branch?")) return;
+        try {
+            await api.delete(`/branches/${id}`);
+            setBranches(branches.filter(b => b.id !== id));
+        } catch (error: any) {
+            alert(error.response?.data?.error || 'Failed to delete branch');
         }
     };
 
@@ -46,6 +73,10 @@ export default function Branches() {
             setBranches(newBranches);
         }
     };
+
+    if (isLoading) {
+        return <div className="branches-container setup-container" style={{ padding: '2rem' }}>Loading branches...</div>;
+    }
 
     return (
         <div className="branches-container setup-container">
@@ -83,7 +114,7 @@ export default function Branches() {
                                         {branch.type}
                                     </span>
 
-                                    {isReordering && (
+                                    {isReordering ? (
                                         <div className="sort-actions">
                                             <button
                                                 style={{ border: 'none', background: 'transparent', cursor: index === 0 ? 'not-allowed' : 'pointer' }}
@@ -100,6 +131,14 @@ export default function Branches() {
                                                 <ArrowDown size={14} color={index === branches.length - 1 ? '#cbd5e1' : '#64748b'} />
                                             </button>
                                         </div>
+                                    ) : (
+                                        <button
+                                            onClick={() => handleDelete(branch.id)}
+                                            style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: '#ef4444', padding: '4px' }}
+                                            title="Delete Branch"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
                                     )}
                                 </div>
                             </div>

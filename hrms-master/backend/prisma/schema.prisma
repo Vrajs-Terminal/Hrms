@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int      @id @default(autoincrement())
+  name          String
+  email         String   @unique
+  password_hash String
+  role          String   @default("Admin")
+  branch_id     Int?
+  department_id Int?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relations
+  branch        Branch?     @relation(fields: [branch_id], references: [id])
+  department    Department? @relation(fields: [department_id], references: [id])
+}
+
+model Company {
+  id        Int      @id @default(autoincrement())
+  name      String
+  website   String?
+  logo_url  String?
+  tax_info  String?
+}
+
+model Branch {
+  id          Int          @id @default(autoincrement())
+  name        String
+  code        String       @unique
+  type        String       @default("Metro")
+  order_index Int          @default(0)
+  departments Department[]
+  users       User[]
+}
+
+model Department {
+  id          Int      @id @default(autoincrement())
+  name        String
+  branch_id   Int
+  order_index Int      @default(0)
+  branch      Branch   @relation(fields: [branch_id], references: [id])
+  users       User[]
+}

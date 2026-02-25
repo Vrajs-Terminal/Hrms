@@ -1,31 +1,67 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     Save, Building, Phone,
     Briefcase, Globe,
     Image as ImageIcon, Monitor
 } from 'lucide-react';
+import api from '../lib/axios';
 import './company-setup.css';
 
 export default function CompanySetup() {
     const [formData, setFormData] = useState({
-        companyName: 'MineHR-Solutions Pvt. Ltd.',
-        websiteUrl: 'https://minehr.com',
+        companyName: '',
+        websiteUrl: '',
         timeZone: 'Asia/Kolkata',
-        address: '123 Business Park, Sector 62',
-        email: 'admin@minehr.com',
-        contact: '+91 9876543210',
-        hrEmail: 'hr@minehr.com',
-        pincode: '201309',
-        gst: '07AAAAA1234A1Z5',
-        pan: 'AAAAA1234A',
-        tan: 'AAAA12345A',
+        address: '',
+        email: '',
+        contact: '',
+        hrEmail: '',
+        pincode: '',
+        gst: '',
+        pan: '',
+        tan: '',
         currency: 'INR (₹)',
         instagram: '',
         facebook: '',
-        linkedin: 'https://linkedin.com/company/minehr',
+        linkedin: '',
         youtube: '',
-        location: 'Delhi NCR'
+        location: ''
     });
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchCompany = async () => {
+            try {
+                const res = await api.get('/company');
+                if (res.data) {
+                    setFormData({
+                        companyName: res.data.name || '',
+                        websiteUrl: res.data.website || '',
+                        timeZone: 'Asia/Kolkata', // Hardcoded as extra fields aren't in schema yet
+                        address: '',
+                        email: '',
+                        contact: '',
+                        hrEmail: '',
+                        pincode: '',
+                        gst: '',
+                        pan: '',
+                        tan: '',
+                        currency: 'INR (₹)',
+                        instagram: '',
+                        facebook: '',
+                        linkedin: '',
+                        youtube: '',
+                        location: ''
+                    });
+                }
+            } catch (error) {
+                console.error("Failed to load company", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchCompany();
+    }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setFormData({
@@ -34,10 +70,23 @@ export default function CompanySetup() {
         });
     };
 
-    const handleSave = (e: React.FormEvent) => {
+    const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
-        alert('Company setup saved successfully!');
+        try {
+            await api.put('/company', {
+                name: formData.companyName,
+                website: formData.websiteUrl,
+                tax_info: formData.gst
+            });
+            alert('Company setup saved successfully!');
+        } catch (error: any) {
+            alert(error.response?.data?.error || 'Failed to save company settings');
+        }
     };
+
+    if (isLoading) {
+        return <div style={{ padding: '2rem' }}>Loading company settings...</div>;
+    }
 
     return (
         <div className="setup-container">
