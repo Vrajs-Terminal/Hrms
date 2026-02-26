@@ -8,6 +8,9 @@ import companyRoutes from './routes/company';
 import branchesRoutes from './routes/branches';
 import departmentRoutes from './routes/departments';
 import dashboardRoutes from './routes/dashboard';
+import zonesRoutes from './routes/zones';
+import subDepartmentRoutes from './routes/sub-departments';
+import designationRoutes from './routes/designations';
 
 dotenv.config();
 
@@ -25,6 +28,9 @@ app.use('/api/company', companyRoutes);
 app.use('/api/branches', branchesRoutes);
 app.use('/api/departments', departmentRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/zones', zonesRoutes);
+app.use('/api/sub-departments', subDepartmentRoutes);
+app.use('/api/designations', designationRoutes);
 
 // Basic test route
 app.get('/api/health', (req, res) => {

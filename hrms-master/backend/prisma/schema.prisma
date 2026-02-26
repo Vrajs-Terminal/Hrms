@@ -31,12 +31,21 @@ model Company {
   tax_info  String?
 }
 
+model Zone {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  order_index Int      @default(0)
+  branches    Branch[]
+}
+
 model Branch {
   id          Int          @id @default(autoincrement())
   name        String
   code        String       @unique
   type        String       @default("Metro")
   order_index Int          @default(0)
+  zone_id     Int?
+  zone        Zone?        @relation(fields: [zone_id], references: [id], onDelete: SetNull)
   departments Department[]
   users       User[]
 }
@@ -45,7 +54,29 @@ model Department {
   id          Int      @id @default(autoincrement())
   name        String
   branch_id   Int
-  order_index Int      @default(0)
-  branch      Branch   @relation(fields: [branch_id], references: [id])
-  users       User[]
+  order_index    Int             @default(0)
+  branch         Branch          @relation(fields: [branch_id], references: [id], onDelete: Cascade)
+  users          User[]
+  subDepartments SubDepartment[]
+}
+
+model SubDepartment {
+  id            Int           @id @default(autoincrement())
+  name          String
+  department_id Int
+  order_index   Int           @default(0)
+  department    Department    @relation(fields: [department_id], references: [id], onDelete: Cascade)
+  designations  Designation[]
+
+  @@unique([name, department_id]) // Prevent duplicate sub-departments within the same department
+}
+
+model Designation {
+  id                Int           @id @default(autoincrement())
+  name              String
+  sub_department_id Int
+  order_index       Int           @default(0)
+  subDepartment     SubDepartment @relation(fields: [sub_department_id], references: [id], onDelete: Cascade)
+
+  @@unique([name, sub_department_id]) // Prevent duplicate designations within the same sub-department
 }

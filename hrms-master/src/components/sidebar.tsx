@@ -29,9 +29,7 @@ interface SidebarProps {
 function Sidebar({ isOpen }: SidebarProps) {
     const companyName = "MineHR-Solutions Pvt. Ltd.";
     const location = useLocation();
-    const [openMenus, setOpenMenus] = useState<{ [key: string]: boolean }>({
-        "Company Settings": true
-    });
+    const [openMenus, setOpenMenus] = useState<{ [key: string]: boolean }>({});
 
     const toggleMenu = (menuName: string) => {
         setOpenMenus(prev => ({
@@ -47,8 +45,11 @@ function Sidebar({ isOpen }: SidebarProps) {
             icon: Settings,
             subItems: [
                 { name: "Company Setup", path: "/company-setup" },
+                { name: "Zones", path: "/zones" },
                 { name: "Branches", path: "/branches" },
-                { name: "Department", path: "/departments" },
+                { name: "Departments", path: "/departments" },
+                { name: "Sub-Departments", path: "/sub-departments" },
+                { name: "Designations", path: "/designations" },
             ]
         },
         { name: "Core HRMS", path: "/core-hrms", icon: Users },

@@ -7,6 +7,9 @@ import Login from "./pages/login";
 import CompanySetup from "./pages/company-setup";
 import Branches from "./pages/branches";
 import Departments from "./pages/departments";
+import Zones from "./pages/zones";
+import SubDepartments from "./pages/sub-departments";
+import Designations from "./pages/designations";
 import { useAuthStore } from "./store/useAuthStore";
 
 function App() {
@@ -35,8 +38,11 @@ function App() {
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/company-setup" element={<CompanySetup />} />
+              <Route path="/zones" element={<Zones />} />
               <Route path="/branches" element={<Branches />} />
               <Route path="/departments" element={<Departments />} />
+              <Route path="/sub-departments" element={<SubDepartments />} />
+              <Route path="/designations" element={<Designations />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </div>
