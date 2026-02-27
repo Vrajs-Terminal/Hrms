@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import prisma from '../lib/prismaClient';
+import { logActivity } from '../services/activityLogger';
 
 const router = Router();
 
@@ -35,6 +36,7 @@ router.post('/bulk', async (req, res) => {
         }));
 
         await prisma.zone.createMany({ data: dataToInsert, skipDuplicates: true });
+        names.forEach((n: string) => logActivity(null, 'CREATED', 'ZONE', n.trim()));
 
         // Return fresh list
         const freshZones = await prisma.zone.findMany({ orderBy: { order_index: 'asc' } });
@@ -58,6 +60,7 @@ router.put('/:id', async (req, res) => {
             data: { name: name.trim() }
         });
         res.json(updated);
+        logActivity(null, 'UPDATED', 'ZONE', updated.name);
     } catch (error) {
         res.status(500).json({ error: 'Failed to update zone' });
     }
@@ -105,6 +108,7 @@ router.delete('/:id', async (req, res) => {
         }
 
         await prisma.zone.delete({ where: { id: parseInt(id) } });
+        logActivity(null, 'DELETED', 'ZONE', zone.name);
         res.json({ message: 'Zone deleted successfully' });
     } catch (error) {
         res.status(500).json({ error: 'Failed to delete zone' });

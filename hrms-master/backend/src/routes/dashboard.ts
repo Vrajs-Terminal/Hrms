@@ -16,9 +16,11 @@ router.get('/stats', async (req, res) => {
             return res.json(cachedStats);
         }
 
-        const totalEmployees = await prisma.user.count();
-        const totalBranches = await prisma.branch.count();
-        const totalDepartments = await prisma.department.count();
+        const [totalEmployees, totalBranches, totalDepartments] = await Promise.all([
+            prisma.user.count(),
+            prisma.branch.count(),
+            prisma.department.count()
+        ]);
 
         // In the future, newHires, onLeave, and presentToday will be calculated
         // from the Payroll/Attendance tables.

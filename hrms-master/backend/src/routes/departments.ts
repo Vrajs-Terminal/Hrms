@@ -1,13 +1,38 @@
 import { Router } from 'express';
 import prisma from '../lib/prismaClient';
+import { authenticateToken } from '../middleware/authMiddleware';
+import { logActivity } from '../services/activityLogger';
 
 const router = Router();
 
 
 // Get all departments
-router.get('/', async (req, res) => {
+router.get('/', authenticateToken, async (req, res) => {
     try {
+        const user = (req as any).user;
+        let whereClause: any = {};
+
+        if (user && user.role === 'Admin') {
+            const conditions = [];
+
+            // If they are locked to specific branches, they can only see departments inside those branches
+            if (user.restrictedBranchIds && user.restrictedBranchIds.length > 0) {
+                conditions.push({ branch_id: { in: user.restrictedBranchIds } });
+            }
+
+            // If they are locked to specific departments, apply that additional filter
+            if (user.restrictedDepartmentIds && user.restrictedDepartmentIds.length > 0) {
+                conditions.push({ id: { in: user.restrictedDepartmentIds } });
+            }
+
+            if (conditions.length > 0) {
+                // If both are present, typically it's an AND condition, or whichever is stricter
+                whereClause.AND = conditions;
+            }
+        }
+
         const departments = await prisma.department.findMany({
+            where: whereClause,
             orderBy: { order_index: 'asc' },
             include: { branch: true }
         });
@@ -46,6 +71,7 @@ router.post('/', async (req, res) => {
             }
         });
         res.status(201).json(department);
+        logActivity(null, 'CREATED', 'DEPARTMENT', department.name, { branch_id: department.branch_id });
     } catch (error) {
         res.status(500).json({ error: 'Failed to create department' });
     }
@@ -56,6 +82,7 @@ router.delete('/:id', async (req, res) => {
     const { id } = req.params;
     try {
         await prisma.department.delete({ where: { id: parseInt(id) } });
+        logActivity(null, 'DELETED', 'DEPARTMENT', `Department #${id}`);
         res.json({ message: 'Department deleted successfully' });
     } catch (error) {
         res.status(500).json({ error: 'Failed to delete department' });

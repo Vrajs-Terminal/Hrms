@@ -2,6 +2,7 @@ import { Router } from 'express';
 import prisma from '../lib/prismaClient';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { logActivity } from '../services/activityLogger';
 
 const router = Router();
 
@@ -71,8 +72,72 @@ router.post('/setup-admin', async (req, res) => {
         });
 
         res.status(201).json({ message: 'Admin created successfully', admin: { id: admin.id, name: admin.name } });
+        logActivity(admin.id, 'CREATED', 'USER', admin.name, { role: 'Admin', email });
     } catch (error: any) {
         res.status(500).json({ error: 'Failed to create admin', details: error.message });
+    }
+});
+
+// Create a new user from the Admin dashboard
+router.post('/add-user', async (req, res) => {
+    const { name, email, password, role = 'Admin' } = req.body;
+
+    if (!name || !email || !password) {
+        return res.status(400).json({ error: 'Name, email, and password are required' });
+    }
+
+    try {
+        const existingUser = await prisma.user.findUnique({ where: { email } });
+        if (existingUser) {
+            return res.status(400).json({ error: 'An account with this email already exists.' });
+        }
+
+        const password_hash = await bcrypt.hash(password, 10);
+        const newUser = await prisma.user.create({
+            data: {
+                name,
+                email,
+                password_hash,
+                role
+            }
+        });
+
+        res.status(201).json({ message: 'User created successfully', user: { id: newUser.id, name: newUser.name } });
+        logActivity(null, 'CREATED', 'USER', newUser.name, { role, email });
+    } catch (error: any) {
+        res.status(500).json({ error: 'Failed to create user', details: error.message });
+    }
+});
+
+// Delete a user
+router.delete('/user/:id', async (req, res) => {
+    try {
+        await prisma.user.delete({
+            where: { id: parseInt(req.params.id) }
+        });
+        res.json({ message: 'User deleted successfully' });
+        logActivity(null, 'DELETED', 'USER', `User #${req.params.id}`);
+    } catch (error: any) {
+        res.status(500).json({ error: 'Failed to delete user', details: error.message });
+    }
+});
+
+// Admin forced password reset
+router.put('/user/:id/password', async (req, res) => {
+    const { password } = req.body;
+    if (!password) {
+        return res.status(400).json({ error: 'New password is required' });
+    }
+    try {
+        const password_hash = await bcrypt.hash(password, 10);
+        await prisma.user.update({
+            where: { id: parseInt(req.params.id) },
+            data: { password_hash }
+        });
+        res.json({ message: 'Password updated successfully' });
+        logActivity(null, 'UPDATED', 'USER', `User #${req.params.id}`, { action: 'Password Reset' });
+    } catch (error: any) {
+        res.status(500).json({ error: 'Failed to update password', details: error.message });
     }
 });
 

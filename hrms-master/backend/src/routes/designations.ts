@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import prisma from '../lib/prismaClient';
+import { logActivity } from '../services/activityLogger';
 
 const router = Router();
 
@@ -46,6 +47,7 @@ router.post('/bulk', async (req, res) => {
         });
 
         res.status(201).json({ message: 'Designations created successfully' });
+        names.forEach((n: string) => logActivity(null, 'CREATED', 'DESIGNATION', n.trim()));
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to create designations' });
@@ -65,6 +67,7 @@ router.put('/:id', async (req, res) => {
             data: { name: name.trim() }
         });
         res.json(updated);
+        logActivity(null, 'UPDATED', 'DESIGNATION', updated.name);
     } catch (error) {
         res.status(500).json({ error: 'Failed to update designation' });
     }
@@ -100,6 +103,7 @@ router.delete('/:id', async (req, res) => {
         // Safe to delete outright as Designations are the lowest tier
         // and have no child tables dependent on them yet.
         await prisma.designation.delete({ where: { id: parseInt(id) } });
+        logActivity(null, 'DELETED', 'DESIGNATION', `Designation #${id}`);
         res.json({ message: 'Designation deleted successfully' });
     } catch (error) {
         res.status(500).json({ error: 'Failed to delete designation' });

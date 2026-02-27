@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import prisma from '../lib/prismaClient';
+import { logActivity } from '../services/activityLogger';
 
 const router = Router();
 
@@ -44,6 +45,7 @@ router.put('/', async (req, res) => {
         }
 
         res.json(company);
+        logActivity(null, 'UPDATED', 'COMPANY', company.name, { website, tax_info });
     } catch (error) {
         res.status(500).json({ error: 'Failed to update company details' });
     }

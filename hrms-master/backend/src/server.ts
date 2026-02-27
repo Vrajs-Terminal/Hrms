@@ -1,18 +1,24 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
-import prisma from '../lib/prismaClient';
+import prisma from './lib/prismaClient';
 
 import authRoutes from './routes/auth';
 import companyRoutes from './routes/company';
+import companiesRoutes from './routes/companies';
+import employeeLevelsRoutes from './routes/employee-levels';
+import employeeGradesRoutes from './routes/employee-grades';
+import adminRightsRoutes from './routes/admin-rights';
 import branchesRoutes from './routes/branches';
 import departmentRoutes from './routes/departments';
 import dashboardRoutes from './routes/dashboard';
 import zonesRoutes from './routes/zones';
 import subDepartmentRoutes from './routes/sub-departments';
 import designationRoutes from './routes/designations';
+import notificationRoutes from './routes/notifications';
 
-dotenv.config();
 
 const app = express();
 
@@ -25,12 +31,17 @@ app.use(express.json()); // Allow us to receive JSON from React
 // Mount API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/company', companyRoutes);
+app.use('/api/companies', companiesRoutes);
+app.use('/api/employee-levels', employeeLevelsRoutes);
+app.use('/api/employee-grades', employeeGradesRoutes);
+app.use('/api/admin-rights', adminRightsRoutes);
 app.use('/api/branches', branchesRoutes);
 app.use('/api/departments', departmentRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/zones', zonesRoutes);
 app.use('/api/sub-departments', subDepartmentRoutes);
 app.use('/api/designations', designationRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Basic test route
 app.get('/api/health', (req, res) => {

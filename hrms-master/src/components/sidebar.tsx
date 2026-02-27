@@ -45,6 +45,10 @@ function Sidebar({ isOpen }: SidebarProps) {
             icon: Settings,
             subItems: [
                 { name: "Company Setup", path: "/company-setup" },
+                { name: "Roles & Privileges", path: "/admin-rights" },
+                { name: "Sister Companies", path: "/sister-companies" },
+                { name: "Employee Levels", path: "/employee-levels" },
+                { name: "Employee Grades", path: "/employee-grades" },
                 { name: "Zones", path: "/zones" },
                 { name: "Branches", path: "/branches" },
                 { name: "Departments", path: "/departments" },

@@ -76,7 +76,7 @@ function Dashboard() {
 
                 {/* Stats Grid */}
                 <div className="main-stats-grid">
-                    <div className="new-stat-card">
+                    <div className="new-stat-card animate-fade-up" style={{ animationDelay: '0.1s' }}>
                         <div className="ns-header">
                             <div className="ns-icon ns-blue"><Users size={16} /></div>
                             <div className="ns-change positive"><ArrowUpRight size={12} strokeWidth={3} /> Active</div>
@@ -88,7 +88,7 @@ function Dashboard() {
                         <div className="ns-progress"><div className="ns-progress-fill bg-blue" style={{ width: '100%' }}></div></div>
                     </div>
 
-                    <div className="new-stat-card">
+                    <div className="new-stat-card animate-fade-up" style={{ animationDelay: '0.2s' }}>
                         <div className="ns-header">
                             <div className="ns-icon ns-green"><UserCheck size={16} /></div>
                             <div className="ns-change positive"><ArrowUpRight size={12} strokeWidth={3} /> Today</div>
@@ -100,7 +100,7 @@ function Dashboard() {
                         <div className="ns-progress"><div className="ns-progress-fill bg-green" style={{ width: '100%' }}></div></div>
                     </div>
 
-                    <div className="new-stat-card">
+                    <div className="new-stat-card animate-fade-up" style={{ animationDelay: '0.3s' }}>
                         <div className="ns-header">
                             <div className="ns-icon ns-orange"><Building size={16} /></div>
                             <div className="ns-change positive"><ArrowUpRight size={12} strokeWidth={3} /> Active</div>
@@ -112,7 +112,7 @@ function Dashboard() {
                         <div className="ns-progress"><div className="ns-progress-fill bg-orange" style={{ width: '100%' }}></div></div>
                     </div>
 
-                    <div className="new-stat-card">
+                    <div className="new-stat-card animate-fade-up" style={{ animationDelay: '0.4s' }}>
                         <div className="ns-header">
                             <div className="ns-icon ns-red"><Layers size={16} /></div>
                             <div className="ns-change positive"><ArrowUpRight size={12} strokeWidth={3} /> Active</div>

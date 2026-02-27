@@ -1,13 +1,24 @@
 import { Router } from 'express';
 import prisma from '../lib/prismaClient';
+import { authenticateToken } from '../middleware/authMiddleware';
+import { logActivity } from '../services/activityLogger';
 
 const router = Router();
 
 
 // Get all branches
-router.get('/', async (req, res) => {
+router.get('/', authenticateToken, async (req, res) => {
     try {
+        const user = (req as any).user;
+        let whereClause = {};
+
+        // Apply branch data silo restrictions if not empty
+        if (user && user.role === 'Admin' && user.restrictedBranchIds && user.restrictedBranchIds.length > 0) {
+            whereClause = { id: { in: user.restrictedBranchIds } };
+        }
+
         const branches = await prisma.branch.findMany({
+            where: whereClause,
             orderBy: { order_index: 'asc' },
             include: { departments: true }
         });
@@ -46,6 +57,7 @@ router.post('/', async (req, res) => {
             include: { departments: true }
         });
         res.status(201).json(branch);
+        logActivity(null, 'CREATED', 'BRANCH', branch.name, { code: branch.code, type: branch.type });
     } catch (error) {
         res.status(500).json({ error: 'Failed to create branch' });
     }
@@ -67,6 +79,7 @@ router.delete('/:id', async (req, res) => {
         }
 
         await prisma.branch.delete({ where: { id: parseInt(id) } });
+        logActivity(null, 'DELETED', 'BRANCH', branch.name);
         res.json({ message: 'Branch deleted successfully' });
     } catch (error) {
         res.status(500).json({ error: 'Failed to delete branch' });

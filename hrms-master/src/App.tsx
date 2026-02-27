@@ -10,6 +10,10 @@ import Departments from "./pages/departments";
 import Zones from "./pages/zones";
 import SubDepartments from "./pages/sub-departments";
 import Designations from "./pages/designations";
+import SisterCompanies from "./pages/sister-companies";
+import EmployeeLevels from "./pages/employee-levels";
+import EmployeeGrades from "./pages/employee-grades";
+import AdminRights from "./pages/admin-rights";
 import { useAuthStore } from "./store/useAuthStore";
 
 function App() {
@@ -38,6 +42,10 @@ function App() {
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/company-setup" element={<CompanySetup />} />
+              <Route path="/sister-companies" element={<SisterCompanies />} />
+              <Route path="/employee-levels" element={<EmployeeLevels />} />
+              <Route path="/employee-grades" element={<EmployeeGrades />} />
+              <Route path="/admin-rights" element={<AdminRights />} />
               <Route path="/zones" element={<Zones />} />
               <Route path="/branches" element={<Branches />} />
               <Route path="/departments" element={<Departments />} />

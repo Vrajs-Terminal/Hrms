@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import prisma from '../lib/prismaClient';
+import { logActivity } from '../services/activityLogger';
 
 const router = Router();
 
@@ -47,6 +48,7 @@ router.post('/bulk', async (req, res) => {
         });
 
         res.status(201).json({ message: 'Sub-Departments created successfully' });
+        names.forEach((n: string) => logActivity(null, 'CREATED', 'SUB_DEPARTMENT', n.trim()));
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to create sub-departments' });
@@ -66,6 +68,7 @@ router.put('/:id', async (req, res) => {
             data: { name: name.trim() }
         });
         res.json(updated);
+        logActivity(null, 'UPDATED', 'SUB_DEPARTMENT', updated.name);
     } catch (error) {
         res.status(500).json({ error: 'Failed to update sub-department' });
     }
@@ -111,6 +114,7 @@ router.delete('/:id', async (req, res) => {
         }
 
         await prisma.subDepartment.delete({ where: { id: parseInt(id) } });
+        logActivity(null, 'DELETED', 'SUB_DEPARTMENT', subDept.name);
         res.json({ message: 'Sub-Department deleted successfully' });
     } catch (error) {
         res.status(500).json({ error: 'Failed to delete sub-department' });

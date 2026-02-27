@@ -20,16 +20,31 @@ model User {
   branch        Branch?     @relation(fields: [branch_id], references: [id])
   department    Department? @relation(fields: [department_id], references: [id])
 
+  employee_level_id Int?
+  employee_grade_id Int?
+  employeeLevel     EmployeeLevel? @relation(fields: [employee_level_id], references: [id])
+  employeeGrade     EmployeeGrade? @relation(fields: [employee_grade_id], references: [id])
+
+  adminBranchRestrictions     AdminBranchRestriction[]
+  adminDepartmentRestrictions AdminDepartmentRestriction[]
+  activityLogs                ActivityLog[]
+
   @@index([branch_id], map: "User_branch_id_fkey")
   @@index([department_id], map: "User_department_id_fkey")
+  @@index([employee_level_id])
+  @@index([employee_grade_id])
 }
 
 model Company {
-  id       Int     @id @default(autoincrement())
-  name     String
-  website  String?
-  logo_url String?
-  tax_info String?
+  id          Int      @id @default(autoincrement())
+  name        String
+  code        String?  @unique
+  website     String?
+  logo_url    String?
+  tax_info    String?
+  status      String   @default("Active")
+  order_index Int      @default(0)
+  branches    Branch[]
 }
 
 model Zone {
@@ -45,12 +60,17 @@ model Branch {
   code        String       @unique
   type        String       @default("Metro")
   order_index Int          @default(0)
+  company_id  Int?
   zone_id     Int?
+  company     Company?     @relation(fields: [company_id], references: [id])
   zone        Zone?        @relation(fields: [zone_id], references: [id])
   departments Department[]
   users       User[]
 
+  adminBranchRestrictions AdminBranchRestriction[]
+
   @@index([zone_id], map: "Branch_zone_id_fkey")
+  @@index([company_id])
 }
 
 model Department {
@@ -61,6 +81,7 @@ model Department {
   branch         Branch          @relation(fields: [branch_id], references: [id], onDelete: Cascade)
   subDepartments SubDepartment[]
   users          User[]
+  adminDepartmentRestrictions AdminDepartmentRestriction[]
 
   @@index([branch_id], map: "Department_branch_id_fkey")
 }
@@ -86,4 +107,64 @@ model Designation {
 
   @@unique([name, sub_department_id])
   @@index([sub_department_id], map: "Designation_sub_department_id_fkey")
+}
+
+model EmployeeLevel {
+  id          Int             @id @default(autoincrement())
+  name        String
+  parent_id   Int?
+  order_index Int             @default(0)
+  parent      EmployeeLevel?  @relation("EmployeeLevelHierarchy", fields: [parent_id], references: [id], onDelete: SetNull)
+  children    EmployeeLevel[] @relation("EmployeeLevelHierarchy")
+  users       User[]
+
+  @@index([parent_id])
+}
+
+model EmployeeGrade {
+  id          Int      @id @default(autoincrement())
+  name        String
+  code        String?  @unique
+  status      String   @default("Active")
+  users       User[]
+}
+
+model AdminBranchRestriction {
+  id        Int      @id @default(autoincrement())
+  user_id   Int
+  branch_id Int
+  user      User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  branch    Branch   @relation(fields: [branch_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, branch_id])
+  @@index([user_id])
+  @@index([branch_id])
+}
+
+model AdminDepartmentRestriction {
+  id            Int        @id @default(autoincrement())
+  user_id       Int
+  department_id Int
+  user          User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  department    Department @relation(fields: [department_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, department_id])
+  @@index([user_id])
+  @@index([department_id])
+}
+
+model ActivityLog {
+  id          Int      @id @default(autoincrement())
+  action      String
+  entity_type String
+  entity_name String
+  details     String?  @db.Text
+  user_id     Int?
+  createdAt   DateTime @default(now())
+
+  user        User?    @relation(fields: [user_id], references: [id], onDelete: SetNull)
+
+  @@index([user_id])
+  @@index([createdAt])
+  @@index([entity_type])
 }
