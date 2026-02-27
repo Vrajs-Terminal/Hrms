@@ -1,10 +1,10 @@
 import { Router } from 'express';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prismaClient';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 const router = Router();
-const prisma = new PrismaClient();
+
 const JWT_SECRET = process.env.JWT_SECRET || 'secret_key_for_minehr';
 
 router.post('/login', async (req, res) => {
@@ -45,8 +45,8 @@ router.post('/login', async (req, res) => {
             }
         });
 
-    } catch (error) {
-        res.status(500).json({ error: 'Internal server error during login' });
+    } catch (error: any) {
+        res.status(500).json({ error: 'Internal server error during login', details: error.message });
     }
 });
 
@@ -71,8 +71,8 @@ router.post('/setup-admin', async (req, res) => {
         });
 
         res.status(201).json({ message: 'Admin created successfully', admin: { id: admin.id, name: admin.name } });
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to create admin' });
+    } catch (error: any) {
+        res.status(500).json({ error: 'Failed to create admin', details: error.message });
     }
 });
 

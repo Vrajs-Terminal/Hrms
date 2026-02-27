@@ -1,18 +1,28 @@
 import { Router } from 'express';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prismaClient';
 
 const router = Router();
-const prisma = new PrismaClient();
+
+
+// Simple in-memory cache to prevent redundant DB hits on Vercel Edge Serverless
+let cachedStats: any = null;
+let lastCacheTime = 0;
+const CACHE_TTL_MS = 60000; // 60 seconds
 
 router.get('/stats', async (req, res) => {
     try {
+        const now = Date.now();
+        if (cachedStats && (now - lastCacheTime) < CACHE_TTL_MS) {
+            return res.json(cachedStats);
+        }
+
         const totalEmployees = await prisma.user.count();
         const totalBranches = await prisma.branch.count();
         const totalDepartments = await prisma.department.count();
 
         // In the future, newHires, onLeave, and presentToday will be calculated
         // from the Payroll/Attendance tables.
-        res.json({
+        cachedStats = {
             overview: {
                 totalEmployees,
                 newHires: 0,
@@ -26,7 +36,9 @@ router.get('/stats', async (req, res) => {
             recentActivities: [
                 { id: 1, action: 'System initialized successfully', type: 'system', time: 'Today' }
             ]
-        });
+        };
+        lastCacheTime = now;
+        res.json(cachedStats);
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch dashboard stats' });
     }

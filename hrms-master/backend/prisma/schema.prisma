@@ -8,27 +8,28 @@ datasource db {
 }
 
 model User {
-  id            Int      @id @default(autoincrement())
+  id            Int         @id @default(autoincrement())
   name          String
-  email         String   @unique
+  email         String      @unique
   password_hash String
-  role          String   @default("Admin")
+  role          String      @default("Admin")
   branch_id     Int?
   department_id Int?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  
-  // Relations
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
   branch        Branch?     @relation(fields: [branch_id], references: [id])
   department    Department? @relation(fields: [department_id], references: [id])
+
+  @@index([branch_id], map: "User_branch_id_fkey")
+  @@index([department_id], map: "User_department_id_fkey")
 }
 
 model Company {
-  id        Int      @id @default(autoincrement())
-  name      String
-  website   String?
-  logo_url  String?
-  tax_info  String?
+  id       Int     @id @default(autoincrement())
+  name     String
+  website  String?
+  logo_url String?
+  tax_info String?
 }
 
 model Zone {
@@ -45,19 +46,23 @@ model Branch {
   type        String       @default("Metro")
   order_index Int          @default(0)
   zone_id     Int?
-  zone        Zone?        @relation(fields: [zone_id], references: [id], onDelete: SetNull)
+  zone        Zone?        @relation(fields: [zone_id], references: [id])
   departments Department[]
   users       User[]
+
+  @@index([zone_id], map: "Branch_zone_id_fkey")
 }
 
 model Department {
-  id          Int      @id @default(autoincrement())
-  name        String
-  branch_id   Int
+  id             Int             @id @default(autoincrement())
+  name           String
+  branch_id      Int
   order_index    Int             @default(0)
   branch         Branch          @relation(fields: [branch_id], references: [id], onDelete: Cascade)
-  users          User[]
   subDepartments SubDepartment[]
+  users          User[]
+
+  @@index([branch_id], map: "Department_branch_id_fkey")
 }
 
 model SubDepartment {
@@ -65,10 +70,11 @@ model SubDepartment {
   name          String
   department_id Int
   order_index   Int           @default(0)
-  department    Department    @relation(fields: [department_id], references: [id], onDelete: Cascade)
   designations  Designation[]
+  department    Department    @relation(fields: [department_id], references: [id], onDelete: Cascade)
 
-  @@unique([name, department_id]) // Prevent duplicate sub-departments within the same department
+  @@unique([name, department_id])
+  @@index([department_id], map: "SubDepartment_department_id_fkey")
 }
 
 model Designation {
@@ -78,5 +84,6 @@ model Designation {
   order_index       Int           @default(0)
   subDepartment     SubDepartment @relation(fields: [sub_department_id], references: [id], onDelete: Cascade)
 
-  @@unique([name, sub_department_id]) // Prevent duplicate designations within the same sub-department
+  @@unique([name, sub_department_id])
+  @@index([sub_department_id], map: "Designation_sub_department_id_fkey")
 }

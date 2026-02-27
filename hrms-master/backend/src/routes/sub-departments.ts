@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prismaClient';
 
 const router = Router();
-const prisma = new PrismaClient();
+
 
 // Get all Sub-Departments
 router.get('/', async (req, res) => {

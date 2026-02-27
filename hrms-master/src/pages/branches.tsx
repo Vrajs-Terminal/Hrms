@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import {
-    Plus, Map, ArrowUp, ArrowDown, GripVertical, Trash2
+    Plus, Map, ArrowUp, ArrowDown, GripVertical, Trash2, Check, X
 } from 'lucide-react';
 import api from '../lib/axios';
 import './branches.css';
@@ -39,6 +39,8 @@ export default function Branches() {
 
     const [isReordering, setIsReordering] = useState(false);
 
+    const [deletingId, setDeletingId] = useState<number | null>(null);
+
     const handleAddBranch = async (e: React.FormEvent) => {
         e.preventDefault();
         if (newBranch.name && newBranch.code) {
@@ -53,12 +55,13 @@ export default function Branches() {
     };
 
     const handleDelete = async (id: number) => {
-        if (!window.confirm("Are you sure you want to delete this branch?")) return;
         try {
             await api.delete(`/branches/${id}`);
             setBranches(branches.filter(b => b.id !== id));
+            setDeletingId(null);
         } catch (error: any) {
             alert(error.response?.data?.error || 'Failed to delete branch');
+            setDeletingId(null);
         }
     };
 
@@ -131,9 +134,19 @@ export default function Branches() {
                                                 <ArrowDown size={14} color={index === branches.length - 1 ? '#cbd5e1' : '#64748b'} />
                                             </button>
                                         </div>
+                                    ) : deletingId === branch.id ? (
+                                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                            <span style={{ fontSize: '13px', color: '#ef4444', fontWeight: 500 }}>Delete?</span>
+                                            <button onClick={() => handleDelete(branch.id)} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: '#22c55e', padding: '4px' }} title="Confirm">
+                                                <Check size={16} />
+                                            </button>
+                                            <button onClick={() => setDeletingId(null)} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: '#94a3b8', padding: '4px' }} title="Cancel">
+                                                <X size={16} />
+                                            </button>
+                                        </div>
                                     ) : (
                                         <button
-                                            onClick={() => handleDelete(branch.id)}
+                                            onClick={() => setDeletingId(branch.id)}
                                             style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: '#ef4444', padding: '4px' }}
                                             title="Delete Branch"
                                         >
