@@ -117,6 +117,7 @@ model Manager {
   id         Int      @id @default(autoincrement())
   name       String?
   email      String?
+  mobile     String?
   department String?
   branch     String?
   level      String?  // Manager, Senior Manager, Team Lead

@@ -76,7 +76,7 @@ export const updateChecklist = async (req: Request, res: Response) => {
         const { status } = req.body; // "Pending" or "Completed"
 
         const updated = await prisma.exitChecklist.update({
-            where: { id: parseInt(checklistId) },
+            where: { id: parseInt(checklistId as string) },
             data: {
                 status,
                 completionDate: status === 'Completed' ? new Date() : null
@@ -88,7 +88,7 @@ export const updateChecklist = async (req: Request, res: Response) => {
             where: { offboardingId: updated.offboardingId }
         });
 
-        if (allChecklists.every(c => c.status === "Completed")) {
+        if (allChecklists.every((c: any) => c.status === "Completed")) {
             await prisma.offboarding.update({
                 where: { id: updated.offboardingId },
                 data: { status: "Completed" }
@@ -114,11 +114,11 @@ export const cancelOffboarding = async (req: Request, res: Response) => {
 
         // Delete child checklists first
         await prisma.exitChecklist.deleteMany({
-            where: { offboardingId: parseInt(id) }
+            where: { offboardingId: parseInt(id as string) }
         });
 
         await prisma.offboarding.delete({
-            where: { id: parseInt(id) }
+            where: { id: parseInt(id as string) }
         });
 
         res.status(200).json({ message: "Offboarding cancelled successfully." });
