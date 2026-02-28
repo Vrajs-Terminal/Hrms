@@ -1,0 +1,179 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Employee {
+  id          Int      @id @default(autoincrement())
+  employeeId  String   @unique
+  
+  // Basic Info
+  firstName   String?
+  middleName  String?
+  lastName    String?
+  mobile      String?
+  dob         DateTime?
+  bloodGroup  String?
+  gender      String?
+  cvUrl       String?
+  idProofUrl  String?
+  welcomeSent Boolean  @default(false)
+  
+  // Job Info
+  designation String?
+  branch      String?
+  department  String?
+  subDepartment String?
+  grade       String?
+  employeeType String?
+  zone        String?
+  level       String?
+  shift       String?
+  email       String?
+  doj         DateTime?
+  probationDays Int?
+  trainingCompletionDate DateTime?
+  permanentDate DateTime?
+  sisterCompany String?
+  location    String?
+  
+  // Manager Relation
+  managerId   Int?
+  manager     Manager? @relation(fields: [managerId], references: [id])
+
+  insuranceNo String?
+  insuranceCompany String?
+  insuranceExpiry DateTime?
+  retirementAge Int?
+  jobDescription String? @db.Text
+
+  // Contact Info
+  whatsapp      String?
+  altPhone      String?
+  emergencyNumber String?
+  companyMobile String?
+  currentAddress String? @db.Text
+  permanentAddress String? @db.Text
+  personalEmail String?
+  socialLinks   String? @db.Text
+
+  // Other Info
+  skills        String? @db.Text
+  hobbies       String? @db.Text
+  languages     String?
+  specialSkills String? @db.Text
+  maritalStatus String?
+  familyMembers Int?
+  nationality   String?
+  
+  // Bank Details
+  bankHolder    String?
+  bankName      String?
+  bankBranch    String?
+  accountType   String?
+  accountNo     String?
+  ifscCode      String?
+  crnNo         String?
+  esicNo        String?
+  panNo         String?
+  pfNo          String?
+  uanNo         String?
+  micrNo        String?
+
+  status      String   @default("Active")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  offboardings Offboarding[]
+}
+
+model ExEmployee {
+  id                Int      @id @default(autoincrement())
+  employeeId        String
+  
+  // Matching fields to save data
+  firstName         String?
+  middleName        String?
+  lastName          String?
+  email             String?
+  mobile            String?
+  designation       String?
+  department        String?
+  branch            String?
+  
+  exitDate          DateTime?
+  reason            String?
+  eligibleForRehire Boolean?
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Manager {
+  id         Int      @id @default(autoincrement())
+  name       String?
+  email      String?
+  department String?
+  branch     String?
+  level      String?  // Manager, Senior Manager, Team Lead
+  active     Boolean? @default(true)
+  employees  Employee[]
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Offboarding {
+  id             Int       @id @default(autoincrement())
+  employeeId     Int
+  employee       Employee  @relation(fields: [employeeId], references: [id])
+  lastWorkingDate DateTime?
+  reason         String?
+  status         String    @default("Pending") // Pending / Completed
+  
+  checklists     ExitChecklist[]
+
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model ExitChecklist {
+  id             Int          @id @default(autoincrement())
+  offboardingId  Int
+  offboarding    Offboarding  @relation(fields: [offboardingId], references: [id])
+  department     String       // HR, IT, Admin, Finance
+  taskName       String
+  assignedTo     String?      // Email or ID of responsible person
+  status         String       @default("Pending") // Pending / Completed
+  completionDate DateTime?
+
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model Finance {
+  id         Int      @id @default(autoincrement())
+  employeeId String
+  salary     Float?
+  bonus      Float?
+  deductions Float?
+  month      String?
+  year       Int?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Onboarding {
+  id                 Int      @id @default(autoincrement())
+  employeeId         String
+  documentsSubmitted Boolean?
+  trainingCompleted  Boolean?
+  orientationDone    Boolean?
+  status             String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
