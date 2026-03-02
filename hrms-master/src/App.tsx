@@ -14,6 +14,13 @@ import SisterCompanies from "./pages/sister-companies";
 import EmployeeLevels from "./pages/employee-levels";
 import EmployeeGrades from "./pages/employee-grades";
 import AdminRights from "./pages/admin-rights";
+import AssignEmployeeGrade from "./pages/assign-employee-grade";
+import EmployeeParking from "./pages/employee-parking";
+import EmergencyNumbers from "./pages/emergency-numbers";
+import AdminMenuReordering from "./pages/admin-menu-reordering";
+import WhatsAppAlerts from "./pages/whatsapp-alerts";
+import IDCardTemplates from "./pages/id-card-templates";
+import DailyAttendanceEmail from "./pages/daily-attendance-email";
 import { useAuthStore } from "./store/useAuthStore";
 
 function App() {
@@ -51,6 +58,13 @@ function App() {
               <Route path="/departments" element={<Departments />} />
               <Route path="/sub-departments" element={<SubDepartments />} />
               <Route path="/designations" element={<Designations />} />
+              <Route path="/assign-employee-grade" element={<AssignEmployeeGrade />} />
+              <Route path="/employee-parking" element={<EmployeeParking />} />
+              <Route path="/emergency-numbers" element={<EmergencyNumbers />} />
+              <Route path="/admin-menu-reordering" element={<AdminMenuReordering />} />
+              <Route path="/whatsapp-alerts" element={<WhatsAppAlerts />} />
+              <Route path="/id-card-templates" element={<IDCardTemplates />} />
+              <Route path="/daily-attendance-email" element={<DailyAttendanceEmail />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </div>

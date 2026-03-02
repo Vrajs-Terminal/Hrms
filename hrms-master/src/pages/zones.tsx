@@ -37,7 +37,6 @@ export default function Zones() {
     const [isReordering, setIsReordering] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
     const [editName, setEditName] = useState('');
-    const [deletingId, setDeletingId] = useState<number | null>(null);
 
     // --- Multi-Add Logic ---
     const handleNumChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -87,14 +86,14 @@ export default function Zones() {
 
     // --- Item Actions ---
     const handleDelete = async (id: number) => {
+        if (!window.confirm("Are you sure you want to delete this Zone? This might affect Branches inside it later.")) return;
+
         try {
             await axios.delete(`/zones/${id}`);
             setZones(zones.filter(z => z.id !== id));
-            setDeletingId(null);
         } catch (error: any) {
             console.error('Error deleting zone:', error);
             alert(error.response?.data?.error || 'Failed to delete zone.');
-            setDeletingId(null);
         }
     };
 
@@ -200,18 +199,9 @@ export default function Zones() {
                                             <button onClick={() => startEditing(zone)} className="btn-icon text-blue" title="Edit Zone">
                                                 <Edit2 size={16} />
                                             </button>
-
-                                            {deletingId === zone.id ? (
-                                                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                                    <span style={{ fontSize: '13px', color: '#ef4444', fontWeight: 500 }}>Delete?</span>
-                                                    <button onClick={() => handleDelete(zone.id)} className="btn-icon text-green"><Check size={16} /></button>
-                                                    <button onClick={() => setDeletingId(null)} className="btn-icon text-gray"><X size={16} /></button>
-                                                </div>
-                                            ) : (
-                                                <button onClick={() => setDeletingId(zone.id)} className="btn-icon text-red" title="Delete Zone">
+                                            <button onClick={() => handleDelete(zone.id)} className="btn-icon text-red" title="Delete Zone">
                                                     <Trash2 size={16} />
                                                 </button>
-                                            )}
                                         </div>
                                     )}
 

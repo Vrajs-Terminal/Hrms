@@ -28,6 +28,8 @@ model User {
   adminBranchRestrictions     AdminBranchRestriction[]
   adminDepartmentRestrictions AdminDepartmentRestriction[]
   activityLogs                ActivityLog[]
+  employeeGradeHistory        EmployeeGradeHistory[]
+  parkingSlot                 ParkingSlot?
 
   @@index([branch_id], map: "User_branch_id_fkey")
   @@index([department_id], map: "User_department_id_fkey")
@@ -68,20 +70,22 @@ model Branch {
   users       User[]
 
   adminBranchRestrictions AdminBranchRestriction[]
+  idCardTemplates         IdCardTemplate[]
 
   @@index([zone_id], map: "Branch_zone_id_fkey")
   @@index([company_id])
 }
 
 model Department {
-  id             Int             @id @default(autoincrement())
-  name           String
-  branch_id      Int
-  order_index    Int             @default(0)
-  branch         Branch          @relation(fields: [branch_id], references: [id], onDelete: Cascade)
-  subDepartments SubDepartment[]
-  users          User[]
+  id                          Int                          @id @default(autoincrement())
+  name                        String
+  branch_id                   Int
+  order_index                 Int                          @default(0)
+  branch                      Branch                       @relation(fields: [branch_id], references: [id], onDelete: Cascade)
+  subDepartments              SubDepartment[]
+  users                       User[]
   adminDepartmentRestrictions AdminDepartmentRestriction[]
+  idCardTemplates             IdCardTemplate[]
 
   @@index([branch_id], map: "Department_branch_id_fkey")
 }
@@ -122,19 +126,20 @@ model EmployeeLevel {
 }
 
 model EmployeeGrade {
-  id          Int      @id @default(autoincrement())
-  name        String
-  code        String?  @unique
-  status      String   @default("Active")
-  users       User[]
+  id      Int                    @id @default(autoincrement())
+  name    String
+  code    String?                @unique
+  status  String                 @default("Active")
+  users   User[]
+  history EmployeeGradeHistory[]
 }
 
 model AdminBranchRestriction {
-  id        Int      @id @default(autoincrement())
+  id        Int    @id @default(autoincrement())
   user_id   Int
   branch_id Int
-  user      User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  branch    Branch   @relation(fields: [branch_id], references: [id], onDelete: Cascade)
+  user      User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  branch    Branch @relation(fields: [branch_id], references: [id], onDelete: Cascade)
 
   @@unique([user_id, branch_id])
   @@index([user_id])
@@ -162,9 +167,105 @@ model ActivityLog {
   user_id     Int?
   createdAt   DateTime @default(now())
 
-  user        User?    @relation(fields: [user_id], references: [id], onDelete: SetNull)
+  user User? @relation(fields: [user_id], references: [id], onDelete: SetNull)
 
   @@index([user_id])
   @@index([createdAt])
   @@index([entity_type])
+}
+
+// ==========================================
+// Phase 3 & 4 New Models
+// ==========================================
+
+model EmployeeGradeHistory {
+  id             Int       @id @default(autoincrement())
+  user_id        Int
+  grade_id       Int
+  effective_from DateTime
+  effective_to   DateTime?
+  remarks        String?   @db.Text
+  assigned_by    Int? // User ID who assigned it
+  status         String    @default("Active") // Active or Closed
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  user  User          @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  grade EmployeeGrade @relation(fields: [grade_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([grade_id])
+}
+
+model ParkingSlot {
+  id             Int      @id @default(autoincrement())
+  slot_number    String   @unique
+  user_id        Int?     @unique // One slot per user
+  vehicle_number String?
+  access_type    String   @default("QR") // "QR" or "Sticker"
+  status         String   @default("Active")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user User? @relation(fields: [user_id], references: [id], onDelete: SetNull)
+
+  @@index([user_id])
+}
+
+model EmergencyNumber {
+  id           Int      @id @default(autoincrement())
+  contact_name String
+  number       String
+  type         String   @default("Medical") // "Medical", "Security", "Fire", "Other"
+  status       String   @default("Active")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model WhatsAppAlert {
+  id               Int      @id @default(autoincrement())
+  alert_name       String
+  trigger_event    String
+  recipient_type   String   @default("Individual")
+  message_template String   @db.Text
+  status           String   @default("Active")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model IdCardTemplate {
+  id            Int      @id @default(autoincrement())
+  template_name String
+  template_type String   @default("Employee") // Employee, Contractor, Visitor
+  branch_id     Int?
+  department_id Int?
+  status        String   @default("Active")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  branch     Branch?     @relation(fields: [branch_id], references: [id], onDelete: SetNull)
+  department Department? @relation(fields: [department_id], references: [id], onDelete: SetNull)
+
+  @@index([branch_id])
+  @@index([department_id])
+}
+
+model DailyAttendanceEmail {
+  id             Int      @id @default(autoincrement())
+  report_name    String
+  recipient_type String   @default("Manager")
+  filter_value   String?
+  schedule_time  String
+  email_template String?  @db.Text
+  status         String   @default("Active")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model CompanySetting {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique
+  value     Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

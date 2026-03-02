@@ -1,6 +1,6 @@
 import "./sidebar.css";
 import logo from "../assets/logo2.png";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
     LayoutDashboard,
@@ -45,15 +45,25 @@ function Sidebar({ isOpen }: SidebarProps) {
             icon: Settings,
             subItems: [
                 { name: "Company Setup", path: "/company-setup" },
-                { name: "Roles & Privileges", path: "/admin-rights" },
                 { name: "Sister Companies", path: "/sister-companies" },
-                { name: "Employee Levels", path: "/employee-levels" },
-                { name: "Employee Grades", path: "/employee-grades" },
+                { name: "Roles & Privileges", path: "/admin-rights" },
+                { name: "Admin Menu Reordering", path: "/admin-menu-reordering" },
+                // Add a visual separator if needed via CSS, but per request, just align better
                 { name: "Zones", path: "/zones" },
                 { name: "Branches", path: "/branches" },
                 { name: "Departments", path: "/departments" },
                 { name: "Sub-Departments", path: "/sub-departments" },
                 { name: "Designations", path: "/designations" },
+
+                { name: "Employee Levels", path: "/employee-levels" },
+                { name: "Employee Grades", path: "/employee-grades" },
+                { name: "Assign Employee Grade", path: "/assign-employee-grade" },
+                { name: "ID Card Templates", path: "/id-card-templates" },
+                { name: "Employee Parking Area", path: "/employee-parking" },
+
+                { name: "Emergency Numbers", path: "/emergency-numbers" },
+                { name: "Manage WhatsApp Alerts", path: "/whatsapp-alerts" },
+                { name: "Daily Attendance Email", path: "/daily-attendance-email" },
             ]
         },
         { name: "Core HRMS", path: "/core-hrms", icon: Users },
@@ -69,6 +79,52 @@ function Sidebar({ isOpen }: SidebarProps) {
         { name: "Other Utilities", path: "/utilities", icon: Grid },
         { name: "Contact Support Team", path: "/support", icon: Headphones },
     ];
+
+    const [dynamicMenuItems, setDynamicMenuItems] = useState(menuItems);
+
+    useEffect(() => {
+        const fetchMenuOrder = async () => {
+            try {
+                const res = await fetch('http://localhost:5001/api/settings/ADMIN_MENU_ORDER');
+                if (res.ok) {
+                    const data = await res.json();
+                    // The saved shape is: { id, name, iconName, order }
+                    if (data && data.value && Array.isArray(data.value)) {
+                        const orderData: { id: string; name: string; iconName: string; order: number }[] = data.value;
+
+                        // Sort by the saved order field
+                        const sorted = [...orderData].sort((a, b) => a.order - b.order);
+
+                        // Map saved names back to local menu items (which have icons already)
+                        const newOrderedList = sorted
+                            .map(savedItem => menuItems.find(m => m.name === savedItem.name))
+                            .filter((m): m is typeof menuItems[0] => Boolean(m));
+
+                        // Append any local items not found in the saved order (future-proofing)
+                        menuItems.forEach(localItem => {
+                            if (!newOrderedList.find(om => om.name === localItem.name)) {
+                                newOrderedList.push(localItem);
+                            }
+                        });
+
+                        setDynamicMenuItems(newOrderedList);
+                    }
+                }
+            } catch (err) {
+                console.error('Failed to fetch menu order', err);
+            }
+        };
+
+        fetchMenuOrder();
+
+        // Listen for real-time updates when admin saves menu order on the same tab
+        window.addEventListener('menuOrderChanged', fetchMenuOrder);
+
+        return () => {
+            window.removeEventListener('menuOrderChanged', fetchMenuOrder);
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const isActive = (path?: string) => {
         if (!path) return false;
@@ -96,10 +152,17 @@ function Sidebar({ isOpen }: SidebarProps) {
                 {/* Menu Section */}
                 <nav className="sidebar-menu">
                     <ul>
-                        {menuItems.map((item, index) => {
+                        {dynamicMenuItems.map((item, index) => {
                             const hasSubItems = item.subItems && item.subItems.length > 0;
                             const isMenuOpen = openMenus[item.name];
-                            const isItemActive = item.path ? isActive(item.path) : (hasSubItems ? item.subItems?.some(sub => isActive(sub.path)) : false);
+
+                            // Check if current path matches any subitem
+                            let isItemActive = false;
+                            if (item.path) {
+                                isItemActive = isActive(item.path);
+                            } else if (hasSubItems) {
+                                isItemActive = item.subItems?.some(sub => isActive(sub.path)) || false;
+                            }
 
                             return (
                                 <li key={index} className={`menu-group ${hasSubItems ? 'has-subitems' : ''}`}>
@@ -126,17 +189,19 @@ function Sidebar({ isOpen }: SidebarProps) {
                                         </Link>
                                     )}
 
-                                    {/* Sub Items */}
+                                    {/* Flat Sub Items */}
                                     {hasSubItems && isMenuOpen && (
                                         <ul className="sub-menu">
                                             {item.subItems!.map((subItem, subIndex) => (
                                                 <li key={subIndex}>
                                                     <Link
-                                                        to={subItem.path}
+                                                        to={subItem.path || "#"}
                                                         className={`sub-menu-item ${isActive(subItem.path) ? "active" : ""}`}
                                                     >
                                                         <div className="sub-menu-dot"></div>
-                                                        <span>{subItem.name}</span>
+                                                        <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                                            {subItem.name}
+                                                        </span>
                                                     </Link>
                                                 </li>
                                             ))}

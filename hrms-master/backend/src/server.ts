@@ -18,7 +18,12 @@ import zonesRoutes from './routes/zones';
 import subDepartmentRoutes from './routes/sub-departments';
 import designationRoutes from './routes/designations';
 import notificationRoutes from './routes/notifications';
-
+import idCardTemplatesRoutes from './routes/id-card-templates';
+import dailyAttendanceEmailRoutes from './routes/daily-attendance-email';
+import employeeParkingRoutes from './routes/employee-parking';
+import emergencyNumbersRoutes from './routes/emergency-numbers';
+import settingsRoutes from './routes/settings';
+import whatsappAlertsRoutes from './routes/whatsapp-alerts';
 
 const app = express();
 
@@ -42,6 +47,12 @@ app.use('/api/zones', zonesRoutes);
 app.use('/api/sub-departments', subDepartmentRoutes);
 app.use('/api/designations', designationRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/id-card-templates', idCardTemplatesRoutes);
+app.use('/api/daily-attendance-email', dailyAttendanceEmailRoutes);
+app.use('/api/employee-parking', employeeParkingRoutes);
+app.use('/api/emergency-numbers', emergencyNumbersRoutes);
+app.use('/api/settings', settingsRoutes);
+app.use('/api/whatsapp-alerts', whatsappAlertsRoutes);
 
 // Basic test route
 app.get('/api/health', (req, res) => {
