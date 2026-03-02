@@ -1,13 +1,13 @@
 import { Router } from 'express';
 import prisma from '../lib/prismaClient';
-import { authenticateToken } from '../middleware/authMiddleware';
+import { optionalAuthenticateToken } from '../middleware/authMiddleware';
 import { logActivity } from '../services/activityLogger';
 
 const router = Router();
 
 
 // Get all branches
-router.get('/', authenticateToken, async (req, res) => {
+router.get('/', optionalAuthenticateToken, async (req, res) => {
     try {
         const user = (req as any).user;
         let whereClause = {};
