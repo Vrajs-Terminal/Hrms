@@ -1,12 +1,12 @@
 /* Base Sidebar Styles */
 .sidebar {
-    width: 280px;
-    min-width: 280px;
-    /* Mesh Gradient Background with Navy Overlay */
-    background:
-        linear-gradient(to bottom, rgba(15, 23, 42, 0.666), rgba(15, 23, 42, 0.6)),
-        url("../assets/image-mesh-gradient.png") no-repeat center center;
+    width: 260px;
+    min-width: 260px;
+    /* Mesh Gradient Background with Navy Overlay — image loaded via inline style in sidebar.tsx */
+    background-color: #0f172a;
     background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
     color: #f1f5f9;
 
     height: 100vh;
@@ -31,9 +31,9 @@
 
 /* Inner Wrapper to hold fixed width content */
 .sidebar-content-wrapper {
-    width: 280px;
+    width: 260px;
     /* Fixed width prevents internal reflow */
-    min-width: 280px;
+    min-width: 260px;
     display: flex;
     flex-direction: column;
     height: 100%;

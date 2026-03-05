@@ -13,7 +13,6 @@
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
-    "@prisma/client": "^7.4.1",
     "@tanstack/react-query": "^5.90.21",
     "axios": "^1.13.5",
     "bcryptjs": "^3.0.3",

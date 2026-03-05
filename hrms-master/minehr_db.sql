@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Mar 02, 2026 at 09:04 AM
+-- Generation Time: Mar 05, 2026 at 07:48 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.0.28
 
@@ -85,6 +85,50 @@ CREATE TABLE `AdminDepartmentRestriction` (
   `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `department_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `AttendanceRecord`
+--
+
+CREATE TABLE `AttendanceRecord` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `date` date NOT NULL,
+  `in_time` datetime(3) DEFAULT NULL,
+  `out_time` datetime(3) DEFAULT NULL,
+  `break_minutes` int(11) NOT NULL DEFAULT 0,
+  `total_working_hours` double NOT NULL DEFAULT 0,
+  `late_by_minutes` int(11) NOT NULL DEFAULT 0,
+  `early_leaving_mins` int(11) NOT NULL DEFAULT 0,
+  `overtime_hours` double NOT NULL DEFAULT 0,
+  `status` varchar(191) NOT NULL DEFAULT 'Absent',
+  `source` varchar(191) NOT NULL DEFAULT 'Web',
+  `remarks` text DEFAULT NULL,
+  `createdAt` datetime(3) NOT NULL DEFAULT current_timestamp(3),
+  `updatedAt` datetime(3) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `AttendanceRequest`
+--
+
+CREATE TABLE `AttendanceRequest` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `request_type` varchar(191) NOT NULL,
+  `date` date NOT NULL,
+  `requested_data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`requested_data`)),
+  `reason` text NOT NULL,
+  `status` varchar(191) NOT NULL DEFAULT 'Pending',
+  `approver_id` int(11) DEFAULT NULL,
+  `approver_remarks` text DEFAULT NULL,
+  `createdAt` datetime(3) NOT NULL DEFAULT current_timestamp(3),
+  `modifiedAt` datetime(3) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -347,6 +391,26 @@ INSERT INTO `ParkingSlot` (`id`, `slot_number`, `user_id`, `vehicle_number`, `ac
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `Shift`
+--
+
+CREATE TABLE `Shift` (
+  `id` int(11) NOT NULL,
+  `name` varchar(191) NOT NULL,
+  `start_time` varchar(191) NOT NULL,
+  `end_time` varchar(191) NOT NULL,
+  `grace_time_minutes` int(11) NOT NULL DEFAULT 0,
+  `half_day_min_hours` double NOT NULL DEFAULT 4,
+  `full_day_min_hours` double NOT NULL DEFAULT 8,
+  `break_duration_mins` int(11) NOT NULL DEFAULT 60,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `createdAt` datetime(3) NOT NULL DEFAULT current_timestamp(3),
+  `updatedAt` datetime(3) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `SubDepartment`
 --
 
@@ -381,18 +445,21 @@ CREATE TABLE `User` (
   `createdAt` datetime(3) NOT NULL DEFAULT current_timestamp(3),
   `updatedAt` datetime(3) NOT NULL,
   `employee_grade_id` int(11) DEFAULT NULL,
-  `employee_level_id` int(11) DEFAULT NULL
+  `employee_level_id` int(11) DEFAULT NULL,
+  `resetPasswordOtp` varchar(191) DEFAULT NULL,
+  `resetPasswordOtpExpiry` datetime(3) DEFAULT NULL,
+  `shift_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `User`
 --
 
-INSERT INTO `User` (`id`, `name`, `email`, `password_hash`, `role`, `branch_id`, `department_id`, `createdAt`, `updatedAt`, `employee_grade_id`, `employee_level_id`) VALUES
-(1, 'System Admin', 'admin@minehr.com', '$2b$10$OLU3UctHX.bdYKS1CFlQs..pHH2vxoUWtRecMg3KMcnbR61.DHU1u', 'Admin', NULL, NULL, '2026-02-25 14:41:20.292', '2026-02-25 14:41:20.292', NULL, NULL),
-(2, 'Vraj Amin', 'vraj@minehr.com', '$2b$10$E6tYJJLFspcd4nzZNHZZHuftcipUotHmAB9q7Fc7iA4h/kbV1zcQC', 'Admin', NULL, NULL, '2026-02-25 14:54:09.544', '2026-02-25 14:54:09.544', NULL, NULL),
-(3, 'Admin User', 'verify@test.com', '$2b$10$5Tdigj6XpBvS7FkmtZCa5OuXuoZFdLULrLWkawB1iLsND8.3wUzH2', 'Admin', NULL, NULL, '2026-02-27 11:57:45.594', '2026-02-27 11:57:45.594', NULL, NULL),
-(6, 'employee', 'employee@minehr.com', '$2b$10$/PYX7q3Lyr1eIWa6SzJTseeGZFG/AXz9Gd4jI.VujByi/ug1ECqli', 'Employee', NULL, NULL, '2026-03-02 07:22:02.766', '2026-03-02 07:22:02.766', NULL, NULL);
+INSERT INTO `User` (`id`, `name`, `email`, `password_hash`, `role`, `branch_id`, `department_id`, `createdAt`, `updatedAt`, `employee_grade_id`, `employee_level_id`, `resetPasswordOtp`, `resetPasswordOtpExpiry`, `shift_id`) VALUES
+(1, 'System Admin', 'admin@minehr.com', '$2b$10$OLU3UctHX.bdYKS1CFlQs..pHH2vxoUWtRecMg3KMcnbR61.DHU1u', 'Admin', NULL, NULL, '2026-02-25 14:41:20.292', '2026-02-25 14:41:20.292', NULL, NULL, NULL, NULL, NULL),
+(2, 'Vraj Amin', 'vraj@minehr.com', '$2b$10$E6tYJJLFspcd4nzZNHZZHuftcipUotHmAB9q7Fc7iA4h/kbV1zcQC', 'Admin', NULL, NULL, '2026-02-25 14:54:09.544', '2026-02-25 14:54:09.544', NULL, NULL, NULL, NULL, NULL),
+(3, 'Admin User', 'verify@test.com', '$2b$10$5Tdigj6XpBvS7FkmtZCa5OuXuoZFdLULrLWkawB1iLsND8.3wUzH2', 'Admin', NULL, NULL, '2026-02-27 11:57:45.594', '2026-02-27 11:57:45.594', NULL, NULL, NULL, NULL, NULL),
+(6, 'employee', 'employee@minehr.com', '$2b$10$/PYX7q3Lyr1eIWa6SzJTseeGZFG/AXz9Gd4jI.VujByi/ug1ECqli', 'Employee', NULL, NULL, '2026-03-02 07:22:02.766', '2026-03-02 07:22:02.766', NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -467,6 +534,25 @@ ALTER TABLE `AdminDepartmentRestriction`
   ADD UNIQUE KEY `AdminDepartmentRestriction_user_id_department_id_key` (`user_id`,`department_id`),
   ADD KEY `AdminDepartmentRestriction_user_id_idx` (`user_id`),
   ADD KEY `AdminDepartmentRestriction_department_id_idx` (`department_id`);
+
+--
+-- Indexes for table `AttendanceRecord`
+--
+ALTER TABLE `AttendanceRecord`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `AttendanceRecord_user_id_date_key` (`user_id`,`date`),
+  ADD KEY `AttendanceRecord_user_id_idx` (`user_id`),
+  ADD KEY `AttendanceRecord_date_idx` (`date`),
+  ADD KEY `AttendanceRecord_status_idx` (`status`);
+
+--
+-- Indexes for table `AttendanceRequest`
+--
+ALTER TABLE `AttendanceRequest`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `AttendanceRequest_user_id_idx` (`user_id`),
+  ADD KEY `AttendanceRequest_approver_id_idx` (`approver_id`),
+  ADD KEY `AttendanceRequest_status_idx` (`status`);
 
 --
 -- Indexes for table `Branch`
@@ -558,6 +644,12 @@ ALTER TABLE `ParkingSlot`
   ADD KEY `ParkingSlot_user_id_idx` (`user_id`);
 
 --
+-- Indexes for table `Shift`
+--
+ALTER TABLE `Shift`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `SubDepartment`
 --
 ALTER TABLE `SubDepartment`
@@ -574,7 +666,8 @@ ALTER TABLE `User`
   ADD KEY `User_branch_id_fkey` (`branch_id`),
   ADD KEY `User_department_id_fkey` (`department_id`),
   ADD KEY `User_employee_level_id_idx` (`employee_level_id`),
-  ADD KEY `User_employee_grade_id_idx` (`employee_grade_id`);
+  ADD KEY `User_employee_grade_id_idx` (`employee_grade_id`),
+  ADD KEY `User_shift_id_idx` (`shift_id`);
 
 --
 -- Indexes for table `WhatsAppAlert`
@@ -609,6 +702,18 @@ ALTER TABLE `AdminBranchRestriction`
 -- AUTO_INCREMENT for table `AdminDepartmentRestriction`
 --
 ALTER TABLE `AdminDepartmentRestriction`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `AttendanceRecord`
+--
+ALTER TABLE `AttendanceRecord`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `AttendanceRequest`
+--
+ALTER TABLE `AttendanceRequest`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -684,6 +789,12 @@ ALTER TABLE `ParkingSlot`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
+-- AUTO_INCREMENT for table `Shift`
+--
+ALTER TABLE `Shift`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `SubDepartment`
 --
 ALTER TABLE `SubDepartment`
@@ -730,6 +841,19 @@ ALTER TABLE `AdminBranchRestriction`
 ALTER TABLE `AdminDepartmentRestriction`
   ADD CONSTRAINT `AdminDepartmentRestriction_department_id_fkey` FOREIGN KEY (`department_id`) REFERENCES `Department` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `AdminDepartmentRestriction_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `User` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `AttendanceRecord`
+--
+ALTER TABLE `AttendanceRecord`
+  ADD CONSTRAINT `AttendanceRecord_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `User` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `AttendanceRequest`
+--
+ALTER TABLE `AttendanceRequest`
+  ADD CONSTRAINT `AttendanceRequest_approver_id_fkey` FOREIGN KEY (`approver_id`) REFERENCES `User` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `AttendanceRequest_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `User` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `Branch`
@@ -789,7 +913,8 @@ ALTER TABLE `User`
   ADD CONSTRAINT `User_branch_id_fkey` FOREIGN KEY (`branch_id`) REFERENCES `Branch` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `User_department_id_fkey` FOREIGN KEY (`department_id`) REFERENCES `Department` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `User_employee_grade_id_fkey` FOREIGN KEY (`employee_grade_id`) REFERENCES `EmployeeGrade` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  ADD CONSTRAINT `User_employee_level_id_fkey` FOREIGN KEY (`employee_level_id`) REFERENCES `EmployeeLevel` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+  ADD CONSTRAINT `User_employee_level_id_fkey` FOREIGN KEY (`employee_level_id`) REFERENCES `EmployeeLevel` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `User_shift_id_fkey` FOREIGN KEY (`shift_id`) REFERENCES `Shift` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

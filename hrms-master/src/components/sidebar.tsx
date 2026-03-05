@@ -1,4 +1,5 @@
 import "./sidebar.css";
+import meshBg from "../assets/image-mesh-gradient.png";
 import logo from "../assets/logo2.png";
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
@@ -66,6 +67,35 @@ function Sidebar({ isOpen }: SidebarProps) {
                 { name: "Daily Attendance Email", path: "/daily-attendance-email" },
             ]
         },
+        {
+            name: "Attendance",
+            icon: ClipboardList,
+            subItems: [
+                { name: "Attendance Dashboard", path: "/attendance-dashboard" },
+                { name: "View Attendance", path: "/view-attendance" },
+                { name: "Add Attendance", path: "/add-attendance" },
+                { name: "Month Wise Attendances", path: "/month-wise-attendance" },
+                { name: "Weekly Attendance", path: "/weekly-attendance" },
+                { name: "Pending Attendance", path: "/pending-attendance" },
+                { name: "Punch Out Missing Request", path: "/punch-out-missing-request" },
+                { name: "Punch Out Missing Approval", path: "/punch-out-missing-approval" },
+                { name: "Previous Date Attendance Request", path: "/previous-date-attendance" },
+                { name: "Update Attendance", path: "/update-attendance" },
+                { name: "Update Break", path: "/update-break" },
+                { name: "Week Off Exchange Request", path: "/week-off-exchange" },
+                { name: "Week Off Approval", path: "/week-off-approval" },
+                { name: "Absent Employees", path: "/absent-employees" },
+                { name: "Add Bulk Attendance", path: "/add-bulk-attendance" },
+                { name: "Pending Break", path: "/pending-break" },
+                { name: "Break Approval Request", path: "/break-approval" },
+                { name: "Overtime Request", path: "/overtime-request" },
+                { name: "Overtime Approval", path: "/overtime-approval" },
+                { name: "Delete Attendance", path: "/delete-attendance" },
+                { name: "Attendance Modification Request", path: "/attendance-modification" },
+                { name: "Recalculate Attendance", path: "/recalculate-attendance" },
+                { name: "Pending Flags", path: "/pending-flags" },
+            ]
+        },
         { name: "Core HRMS", path: "/core-hrms", icon: Users },
         { name: "Finance & Accounting", path: "/finance", icon: Calculator },
         { name: "Productivity & Tracking", path: "/productivity", icon: Activity },
@@ -85,7 +115,7 @@ function Sidebar({ isOpen }: SidebarProps) {
     useEffect(() => {
         const fetchMenuOrder = async () => {
             try {
-                const res = await fetch('http://localhost:5001/api/settings/ADMIN_MENU_ORDER');
+                const res = await fetch('/api/settings/ADMIN_MENU_ORDER');
                 if (res.ok) {
                     const data = await res.json();
                     // The saved shape is: { id, name, iconName, order }
@@ -103,9 +133,21 @@ function Sidebar({ isOpen }: SidebarProps) {
                         // Append any local items not found in the saved order (future-proofing)
                         menuItems.forEach(localItem => {
                             if (!newOrderedList.find(om => om.name === localItem.name)) {
-                                newOrderedList.push(localItem);
+                                // If it is "Attendance", intelligently insert it at 3rd place!
+                                if (localItem.name === "Attendance") {
+                                    newOrderedList.splice(2, 0, localItem);
+                                } else {
+                                    newOrderedList.push(localItem);
+                                }
                             }
                         });
+
+                        // Force "Attendance" to definitively reside at pos 3 seamlessly overriding backend cache drops
+                        const attendanceIndex = newOrderedList.findIndex(m => m.name === "Attendance");
+                        if (attendanceIndex !== -1 && attendanceIndex !== 2) {
+                            const [attendanceItem] = newOrderedList.splice(attendanceIndex, 1);
+                            newOrderedList.splice(2, 0, attendanceItem);
+                        }
 
                         setDynamicMenuItems(newOrderedList);
                     }
@@ -133,7 +175,7 @@ function Sidebar({ isOpen }: SidebarProps) {
     };
 
     return (
-        <aside className={`sidebar ${!isOpen ? 'sidebar-hidden' : ''}`}>
+        <aside className={`sidebar ${!isOpen ? 'sidebar-hidden' : ''}`} style={{ backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.666), rgba(15, 23, 42, 0.6)), url(${meshBg})` }}>
             <div className="sidebar-content-wrapper">
                 {/* Top Section: Logo + User Info */}
                 <div className="sidebar-header">
@@ -199,7 +241,7 @@ function Sidebar({ isOpen }: SidebarProps) {
                                                         className={`sub-menu-item ${isActive(subItem.path) ? "active" : ""}`}
                                                     >
                                                         <div className="sub-menu-dot"></div>
-                                                        <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                                        <span style={{ whiteSpace: 'normal', paddingRight: '12px' }}>
                                                             {subItem.name}
                                                         </span>
                                                     </Link>

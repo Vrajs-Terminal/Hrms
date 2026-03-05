@@ -27,16 +27,82 @@ model User {
   employeeLevel     EmployeeLevel? @relation(fields: [employee_level_id], references: [id])
   employeeGrade     EmployeeGrade? @relation(fields: [employee_grade_id], references: [id])
 
+  shift_id Int?
+  shift    Shift? @relation(fields: [shift_id], references: [id])
+
   adminBranchRestrictions     AdminBranchRestriction[]
   adminDepartmentRestrictions AdminDepartmentRestriction[]
   activityLogs                ActivityLog[]
   employeeGradeHistory        EmployeeGradeHistory[]
   parkingSlot                 ParkingSlot?
+  attendanceRecords           AttendanceRecord[]
+  attendanceRequests          AttendanceRequest[] @relation("RequestUser")
+  approvedRequests            AttendanceRequest[] @relation("RequestApprover")
+  
+  // New Silos for Dynamic Dashboard
+  expenses                    ExpenseRequest[]
+  breakLogs                   BreakLog[]
+  documentRequests            DocumentRequest[] @relation("DocumentRequestUser")
+  approvedDocs                DocumentRequest[] @relation("DocumentApprover")
+  payrolls                    Payroll[]
 
   @@index([branch_id], map: "User_branch_id_fkey")
   @@index([department_id], map: "User_department_id_fkey")
   @@index([employee_level_id])
   @@index([employee_grade_id])
+  @@index([shift_id])
+}
+
+// ... existing models ...
+
+model ExpenseRequest {
+  id          Int      @id @default(autoincrement())
+  user_id     Int
+  amount      Float
+  category    String   // Travel, Meal, Office, etc.
+  description String?  @db.Text
+  date        DateTime @db.Date
+  status      String   @default("Pending") // Pending, Approved, Rejected
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+}
+
+model BreakLog {
+  id                   Int      @id @default(autoincrement())
+  user_id              Int
+  attendance_id        Int?
+  start_time           DateTime @default(now())
+  end_time             DateTime?
+  duration_minutes     Int      @default(0)
+  break_type           String   @default("Standard") // Lunch, Tea, etc.
+  status               String   @default("Completed") // Ongoing, Completed
+  
+  user                 User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  attendance           AttendanceRecord? @relation(fields: [attendance_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+}
+
+model DocumentRequest {
+  id             Int      @id @default(autoincrement())
+  user_id        Int
+  // Types: BankChange, DeviceChange, FaceChange, ProfileChange, WFH, ShortLeave, TaxDocument, ShiftChange
+  request_type   String
+  requested_data Json
+  reason         String?  @db.Text
+  status         String   @default("Pending")
+  approver_id    Int?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user     User  @relation("DocumentRequestUser", fields: [user_id], references: [id], onDelete: Cascade)
+  approver User? @relation("DocumentApprover", fields: [approver_id], references: [id], onDelete: SetNull)
+
+  @@index([user_id])
+  @@index([status])
 }
 
 model Company {
@@ -271,3 +337,103 @@ model CompanySetting {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+// ==========================================
+// Phase 5: Attendance Models
+// ==========================================
+
+model Shift {
+  id                   Int      @id @default(autoincrement())
+  name                 String
+  start_time           String   // HH:mm format
+  end_time             String   // HH:mm format
+  grace_time_minutes   Int      @default(0)
+  half_day_min_hours   Float    @default(4.0)
+  full_day_min_hours   Float    @default(8.0)
+  break_duration_mins  Int      @default(60) // Standard break duration
+  is_active            Boolean  @default(true)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  users User[]
+}
+
+model AttendanceRecord {
+  id                  Int      @id @default(autoincrement())
+  user_id             Int
+  date                DateTime @db.Date // Only stores the YYYY-MM-DD
+  in_time             DateTime? // Full timestamp of punch in
+  out_time            DateTime? // Full timestamp of punch out
+  break_minutes       Int      @default(0) // Track literal break minutes taken
+  total_working_hours Float    @default(0.0)
+  late_by_minutes     Int      @default(0)
+  early_leaving_mins  Int      @default(0)
+  overtime_hours      Float    @default(0.0)
+  
+  // Status: Present, Absent, Late, Half Day, Leave, WeekOff, Holiday, MissingPunch
+  status              String   @default("Absent")
+  
+  // Source: Biometric, App, Web, Manual, Bulk
+  source              String   @default("Web")
+  remarks             String?  @db.Text
+  
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  breakLogs           BreakLog[]
+
+  @@unique([user_id, date]) // One primary record per user per day
+  @@index([user_id])
+  @@index([date])
+  @@index([status])
+}
+
+model AttendanceRequest {
+  id               Int      @id @default(autoincrement())
+  user_id          Int
+  // Types: MissingPunchOut, Overtime, BreakCorrection, WeekOffExchange, AttendanceModification
+  request_type     String   
+  // Optional linkage to a specific date/record
+  date             DateTime @db.Date 
+  
+  // Old/Requested Values Stored as JSON or simple fields for flexibility
+  requested_data   Json     // e.g. { "out_time": "18:00", ... }
+  reason           String   @db.Text
+  
+  // Tracking
+  status           String   @default("Pending") // Pending, Approved, Rejected
+  approver_id      Int?
+  approver_remarks String?  @db.Text
+  
+  createdAt        DateTime @default(now())
+  modifiedAt       DateTime @updatedAt
+  
+  user     User  @relation("RequestUser", fields: [user_id], references: [id], onDelete: Cascade)
+  approver User? @relation("RequestApprover", fields: [approver_id], references: [id], onDelete: SetNull)
+
+  @@index([user_id])
+  @@index([approver_id])
+  @@index([status])
+}
+
+model Payroll {
+  id             Int      @id @default(autoincrement())
+  user_id        Int
+  month          Int      // 1-12
+  year           Int
+  basic_salary   Float
+  allowances     Float    @default(0.0)
+  deductions     Float    @default(0.0)
+  net_salary     Float
+  status         String   @default("Pending") // Pending, Processed, Released
+  paid_at        DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, month, year])
+  @@index([user_id])
+}
+

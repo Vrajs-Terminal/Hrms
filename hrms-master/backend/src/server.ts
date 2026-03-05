@@ -24,6 +24,12 @@ import employeeParkingRoutes from './routes/employee-parking';
 import emergencyNumbersRoutes from './routes/emergency-numbers';
 import settingsRoutes from './routes/settings';
 import whatsappAlertsRoutes from './routes/whatsapp-alerts';
+import shiftsRoutes from './routes/shifts';
+import attendanceRoutes from './routes/attendance';
+import attendanceRequestsRoutes from './routes/attendance-requests';
+import documentRequestsRoutes from './routes/document-requests';
+import expensesRoutes from './routes/expenses';
+import breaksRoutes from './routes/breaks';
 
 const app = express();
 
@@ -53,6 +59,12 @@ app.use('/api/employee-parking', employeeParkingRoutes);
 app.use('/api/emergency-numbers', emergencyNumbersRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/whatsapp-alerts', whatsappAlertsRoutes);
+app.use('/api/shifts', shiftsRoutes);
+app.use('/api/attendance', attendanceRoutes);
+app.use('/api/attendance-requests', attendanceRequestsRoutes);
+app.use('/api/document-requests', documentRequestsRoutes);
+app.use('/api/expenses', expensesRoutes);
+app.use('/api/breaks', breaksRoutes);
 
 // Basic test route
 app.get('/api/health', (req, res) => {
