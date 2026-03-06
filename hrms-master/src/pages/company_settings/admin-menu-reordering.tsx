@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { GripVertical, Save, ChevronUp, ChevronDown, LayoutDashboard, Settings, Users, Calculator, Activity, RefreshCcw, Megaphone, ClipboardList, BarChart2, Factory, BookOpen, Monitor, Grid, Headphones, Loader2 } from 'lucide-react';
+import { GripVertical, Save, ChevronUp, ChevronDown, LayoutDashboard, Settings, Users, Calculator, Activity, RefreshCcw, Megaphone, ClipboardList, BarChart2, Factory, BookOpen, Monitor, Grid, Headphones, Loader2, MapPin } from 'lucide-react';
 import './admin-menu-reordering.css';
 
 interface MenuItem {
@@ -14,19 +14,19 @@ const getDefaultMenuItems = (): MenuItem[] => {
         { id: '1', name: 'Dashboard', iconName: 'LayoutDashboard', order: 1 },
         { id: '2', name: 'Company Settings', iconName: 'Settings', order: 2 },
         { id: '3', name: 'Attendance', iconName: 'ClipboardList', order: 3 },
-        { id: '4', name: 'Core HRMS', iconName: 'Users', order: 4 },
-        { id: '5', name: 'Finance & Accounting', iconName: 'Calculator', order: 5 },
-        { id: '6', name: 'Productivity & Tracking', iconName: 'Activity', order: 6 },
-        { id: '7', name: 'CRM', iconName: 'RefreshCcw', order: 7 },
-        { id: '8', name: 'Effective Communication', iconName: 'Megaphone', order: 8 },
-        { id: '8', name: 'Orders & Visits', iconName: 'ClipboardList', order: 8 },
-        { id: '9', name: 'Analytics & Reports', iconName: 'BarChart2', order: 9 },
-        { id: '10', name: 'Industry Modules', iconName: 'Factory', order: 10 },
-        { id: '11', name: 'Knowledge Center', iconName: 'BookOpen', order: 11 },
-        { id: '12', name: 'Assets & Resources', iconName: 'Monitor', order: 12 },
-
-        { id: '13', name: 'Other Utilities', iconName: 'Grid', order: 13 },
-        { id: '14', name: 'Contact Support Team', iconName: 'Headphones', order: 14 },
+        { id: '15', name: 'Employee Tracking', iconName: 'MapPin', order: 4 },
+        { id: '4', name: 'Core HRMS', iconName: 'Users', order: 5 },
+        { id: '5', name: 'Finance & Accounting', iconName: 'Calculator', order: 6 },
+        { id: '6', name: 'Productivity & Tracking', iconName: 'Activity', order: 7 },
+        { id: '7', name: 'CRM', iconName: 'RefreshCcw', order: 8 },
+        { id: '8', name: 'Effective Communication', iconName: 'Megaphone', order: 9 },
+        { id: '16', name: 'Orders & Visits', iconName: 'ClipboardList', order: 10 },
+        { id: '9', name: 'Analytics & Reports', iconName: 'BarChart2', order: 11 },
+        { id: '10', name: 'Industry Modules', iconName: 'Factory', order: 12 },
+        { id: '11', name: 'Knowledge Center', iconName: 'BookOpen', order: 13 },
+        { id: '12', name: 'Assets & Resources', iconName: 'Monitor', order: 14 },
+        { id: '13', name: 'Other Utilities', iconName: 'Grid', order: 15 },
+        { id: '14', name: 'Contact Support Team', iconName: 'Headphones', order: 16 },
     ];
 };
 
@@ -46,6 +46,7 @@ const getIconComponent = (iconName: string) => {
         case 'Monitor': return Monitor;
         case 'Grid': return Grid;
         case 'Headphones': return Headphones;
+        case 'MapPin': return MapPin;
         default: return Grid;
     }
 };
