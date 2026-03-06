@@ -166,11 +166,20 @@ function Sidebar({ isOpen }: SidebarProps) {
 
                         // Force "Employee Tracking" to definitively reside at pos 4
                         const trackingIndex = newOrderedList.findIndex(m => m.name === "Employee Tracking");
+                        console.log("CACHE_BUSTER_123_FORCE_NEW_CHUCK", trackingIndex);
                         if (trackingIndex !== -1 && trackingIndex !== 3) {
                             const [trackingItem] = newOrderedList.splice(trackingIndex, 1);
                             newOrderedList.splice(3, 0, trackingItem);
                         }
 
+                        // Fallback: Ensure Employee Tracking is ALWAYS present if somehow swallowed
+                        const finalTrackingCheck = newOrderedList.findIndex(m => m.name === "Employee Tracking");
+                        if (finalTrackingCheck === -1) {
+                            const fallbackItem = menuItems.find(m => m.name === "Employee Tracking");
+                            if (fallbackItem) newOrderedList.splice(3, 0, fallbackItem);
+                        }
+
+                        console.log("CACHE_BUSTER_456_FINAL_LIST", newOrderedList.map(i => i.name));
                         setDynamicMenuItems(newOrderedList);
                     }
                 }
