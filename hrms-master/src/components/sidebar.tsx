@@ -21,6 +21,7 @@ import {
     Building2,
     ChevronRight,
     ChevronDown,
+    MapPin,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -94,6 +95,19 @@ function Sidebar({ isOpen }: SidebarProps) {
                 { name: "Attendance Modification Request", path: "/attendance-modification" },
                 { name: "Recalculate Attendance", path: "/recalculate-attendance" },
                 { name: "Pending Flags", path: "/pending-flags" },
+            ]
+        },
+        {
+            name: "Employee Tracking",
+            icon: MapPin,
+            subItems: [
+                { name: "Tracking Dashboard", path: "/tracking-dashboard" },
+                { name: "Employee Live Tracking", path: "/employee-live-tracking" },
+                { name: "Tracking History", path: "/tracking-history" },
+                { name: "Geo-Fence Settings", path: "/geofence-settings" },
+                { name: "Exception Management", path: "/exception-management" },
+                { name: "Tracking Reports", path: "/tracking-reports" },
+                { name: "Tracking Employee Wise", path: "/tracking-employee-wise" },
             ]
         },
         { name: "Core HRMS", path: "/core-hrms", icon: Users },

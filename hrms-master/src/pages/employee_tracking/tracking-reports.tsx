@@ -1,0 +1,344 @@
+import { useState, useEffect } from 'react';
+import api from '../../lib/axios';
+import {
+    FileText, Download, Filter, RefreshCcw,
+    Route, MapPin, AlertTriangle, Navigation, Clock,
+    Building2, BarChart2
+} from 'lucide-react';
+import './employee-tracking.css';
+
+type ReportType = 'movement' | 'distance' | 'field_visit' | 'geofence_violation' | 'travel_summary' | 'branch_inout' | 'timeline';
+
+const reportTypes: { key: ReportType; label: string; icon: any; desc: string }[] = [
+    { key: 'movement', label: 'Employee Movement', icon: Route, desc: 'Track employee movement patterns' },
+    { key: 'distance', label: 'Distance Report', icon: Navigation, desc: 'Total distance covered by employees' },
+    { key: 'field_visit', label: 'Field Visit', icon: MapPin, desc: 'Field visit location and duration' },
+    { key: 'geofence_violation', label: 'Geofence Violation', icon: AlertTriangle, desc: 'GPS/Internet On/Off summary' },
+    { key: 'travel_summary', label: 'Travel Summary', icon: BarChart2, desc: 'Overall travel analytics' },
+    { key: 'branch_inout', label: 'Branch In/Out', icon: Building2, desc: 'Branch-wise entry and exit log' },
+    { key: 'timeline', label: 'Timeline Report', icon: Clock, desc: 'Detailed daily timeline' },
+];
+
+const TrackingReports = () => {
+    const [selectedReport, setSelectedReport] = useState<ReportType>('movement');
+    const [dateFrom, setDateFrom] = useState(new Date().toISOString().split('T')[0]);
+    const [dateTo, setDateTo] = useState(new Date().toISOString().split('T')[0]);
+    const [employee, setEmployee] = useState('');
+    const [department, setDepartment] = useState('');
+
+    const [loading, setLoading] = useState(false);
+    const [data, setData] = useState<any[]>([]);
+    const [stats, setStats] = useState({ totalRecords: 0, totalDistance: 0, alertsCount: 0 });
+
+    const [employeeList, setEmployeeList] = useState<string[]>([]);
+    const [departmentList, setDepartmentList] = useState<string[]>([]);
+
+    const fetchReportData = async () => {
+        setLoading(true);
+        try {
+            const query = new URLSearchParams();
+            if (dateFrom) query.append('startDate', dateFrom);
+            if (dateTo) query.append('endDate', dateTo);
+            if (employee) query.append('employee', employee);
+            if (department) query.append('department', department);
+
+            let endpoint = '';
+            // For violations, we fetch exceptions. For everything else, tracking history.
+            if (selectedReport === 'geofence_violation') {
+                endpoint = `/tracking-exceptions?${query.toString()}`;
+            } else {
+                endpoint = `/tracking/history?${query.toString()}`;
+            }
+
+            const res = await api.get(endpoint);
+            const responseData = res.data;
+
+            if (selectedReport === 'geofence_violation') {
+                const exceptions = responseData?.exceptions || [];
+                setData(exceptions);
+                setStats({
+                    totalRecords: exceptions.length,
+                    totalDistance: 0,
+                    alertsCount: responseData?.counts?.pending || exceptions.length
+                });
+            } else {
+                const movements = responseData?.dailyMovements || responseData?.logs || [];
+                setData(movements);
+
+                // Assuming Distance is provided as string like "4.5 km" in dailyMovements
+                const distSum = movements.reduce((acc: number, curr: any) => {
+                    return acc + (parseFloat(curr.distance) || 0);
+                }, 0);
+
+                // Also fetch employees/departments for filters if not loaded
+                const uniqueDepts = Array.from(new Set(movements.map((m: any) => m.department))).filter(Boolean) as string[];
+                const uniqueEmps = Array.from(new Set(movements.map((m: any) => m.employeeName || m.employee))).filter(Boolean) as string[];
+
+                if (departmentList.length === 0) setDepartmentList(uniqueDepts);
+                if (employeeList.length === 0) setEmployeeList(uniqueEmps);
+
+                setStats({
+                    totalRecords: movements.length,
+                    totalDistance: distSum,
+                    alertsCount: 0 // Fetch from exceptions if needed, but keeping 0 for now
+                });
+            }
+        } catch (error) {
+            console.error('Failed to fetch report data', error);
+            setData([]);
+            setStats({ totalRecords: 0, totalDistance: 0, alertsCount: 0 });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchReportData();
+    }, [selectedReport]);
+
+    const handleGenerate = () => {
+        fetchReportData();
+    };
+
+    const handleReset = () => {
+        setDateFrom(new Date().toISOString().split('T')[0]);
+        setDateTo(new Date().toISOString().split('T')[0]);
+        setEmployee('');
+        setDepartment('');
+        setTimeout(fetchReportData, 0);
+    };
+
+    const exportToCSV = async () => {
+        try {
+            const query = new URLSearchParams();
+            if (dateFrom) query.append('startDate', dateFrom);
+            if (dateTo) query.append('endDate', dateTo);
+            if (employee) query.append('employee', employee);
+            if (department) query.append('department', department);
+
+            let endpoint = '';
+            if (selectedReport === 'geofence_violation') {
+                endpoint = `/tracking-exceptions/export?${query.toString()}`;
+            } else {
+                endpoint = `/tracking/history/export?${query.toString()}`;
+            }
+
+            const res = await api.get(endpoint, { responseType: 'blob' });
+            const url = window.URL.createObjectURL(new Blob([res.data]));
+            const a = document.createElement('a');
+            a.href = url;
+            // Since our backend generates CSVs currently, we stick to .csv extension
+            // A future iteration might use xlsx library in the backend to send standard excels.
+            a.download = `${selectedReport}_report_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        } catch (error) {
+            console.error('Export failed', error);
+        }
+    };
+
+    const currentReport = reportTypes.find(r => r.key === selectedReport)!;
+
+    const renderTable = () => {
+        if (loading) {
+            return <div style={{ padding: 40, textAlign: 'center', color: '#64748b' }}>Generating report...</div>;
+        }
+
+        if (data.length === 0) {
+            return <div style={{ padding: 40, textAlign: 'center', color: '#64748b' }}>No data found for given parameters.</div>;
+        }
+
+        if (selectedReport === 'geofence_violation') {
+            return (
+                <table className="et-table">
+                    <thead>
+                        <tr>
+                            <th>Employee</th>
+                            <th>Department</th>
+                            <th>Date</th>
+                            <th>Violation Type</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                            <th>Severity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {data.map((row, i) => (
+                            <tr key={i}>
+                                <td style={{ fontWeight: 600 }}>{row.employeeName}</td>
+                                <td><span className="et-badge et-badge-blue">{row.department}</span></td>
+                                <td>{row.date}</td>
+                                <td>
+                                    <span className={`et-badge ${row.type.includes('GPS') ? 'et-badge-gray' : 'et-badge-red'}`}>
+                                        {row.type}
+                                    </span>
+                                </td>
+                                <td>{row.timestamp}</td>
+                                <td>
+                                    <span className={`et-badge ${row.status === 'Approved' ? 'et-badge-green' : row.status === 'Rejected' ? 'et-badge-red' : 'et-badge-amber'}`}>
+                                        {row.status}
+                                    </span>
+                                </td>
+                                <td>{row.severity}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            );
+        }
+
+        return (
+            <table className="et-table">
+                <thead>
+                    <tr>
+                        <th>Employee</th>
+                        <th>Department</th>
+                        <th>Date</th>
+                        <th>First Ping</th>
+                        <th>Last Ping</th>
+                        <th>Distance</th>
+                        <th>Locations Visited</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {data.map((row, i) => (
+                        <tr key={i}>
+                            <td style={{ fontWeight: 600 }}>{row.employeeName}</td>
+                            <td><span className="et-badge et-badge-blue">{row.department}</span></td>
+                            <td>{row.date}</td>
+                            <td>{row.firstPingTime}</td>
+                            <td>{row.lastPingTime}</td>
+                            <td style={{ fontWeight: 600, color: '#0f172a' }}>{row.distance}</td>
+                            <td style={{ textAlign: 'center' }}>{row.workingTime ? 'Multiple' : '0'}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        );
+    };
+
+    return (
+        <div className="et-container">
+            <div className="et-header">
+                <div>
+                    <h2 className="et-title">Tracking Reports</h2>
+                    <p className="et-subtitle">Generate and export employee tracking reports</p>
+                </div>
+                <div className="et-actions">
+                    <button className="et-btn et-btn-secondary" onClick={() => exportToCSV()}>
+                        <Download size={16} /> Export Excel
+                    </button>
+                    <button className="et-btn et-btn-primary" onClick={() => exportToCSV()}>
+                        <Download size={16} /> Export PDF
+                    </button>
+                </div>
+            </div>
+
+            {/* Report Type Selector */}
+            <div className="et-report-type">
+                {reportTypes.map(report => (
+                    <div
+                        key={report.key}
+                        className={`et-report-card ${selectedReport === report.key ? 'active' : ''}`}
+                        onClick={() => setSelectedReport(report.key)}
+                    >
+                        <div className="et-report-card-icon">
+                            <report.icon size={18} />
+                        </div>
+                        <div>
+                            <div className="et-report-card-label">{report.label}</div>
+                            <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 2 }}>{report.desc}</div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            {/* Filters */}
+            <div className="et-filters">
+                <div className="et-filter-group">
+                    <label>Date From</label>
+                    <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} />
+                </div>
+                <div className="et-filter-group">
+                    <label>Date To</label>
+                    <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} />
+                </div>
+                <div className="et-filter-group">
+                    <label>Employee</label>
+                    <select value={employee} onChange={e => setEmployee(e.target.value)}>
+                        <option value="">All Employees</option>
+                        {employeeList.map(n => <option key={n} value={n}>{n}</option>)}
+                    </select>
+                </div>
+                <div className="et-filter-group">
+                    <label>Department</label>
+                    <select value={department} onChange={e => setDepartment(e.target.value)}>
+                        <option value="">All Departments</option>
+                        {departmentList.map(d => <option key={d} value={d}>{d}</option>)}
+                    </select>
+                </div>
+                <div className="et-filter-buttons">
+                    <button className="et-btn et-btn-primary" onClick={handleGenerate}>
+                        <Filter size={16} /> Generate
+                    </button>
+                    <button className="et-btn et-btn-danger" onClick={handleReset}>
+                        <RefreshCcw size={16} /> Reset
+                    </button>
+                </div>
+            </div>
+
+            {/* Report Header */}
+            <div className="et-card" style={{ marginBottom: 16, padding: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{ width: 40, height: 40, borderRadius: 10, background: '#eff6ff', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <currentReport.icon size={20} />
+                    </div>
+                    <div>
+                        <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: '#0f172a' }}>{currentReport.label} Report</h3>
+                        <p style={{ margin: '2px 0 0 0', fontSize: 12, color: '#64748b' }}>
+                            {currentReport.desc} • {dateFrom} to {dateTo}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Quick Stats for Selected Report */}
+            <div className="et-kpi-grid" style={{ marginBottom: 16, gridTemplateColumns: 'repeat(4, 1fr)' }}>
+                {[
+                    { label: 'Total Records', value: stats.totalRecords, icon: FileText, color: '#3b82f6', bg: '#eff6ff' },
+                    { label: 'Total Distance', value: `${stats.totalDistance.toFixed(2)} km`, icon: Route, color: '#10b981', bg: '#f0fdf4' },
+                    { label: 'Avg per Employee', value: stats.totalRecords > 0 ? `${(stats.totalDistance / stats.totalRecords).toFixed(2)} km` : '0 km', icon: Navigation, color: '#8b5cf6', bg: '#f5f3ff' },
+                    { label: 'Alerts/Violations', value: stats.alertsCount, icon: AlertTriangle, color: '#f59e0b', bg: '#fffbeb' },
+                ].map((stat, i) => (
+                    <div key={i} className="et-kpi-card et-stagger-1">
+                        <div className="et-kpi-top">
+                            <div className="et-kpi-icon" style={{ background: stat.bg, color: stat.color }}>
+                                <stat.icon size={18} />
+                            </div>
+                        </div>
+                        <div className="et-kpi-value">{stat.value}</div>
+                        <div className="et-kpi-label">{stat.label}</div>
+                    </div>
+                ))}
+            </div>
+
+            {/* Report Table */}
+            <div className="et-card et-stagger-2">
+                <div className="et-card-header">
+                    <h3 className="et-card-title">Report Data</h3>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                        <button className="et-btn et-btn-sm et-btn-secondary" onClick={() => exportToCSV()}>
+                            <Download size={12} /> CSV
+                        </button>
+                    </div>
+                </div>
+                <div className="et-table-wrap">
+                    {renderTable()}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default TrackingReports;

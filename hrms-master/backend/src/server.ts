@@ -30,6 +30,10 @@ import attendanceRequestsRoutes from './routes/attendance-requests';
 import documentRequestsRoutes from './routes/document-requests';
 import expensesRoutes from './routes/expenses';
 import breaksRoutes from './routes/breaks';
+import geofencesRoutes from './routes/geofences';
+import trackingRoutes from './routes/tracking';
+import trackingExceptionsRoutes from './routes/tracking-exceptions';
+import trackingConfigRoutes from './routes/tracking-config';
 
 const app = express();
 
@@ -65,6 +69,10 @@ app.use('/api/attendance-requests', attendanceRequestsRoutes);
 app.use('/api/document-requests', documentRequestsRoutes);
 app.use('/api/expenses', expensesRoutes);
 app.use('/api/breaks', breaksRoutes);
+app.use('/api/geofences', geofencesRoutes);
+app.use('/api/tracking', trackingRoutes);
+app.use('/api/tracking-exceptions', trackingExceptionsRoutes);
+app.use('/api/tracking-config', trackingConfigRoutes);
 
 // Basic test route
 app.get('/api/health', (req, res) => {

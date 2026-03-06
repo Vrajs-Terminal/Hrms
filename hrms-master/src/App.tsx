@@ -47,6 +47,14 @@ import AttendanceModification from "./pages/attendance/attendance-modification";
 import RecalculateAttendance from "./pages/attendance/recalculate-attendance";
 import PendingFlags from "./pages/attendance/pending-flags";
 
+import TrackingDashboard from "./pages/employee_tracking/tracking-dashboard";
+import EmployeeLiveTracking from "./pages/employee_tracking/employee-live-tracking";
+import TrackingHistory from "./pages/employee_tracking/tracking-history";
+import GeofenceSettings from "./pages/employee_tracking/geofence-settings";
+import ExceptionManagement from "./pages/employee_tracking/exception-management";
+import TrackingReports from "./pages/employee_tracking/tracking-reports";
+import TrackingEmployeeWise from "./pages/employee_tracking/tracking-employee-wise";
+
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
@@ -113,6 +121,14 @@ function App() {
               <Route path="/attendance-modification" element={<AttendanceModification />} />
               <Route path="/recalculate-attendance" element={<RecalculateAttendance />} />
               <Route path="/pending-flags" element={<PendingFlags />} />
+
+              <Route path="/tracking-dashboard" element={<TrackingDashboard />} />
+              <Route path="/employee-live-tracking" element={<EmployeeLiveTracking />} />
+              <Route path="/tracking-history" element={<TrackingHistory />} />
+              <Route path="/geofence-settings" element={<GeofenceSettings />} />
+              <Route path="/exception-management" element={<ExceptionManagement />} />
+              <Route path="/tracking-reports" element={<TrackingReports />} />
+              <Route path="/tracking-employee-wise" element={<TrackingEmployeeWise />} />
 
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
