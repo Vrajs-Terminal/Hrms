@@ -196,7 +196,7 @@ function Sidebar({ isOpen }: SidebarProps) {
         return () => {
             window.removeEventListener('menuOrderChanged', fetchMenuOrder);
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+         
     }, []);
 
     const isActive = (path?: string) => {

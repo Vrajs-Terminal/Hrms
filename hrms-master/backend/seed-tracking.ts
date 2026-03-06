@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-declare var process: any;
+declare let process: any;
 const prisma = new PrismaClient();
 
 async function seed() {

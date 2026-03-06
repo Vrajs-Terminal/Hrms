@@ -120,7 +120,7 @@ export default function Zones() {
     };
 
     const moveZone = async (index: number, direction: 'up' | 'down') => {
-        let newOrder = [...zones];
+        const newOrder = [...zones];
         if (direction === 'up' && index > 0) {
             [newOrder[index - 1], newOrder[index]] = [newOrder[index], newOrder[index - 1]];
         } else if (direction === 'down' && index < zones.length - 1) {

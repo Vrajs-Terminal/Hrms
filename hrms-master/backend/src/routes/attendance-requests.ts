@@ -45,7 +45,7 @@ router.get('/', authenticateToken, async (req, res) => {
     try {
         const { status, user_id, type } = req.query;
         const user = (req as any).user;
-        let whereClause: any = {};
+        const whereClause: any = {};
 
         // Security check
         if (user.role !== 'Admin' && user.role !== 'Super Admin') {

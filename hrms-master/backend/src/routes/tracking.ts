@@ -125,7 +125,7 @@ router.get('/live', authenticateToken, async (req, res) => {
         const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
         // Get all users with latest tracking log
-        let userWhere: any = {};
+        const userWhere: any = {};
         if (department && department !== 'All Departments') {
             userWhere.department = { name: department as string };
         }
@@ -186,7 +186,7 @@ router.get('/history', authenticateToken, async (req, res) => {
     try {
         const { user_id, department, start_date, end_date } = req.query;
 
-        let whereClause: any = {};
+        const whereClause: any = {};
         if (user_id) whereClause.user_id = parseInt(user_id as string);
         if (start_date && end_date) {
             whereClause.timestamp = {
@@ -241,7 +241,7 @@ router.get('/history', authenticateToken, async (req, res) => {
 router.get('/history/export', authenticateToken, async (req, res) => {
     try {
         const { start_date, end_date } = req.query;
-        let whereClause: any = {};
+        const whereClause: any = {};
         if (start_date && end_date) {
             whereClause.timestamp = {
                 gte: new Date(start_date as string),

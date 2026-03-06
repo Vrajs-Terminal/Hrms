@@ -9,7 +9,7 @@ const router = Router();
 router.get('/', authenticateToken, async (req, res) => {
     try {
         const user = (req as any).user;
-        let where: any = {};
+        const where: any = {};
 
         if (user.role !== 'Admin' && user.role !== 'SuperAdmin') {
             where.user_id = user.id;

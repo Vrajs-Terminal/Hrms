@@ -150,7 +150,7 @@ export default function SubDepartments() {
 
     const moveSubDept = async (departmentId: number, index: number, direction: 'up' | 'down') => {
         const itemsInGroup = subDepts.filter(sd => sd.department_id === departmentId).sort((a, b) => a.order_index - b.order_index);
-        let updatedItems = [...itemsInGroup];
+        const updatedItems = [...itemsInGroup];
 
         if (direction === 'up' && index > 0) {
             [updatedItems[index - 1], updatedItems[index]] = [updatedItems[index], updatedItems[index - 1]];

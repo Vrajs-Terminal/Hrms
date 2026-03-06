@@ -118,7 +118,7 @@ router.get('/', authenticateToken, async (req, res) => {
     try {
         const { date, start_date, end_date, user_id, status, department_id, branch_id } = req.query;
         const user = (req as any).user;
-        let whereClause: any = {};
+        const whereClause: any = {};
 
         if (date) {
             whereClause.date = new Date(date as string);
@@ -241,7 +241,7 @@ router.get('/month-wise', authenticateToken, async (req, res) => {
         const endDate = new Date(y, m, 0); // last day of month
 
         const user = (req as any).user;
-        let whereClause: any = {
+        const whereClause: any = {
             date: { gte: startDate, lte: endDate }
         };
 
@@ -314,7 +314,7 @@ router.get('/weekly', authenticateToken, async (req, res) => {
         endOfWeek.setDate(endOfWeek.getDate() + 6);
 
         const user = (req as any).user;
-        let whereClause: any = {
+        const whereClause: any = {
             date: { gte: startOfWeek, lte: endOfWeek }
         };
 
@@ -594,7 +594,7 @@ router.post('/recalculate', authenticateToken, async (req, res) => {
             return res.status(400).json({ error: 'start_date and end_date are required' });
         }
 
-        let whereClause: any = {
+        const whereClause: any = {
             date: {
                 gte: new Date(start_date),
                 lte: new Date(end_date)

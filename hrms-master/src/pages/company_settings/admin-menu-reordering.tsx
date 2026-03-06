@@ -71,7 +71,7 @@ export default function AdminMenuReordering() {
             if (res.ok) {
                 const data = await res.json();
                 if (data && data.value && Array.isArray(data.value) && data.value.length > 5) {
-                    let fetchedItems: MenuItem[] = [...data.value];
+                    const fetchedItems: MenuItem[] = [...data.value];
 
                     // Self-heal: If Attendance was never saved in DB historically, inject it now!
                     const hasAttendance = fetchedItems.some(item => item.name === 'Attendance');

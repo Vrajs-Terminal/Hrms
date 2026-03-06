@@ -33,7 +33,7 @@ router.post('/bulk', async (req, res) => {
             where: { sub_department_id: sdId },
             _max: { order_index: true }
         });
-        let startIndex = (currentMax._max.order_index || 0) + 1;
+        const startIndex = (currentMax._max.order_index || 0) + 1;
 
         const dataToInsert = names.map((name, i) => ({
             name: name.trim(),

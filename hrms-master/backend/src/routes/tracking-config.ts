@@ -10,7 +10,7 @@ router.get('/', authenticateToken, async (req, res) => {
     try {
         const { search, department } = req.query;
 
-        let userWhere: any = {};
+        const userWhere: any = {};
         if (search) userWhere.name = { contains: search as string };
         if (department && department !== 'All Departments') {
             userWhere.department = { name: department as string };

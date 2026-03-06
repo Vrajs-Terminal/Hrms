@@ -167,7 +167,7 @@ export default function Designations() {
 
     const moveDesig = async (subDeptId: number, index: number, direction: 'up' | 'down') => {
         const itemsInGroup = designations.filter(d => d.sub_department_id === subDeptId).sort((a, b) => a.order_index - b.order_index);
-        let updatedItems = [...itemsInGroup];
+        const updatedItems = [...itemsInGroup];
 
         if (direction === 'up' && index > 0) {
             [updatedItems[index - 1], updatedItems[index]] = [updatedItems[index], updatedItems[index - 1]];

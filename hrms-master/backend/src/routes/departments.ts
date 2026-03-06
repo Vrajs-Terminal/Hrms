@@ -10,7 +10,7 @@ const router = Router();
 router.get('/', optionalAuthenticateToken, async (req, res) => {
     try {
         const user = (req as any).user;
-        let whereClause: any = {};
+        const whereClause: any = {};
 
         if (user && user.role === 'Admin') {
             const conditions = [];

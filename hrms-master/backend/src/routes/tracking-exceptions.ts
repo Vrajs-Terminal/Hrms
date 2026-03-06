@@ -9,7 +9,7 @@ const router = Router();
 router.get('/', authenticateToken, async (req, res) => {
     try {
         const { type, severity, status } = req.query;
-        let whereClause: any = {};
+        const whereClause: any = {};
         if (type && type !== 'All') whereClause.type = type as string;
         if (severity && severity !== 'All') whereClause.severity = severity as string;
         if (status && status !== 'All') whereClause.status = status as string;
