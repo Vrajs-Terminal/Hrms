@@ -99,6 +99,18 @@ export default function AdminMenuReordering() {
                         }
                     });
 
+                    // Force "Employee Tracking" to definitively reside at pos 4 (index 3)
+                    const trackingIndex = fetchedItems.findIndex(m => m.name === "Employee Tracking");
+                    if (trackingIndex !== -1 && trackingIndex !== 3) {
+                        const [trackingItem] = fetchedItems.splice(trackingIndex, 1);
+                        fetchedItems.splice(3, 0, trackingItem);
+                    }
+
+                    // Re-evaluate orders to ensure they are strictly sequential
+                    fetchedItems.forEach((item, i) => {
+                        item.order = i + 1;
+                    });
+
                     setMenuItems(fetchedItems);
                 } else {
                     setMenuItems(baseItems);
