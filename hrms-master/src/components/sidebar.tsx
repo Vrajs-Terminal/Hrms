@@ -147,9 +147,10 @@ function Sidebar({ isOpen }: SidebarProps) {
                         // Append any local items not found in the saved order (future-proofing)
                         menuItems.forEach(localItem => {
                             if (!newOrderedList.find(om => om.name === localItem.name)) {
-                                // If it is "Attendance", intelligently insert it at 3rd place!
                                 if (localItem.name === "Attendance") {
                                     newOrderedList.splice(2, 0, localItem);
+                                } else if (localItem.name === "Employee Tracking") {
+                                    newOrderedList.splice(3, 0, localItem);
                                 } else {
                                     newOrderedList.push(localItem);
                                 }
@@ -161,6 +162,13 @@ function Sidebar({ isOpen }: SidebarProps) {
                         if (attendanceIndex !== -1 && attendanceIndex !== 2) {
                             const [attendanceItem] = newOrderedList.splice(attendanceIndex, 1);
                             newOrderedList.splice(2, 0, attendanceItem);
+                        }
+
+                        // Force "Employee Tracking" to definitively reside at pos 4
+                        const trackingIndex = newOrderedList.findIndex(m => m.name === "Employee Tracking");
+                        if (trackingIndex !== -1 && trackingIndex !== 3) {
+                            const [trackingItem] = newOrderedList.splice(trackingIndex, 1);
+                            newOrderedList.splice(3, 0, trackingItem);
                         }
 
                         setDynamicMenuItems(newOrderedList);
