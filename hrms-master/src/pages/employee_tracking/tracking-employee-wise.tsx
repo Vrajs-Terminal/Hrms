@@ -40,17 +40,17 @@ const TrackingEmployeeWise = () => {
 
             const res = await api.get(`/tracking-config?${query.toString()}`);
             const data = res.data;
-            const mappedData: TrackedEmployee[] = data.configs.map((c: any) => ({
-                id: c.id,
-                userId: c.userId,
-                employeeName: c.user?.name || 'Unknown',
-                department: c.user?.department || 'N/A',
-                designation: c.user?.designation || 'N/A',
-                trackingEnabled: c.trackingEnabled,
-                frequency: c.frequency,
-                activeHoursOnly: c.activeHoursOnly,
-                lastUpdate: c.lastUpdate ? new Date(c.lastUpdate).toLocaleString() : 'N/A',
-                status: c.trackingEnabled ? 'Active' : 'Inactive'
+            const mappedData: TrackedEmployee[] = (data?.configs || []).map((c: any) => ({
+                id: c.userId || c.id || Math.random(),
+                userId: c.userId || c.id,
+                employeeName: c.name || c.user?.name || 'Unknown',
+                department: c.department || c.user?.department || 'N/A',
+                designation: c.designation || c.user?.designation || 'N/A',
+                trackingEnabled: typeof c.enabled !== 'undefined' ? c.enabled : c.trackingEnabled,
+                frequency: c.frequency || 15,
+                activeHoursOnly: typeof c.workingHoursOnly !== 'undefined' ? c.workingHoursOnly : c.activeHoursOnly,
+                lastUpdate: c.lastUpdate ? new Date(c.lastUpdate).toLocaleString() : new Date().toLocaleString(),
+                status: (typeof c.enabled !== 'undefined' ? c.enabled : c.trackingEnabled) ? 'Active' : 'Inactive'
             }));
             setEmployees(mappedData);
 

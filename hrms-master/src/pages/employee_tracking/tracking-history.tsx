@@ -62,7 +62,31 @@ const TrackingHistory = () => {
 
             const res = await api.get(`/tracking/history?${params.toString()}`);
             const data = res.data;
-            const history = data?.history || data?.logs || [];
+            const historyRaw = data?.history || data?.logs || [];
+
+            // Defensively map anything that doesn't perfectly match `DailyMovement`
+            const history: DailyMovement[] = historyRaw.map((raw: any) => {
+                if (raw.timeline && Array.isArray(raw.timeline)) return raw;
+                // If it's a raw backend TrackingLog, cast it into a DailyMovement so children don't crash
+                return {
+                    date: raw.timestamp || raw.createdAt || new Date().toISOString(),
+                    employee: raw.user?.name || raw.employee || 'Unknown',
+                    department: raw.user?.department?.name || raw.department || 'N/A',
+                    distance: '0 km',
+                    workTime: '0h',
+                    locations: 1,
+                    fieldVisits: raw.status === 'Field Visit' ? 1 : 0,
+                    timeline: [{
+                        id: raw.id || 1,
+                        time: new Date(raw.timestamp || new Date()).toLocaleTimeString(),
+                        event: raw.status || 'Status Update',
+                        location: raw.location || 'Unknown',
+                        coords: `${raw.latitude || 0}, ${raw.longitude || 0}`,
+                        type: raw.type || 'Event'
+                    }]
+                };
+            });
+
             setHistoryData(history);
             setTotals(data?.summary || { distance: '0 km', workTime: '0h 0m', locations: 0, fieldVisits: 0 });
 
@@ -234,7 +258,7 @@ const TrackingHistory = () => {
                                         <Navigation size={48} />
                                         <span>Route Visualization</span>
                                         <span style={{ fontSize: 11, color: '#94a3b8' }}>
-                                            {selectedDayLine.timeline.length} waypoints recorded
+                                            {selectedDayLine.timeline?.length || 0} waypoints recorded
                                         </span>
                                         <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
                                             {[
@@ -258,12 +282,12 @@ const TrackingHistory = () => {
                                     <h3 className="et-card-title">
                                         <Clock size={14} style={{ marginRight: 4, color: '#8b5cf6' }} /> Day Timeline
                                     </h3>
-                                    <span className="et-badge et-badge-blue">{selectedDayLine.timeline.length} events</span>
+                                    <span className="et-badge et-badge-blue">{selectedDayLine.timeline?.length || 0} events</span>
                                 </div>
                                 <div className="et-timeline" style={{ maxHeight: 340, overflowY: 'auto' }}>
-                                    {selectedDayLine.timeline.length === 0 ? (
+                                    {(!selectedDayLine.timeline || selectedDayLine.timeline.length === 0) ? (
                                         <div style={{ padding: 20, textAlign: 'center', color: '#94a3b8' }}>No timeline events recorded for this day</div>
-                                    ) : selectedDayLine.timeline.map((item, i) => (
+                                    ) : (selectedDayLine.timeline || []).map((item, i) => (
                                         <div key={i} className="et-timeline-item">
                                             <div className="et-timeline-dot" style={{ background: getEventDotColor(item.type), boxShadow: `0 0 0 2px ${getEventDotColor(item.type)}33` }}></div>
                                             <div className="et-timeline-content">
