@@ -85,7 +85,12 @@ const ExceptionManagement = () => {
 
     const handleAction = async (id: number, action: string) => {
         try {
-            await api.patch(`/tracking-exceptions/${id}/action`, { status: action });
+            let endpoint = '';
+            if (action === 'Approved') endpoint = 'approve';
+            else if (action === 'Rejected') endpoint = 'reject';
+            else if (action === 'Reason Requested') endpoint = 'ask-reason';
+
+            await api.patch(`/tracking-exceptions/${id}/${endpoint}`);
             fetchExceptions(); // Refresh to get updated counts & list
         } catch (error) {
             console.error('Error updating status', error);
