@@ -43,13 +43,35 @@ const ExceptionManagement = () => {
         setLoading(true);
         try {
             const query = new URLSearchParams();
-            if (filterType) query.append('type', filterType);
-            if (filterStatus) query.append('status', filterStatus);
+            if (filterType && filterType !== 'All') query.append('type', filterType);
+            if (filterStatus && filterStatus !== 'All') query.append('status', filterStatus);
             if (filterDate) query.append('date', filterDate);
 
             const res = await api.get(`/tracking-exceptions?${query.toString()}`);
-            setExceptions(res.data?.exceptions || []);
-            setAlertCounts(res.data?.counts || { pending: 0, approved: 0, rejected: 0, total: 0 });
+
+            // Defensively map whatever comes from backend to expected Exception interface format
+            const rawExceptions = res.data?.exceptions || [];
+            const mappedExceptions = rawExceptions.map((ex: any) => ({
+                id: ex.id || Math.random(),
+                employeeName: ex.user?.name || ex.employeeName || 'Unknown User',
+                department: ex.user?.department?.name || ex.department || 'N/A',
+                type: ex.type || 'Alert',
+                description: ex.description || 'No specific description provided.',
+                status: ex.status || 'Pending',
+                severity: ex.severity || 'Medium',
+                timestamp: ex.createdAt ? new Date(ex.createdAt).toLocaleTimeString() : new Date().toLocaleTimeString(),
+                date: ex.createdAt ? new Date(ex.createdAt).toLocaleDateString() : new Date().toLocaleDateString(),
+                location: ex.location || 'Unknown Location'
+            }));
+
+            setExceptions(mappedExceptions);
+            setAlertCounts({
+                late: res.data?.typeCounts?.latePunch || 0,
+                geofence: res.data?.typeCounts?.geofenceViolation || 0,
+                gps: res.data?.typeCounts?.gpsOff || 0,
+                noMovement: res.data?.typeCounts?.internetOff || 0, // Using internetOff as proxy if noMovement missing
+                pending: res.data?.stats?.pending || 0
+            });
         } catch (error) {
             console.error('Failed to fetch exceptions', error);
         } finally {
@@ -233,16 +255,16 @@ const ExceptionManagement = () => {
                                             </div>
                                         </td>
                                     </tr>
-                                ) : exceptions.map(exc => (
+                                ) : exceptions.map((exc: any) => (
                                     <tr key={exc.id}>
                                         <td>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                                                 <div className="et-widget-avatar" style={{ background: '#3b82f6', width: 32, height: 32, fontSize: 12 }}>
-                                                    {exc.employeeName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
+                                                    {(exc.employeeName || 'U').split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase()}
                                                 </div>
                                                 <div>
-                                                    <div style={{ fontWeight: 600, fontSize: 13 }}>{exc.employeeName}</div>
-                                                    <div style={{ fontSize: 11, color: '#64748b' }}>{exc.department}</div>
+                                                    <div style={{ fontWeight: 600, fontSize: 13 }}>{exc.employeeName || 'Unknown'}</div>
+                                                    <div style={{ fontSize: 11, color: '#64748b' }}>{exc.department || 'N/A'}</div>
                                                 </div>
                                             </div>
                                         </td>

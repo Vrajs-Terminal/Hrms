@@ -54,33 +54,62 @@ const TrackingReports = () => {
             const responseData = res.data;
 
             if (selectedReport === 'geofence_violation') {
-                const exceptions = responseData?.exceptions || [];
-                setData(exceptions);
+                const rawExceptions = responseData?.exceptions || [];
+                const exceptions = rawExceptions.map((ex: any) => ({
+                    id: ex.id || Math.random(),
+                    employeeName: ex.user?.name || ex.employeeName || 'Unknown User',
+                    department: ex.user?.department?.name || ex.department || 'N/A',
+                    type: ex.type || 'Alert',
+                    status: ex.status || 'Pending',
+                    severity: ex.severity || 'Medium',
+                    timestamp: ex.createdAt ? new Date(ex.createdAt).toLocaleTimeString() : new Date().toLocaleTimeString(),
+                    date: ex.createdAt ? new Date(ex.createdAt).toLocaleDateString() : new Date().toLocaleDateString()
+                }));
+
+                const uniqueExceptions = exceptions.filter((obj: any, pos: number, arr: any[]) => {
+                    return arr.map(mapObj => mapObj.id).indexOf(obj.id) === pos;
+                });
+
+                setData(uniqueExceptions);
                 setStats({
-                    totalRecords: exceptions.length,
+                    totalRecords: uniqueExceptions.length,
                     totalDistance: 0,
-                    alertsCount: responseData?.counts?.pending || exceptions.length
+                    alertsCount: responseData?.counts?.pending || uniqueExceptions.length
                 });
             } else {
-                const movements = responseData?.dailyMovements || responseData?.logs || [];
-                setData(movements);
+                const rawLogs = responseData?.dailyMovements || responseData?.logs || [];
+                const movements = rawLogs.map((log: any) => ({
+                    id: log.id || Math.random(),
+                    employeeName: log.user?.name || log.employee || log.employeeName || 'Unknown User',
+                    department: log.user?.department?.name || log.department || 'N/A',
+                    date: log.timestamp ? new Date(log.timestamp).toLocaleDateString() : new Date().toLocaleDateString(),
+                    distance: log.distance || '0 km',
+                    firstPingTime: log.firstPingTime || log.timestamp ? new Date(log.timestamp).toLocaleTimeString() : '--:--',
+                    lastPingTime: log.lastPingTime || log.timestamp ? new Date(log.timestamp).toLocaleTimeString() : '--:--',
+                    workingTime: log.workingTime || null
+                }));
 
-                // Assuming Distance is provided as string like "4.5 km" in dailyMovements
-                const distSum = movements.reduce((acc: number, curr: any) => {
+                // Deduplicate by ID
+                const uniqueMovements = movements.filter((obj: any, pos: number, arr: any[]) => {
+                    return arr.map(mapObj => mapObj.id).indexOf(obj.id) === pos;
+                });
+
+                setData(uniqueMovements);
+
+                const distSum = uniqueMovements.reduce((acc: number, curr: any) => {
                     return acc + (parseFloat(curr.distance) || 0);
                 }, 0);
 
-                // Also fetch employees/departments for filters if not loaded
-                const uniqueDepts = Array.from(new Set(movements.map((m: any) => m.department))).filter(Boolean) as string[];
-                const uniqueEmps = Array.from(new Set(movements.map((m: any) => m.employeeName || m.employee))).filter(Boolean) as string[];
+                const uniqueDepts = Array.from(new Set(uniqueMovements.map((m: any) => m.department))).filter(Boolean) as string[];
+                const uniqueEmps = Array.from(new Set(uniqueMovements.map((m: any) => m.employeeName))).filter(Boolean) as string[];
 
                 if (departmentList.length === 0) setDepartmentList(uniqueDepts);
                 if (employeeList.length === 0) setEmployeeList(uniqueEmps);
 
                 setStats({
-                    totalRecords: movements.length,
+                    totalRecords: uniqueMovements.length,
                     totalDistance: distSum,
-                    alertsCount: 0 // Fetch from exceptions if needed, but keeping 0 for now
+                    alertsCount: 0
                 });
             }
         } catch (error) {
