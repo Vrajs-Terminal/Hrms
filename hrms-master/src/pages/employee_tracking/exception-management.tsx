@@ -52,7 +52,7 @@ const ExceptionManagement = () => {
             // Defensively map whatever comes from backend to expected Exception interface format
             const rawExceptions = res.data?.exceptions || [];
             const mappedExceptions = rawExceptions.map((ex: any) => ({
-                id: ex.id || Math.random(),
+                id: ex.id || `temp-${Math.random()}`,
                 employeeName: ex.user?.name || ex.employeeName || 'Unknown User',
                 department: ex.user?.department?.name || ex.department || 'N/A',
                 type: ex.type || 'Alert',
@@ -60,7 +60,7 @@ const ExceptionManagement = () => {
                 status: ex.status || 'Pending',
                 severity: ex.severity || 'Medium',
                 timestamp: ex.createdAt ? new Date(ex.createdAt).toLocaleTimeString() : new Date().toLocaleTimeString(),
-                date: ex.createdAt ? new Date(ex.createdAt).toLocaleDateString() : new Date().toLocaleDateString(),
+                date: ex.createdAt ? ex.createdAt : new Date().toISOString(), // Store raw date for safe parsing
                 location: ex.location || 'Unknown Location'
             }));
 
@@ -166,8 +166,11 @@ const ExceptionManagement = () => {
                             <AlertTriangle size={14} /> {alertCounts.pending} Pending Actions
                         </span>
                     )}
-                    <button className="et-btn et-btn-outline" onClick={exportToCSV}>
-                        <Download size={16} /> Export CSV
+                    <button className="et-btn-refresh btn-secondary" onClick={fetchExceptions} disabled={loading}>
+                        <RefreshCcw size={16} className={loading ? 'fa-spin' : ''} /> Refresh Alert List
+                    </button>
+                    <button className="btn-primary" onClick={exportToCSV}>
+                        <Download size={16} /> Export Reports
                     </button>
                 </div>
             </div>
@@ -222,8 +225,8 @@ const ExceptionManagement = () => {
                     <input type="date" value={filterDate} onChange={e => setFilterDate(e.target.value)} />
                 </div>
                 <div className="et-filter-buttons">
-                    <button className="et-btn et-btn-danger" onClick={() => { setFilterType(''); setFilterStatus(''); setFilterDate(''); }}>
-                        <RefreshCcw size={16} /> Reset
+                    <button className="et-btn-danger" onClick={() => { setFilterType(''); setFilterStatus(''); setFilterDate(''); }}>
+                        <RefreshCcw size={16} /> Reset All Filters
                     </button>
                 </div>
             </div>
@@ -281,7 +284,12 @@ const ExceptionManagement = () => {
                                         <td style={{ maxWidth: 200, fontSize: 12, color: '#475569' }}>{exc.description || 'No description provided'}</td>
                                         <td>
                                             <div style={{ fontSize: 12 }}>
-                                                <div style={{ fontWeight: 500 }}>{new Date(exc.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}</div>
+                                                <div style={{ fontWeight: 500 }}>
+                                                    {(() => {
+                                                        const d = new Date(exc.date);
+                                                        return isNaN(d.getTime()) ? 'Invalid Date' : d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+                                                    })()}
+                                                </div>
                                                 <div style={{ color: '#94a3b8', fontSize: 11 }}>{exc.timestamp}</div>
                                             </div>
                                         </td>

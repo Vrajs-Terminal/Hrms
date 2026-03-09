@@ -54,6 +54,8 @@ import GeofenceSettings from "./pages/employee_tracking/geofence-settings";
 import ExceptionManagement from "./pages/employee_tracking/exception-management";
 import TrackingReports from "./pages/employee_tracking/tracking-reports";
 import TrackingEmployeeWise from "./pages/employee_tracking/tracking-employee-wise";
+import DailyWorkReport from "./pages/employee_tracking/daily-work-report.tsx";
+import DailyWorkReportDetail from "./pages/employee_tracking/daily-work-report-detail.tsx";
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -129,6 +131,8 @@ function App() {
               <Route path="/exception-management" element={<ExceptionManagement />} />
               <Route path="/tracking-reports" element={<TrackingReports />} />
               <Route path="/tracking-employee-wise" element={<TrackingEmployeeWise />} />
+              <Route path="/daily-work-report" element={<DailyWorkReport />} />
+              <Route path="/daily-work-report/:id" element={<DailyWorkReportDetail />} />
 
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

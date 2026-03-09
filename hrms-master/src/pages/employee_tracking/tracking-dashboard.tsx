@@ -5,6 +5,7 @@ import {
     AlertTriangle, ArrowUpRight, ChevronRight,
     RefreshCcw, Map
 } from 'lucide-react';
+import ExportButtons from '../../components/ExportButtons';
 import './employee-tracking.css';
 
 interface DashboardData {
@@ -75,11 +76,11 @@ const TrackingDashboard = () => {
                     <h2 className="et-title">Tracking Dashboard</h2>
                     <p className="et-subtitle">Real-time overview of employee location & activity • {new Date(date).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
                 </div>
-                <div className="et-actions">
-                    <button className="et-btn et-btn-secondary" onClick={fetchDashboard} disabled={loading}>
+                <div className="et-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <button className="btn-secondary" onClick={fetchDashboard} disabled={loading}>
                         <RefreshCcw size={16} className={loading ? 'fa-spin' : ''} /> Refresh
                     </button>
-                    <a href="#/employee-live-tracking" className="et-btn et-btn-primary" style={{ textDecoration: 'none' }}>
+                    <a href="#/employee-live-tracking" className="btn-primary" style={{ textDecoration: 'none' }}>
                         <Map size={16} /> Open Full Map
                     </a>
                 </div>
@@ -212,9 +213,22 @@ const TrackingDashboard = () => {
                             <h3 className="et-card-title">
                                 <Briefcase size={14} style={{ marginRight: 4, color: '#8b5cf6' }} /> Field Employees
                             </h3>
-                            <a href="#/employee-live-tracking" className="et-card-link">
-                                View All <ChevronRight size={12} />
-                            </a>
+                            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                <ExportButtons
+                                    data={data?.fieldEmployees?.map(emp => ({
+                                        "Name": emp.name,
+                                        "ID": `EMP-${String(emp.id).padStart(4, '0')}`,
+                                        "Location": emp.location || 'Unknown',
+                                        "Last Update": formatTime(emp.lastUpdate),
+                                        "Battery": emp.batteryLevel ? `${emp.batteryLevel}%` : 'N/A'
+                                    })) || []}
+                                    fileName="Field_Employees_Live_Status"
+                                    title="Field Employees Live Status Report"
+                                />
+                                <a href="#/employee-live-tracking" className="et-card-link">
+                                    View All <ChevronRight size={12} />
+                                </a>
+                            </div>
                         </div>
                         <div className="et-table-wrap">
                             <table className="et-table">

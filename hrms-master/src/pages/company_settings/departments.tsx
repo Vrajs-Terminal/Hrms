@@ -3,6 +3,8 @@ import {
     Plus, GripVertical, Building2, Layers, ChevronLeft, ChevronRight, Trash2
 } from 'lucide-react';
 import api from '../../lib/axios';
+import ExportButtons from '../../components/ExportButtons';
+import ImportButton from '../../components/ImportButton';
 import './departments.css';
 
 interface Department {
@@ -139,7 +141,22 @@ export default function Departments() {
                     <h1>Departments</h1>
                     <p>Organize internal departments linked to specific branches</p>
                 </div>
-                <div className="actions-row">
+                <div className="actions-row" style={{ display: 'flex', gap: '8px' }}>
+                    <ImportButton
+                        onImport={(data) => {
+                            console.log('Imported Depts:', data);
+                        }}
+                        label="Import"
+                    />
+                    <ExportButtons
+                        data={branchGroups.flatMap(bg => bg.departments.map(d => ({
+                            "Branch": bg.branchName,
+                            "Branch Code": bg.branchCode,
+                            "Department": d.name
+                        })))}
+                        fileName="Departments_List"
+                        title="Company Departments"
+                    />
                     <button className={`btn-secondary ${isReordering ? 'active-reorder' : ''}`} onClick={() => setIsReordering(!isReordering)}>
                         <GripVertical size={16} />
                         {isReordering ? 'Done Reordering' : 'Change Order'}

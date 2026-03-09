@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { GripVertical, Save, ChevronUp, ChevronDown, LayoutDashboard, Settings, Users, Calculator, Activity, RefreshCcw, Megaphone, ClipboardList, BarChart2, Factory, BookOpen, Monitor, Grid, Headphones, Loader2, MapPin } from 'lucide-react';
+import { GripVertical, Save, ChevronUp, ChevronDown, LayoutDashboard, Settings, Users, Calculator, Activity, RefreshCcw, Megaphone, ClipboardList, BarChart2, Factory, BookOpen, Monitor, Grid, Headphones, Loader2, MapPin, FileText } from 'lucide-react';
 import './admin-menu-reordering.css';
 
 interface MenuItem {
@@ -15,8 +15,9 @@ const getDefaultMenuItems = (): MenuItem[] => {
         { id: '2', name: 'Company Settings', iconName: 'Settings', order: 2 },
         { id: '3', name: 'Attendance', iconName: 'ClipboardList', order: 3 },
         { id: '4', name: 'Employee Tracking', iconName: 'MapPin', order: 4 },
-        { id: '5', name: 'Core HRMS', iconName: 'Users', order: 5 },
-        { id: '6', name: 'Finance & Accounting', iconName: 'Calculator', order: 6 },
+        { id: '17', name: 'Daily Work Report', iconName: 'FileText', order: 5 },
+        { id: '5', name: 'Core HRMS', iconName: 'Users', order: 6 },
+        { id: '6', name: 'Finance & Accounting', iconName: 'Calculator', order: 7 },
         { id: '7', name: 'Productivity & Tracking', iconName: 'Activity', order: 7 },
         { id: '8', name: 'CRM', iconName: 'RefreshCcw', order: 8 },
         { id: '9', name: 'Effective Communication', iconName: 'Megaphone', order: 9 },
@@ -26,7 +27,7 @@ const getDefaultMenuItems = (): MenuItem[] => {
         { id: '13', name: 'Knowledge Center', iconName: 'BookOpen', order: 13 },
         { id: '14', name: 'Assets & Resources', iconName: 'Monitor', order: 14 },
         { id: '15', name: 'Other Utilities', iconName: 'Grid', order: 15 },
-        { id: '16', name: 'Contact Support Team', iconName: 'Headphones', order: 16 },
+        { id: '16', name: 'Contact Support Team', iconName: 'Headphones', order: 17 },
     ];
 };
 
@@ -47,6 +48,7 @@ const getIconComponent = (iconName: string) => {
         case 'Grid': return Grid;
         case 'Headphones': return Headphones;
         case 'MapPin': return MapPin;
+        case 'FileText': return FileText;
         default: return Grid;
     }
 };
@@ -104,6 +106,13 @@ export default function AdminMenuReordering() {
                     if (trackingIndex !== -1 && trackingIndex !== 3) {
                         const [trackingItem] = fetchedItems.splice(trackingIndex, 1);
                         fetchedItems.splice(3, 0, trackingItem);
+                    }
+
+                    // Force "Daily Work Report" to definitively reside at pos 5 (index 4)
+                    const dwrIndex = fetchedItems.findIndex(m => m.name === "Daily Work Report");
+                    if (dwrIndex !== -1 && dwrIndex !== 4) {
+                        const [dwrItem] = fetchedItems.splice(dwrIndex, 1);
+                        fetchedItems.splice(4, 0, dwrItem);
                     }
 
                     // Re-evaluate orders to ensure they are strictly sequential

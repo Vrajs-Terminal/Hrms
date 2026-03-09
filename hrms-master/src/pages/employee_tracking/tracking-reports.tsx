@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import api from '../../lib/axios';
 import {
-    FileText, Download, Filter, RefreshCcw,
+    FileText, Filter, RefreshCcw,
     Route, MapPin, AlertTriangle, Navigation, Clock,
     Building2, BarChart2
 } from 'lucide-react';
+import ExportButtons from '../../components/ExportButtons';
+import ImportButton from '../../components/ImportButton';
 import './employee-tracking.css';
 
 type ReportType = 'movement' | 'distance' | 'field_visit' | 'geofence_violation' | 'travel_summary' | 'branch_inout' | 'timeline';
@@ -43,7 +45,6 @@ const TrackingReports = () => {
             if (department) query.append('department', department);
 
             let endpoint = '';
-            // For violations, we fetch exceptions. For everything else, tracking history.
             if (selectedReport === 'geofence_violation') {
                 endpoint = `/tracking-exceptions?${query.toString()}`;
             } else {
@@ -67,7 +68,8 @@ const TrackingReports = () => {
                 }));
 
                 const uniqueExceptions = exceptions.filter((obj: any, pos: number, arr: any[]) => {
-                    return arr.map(mapObj => mapObj.id).indexOf(obj.id) === pos;
+                    const key = obj.id && !obj.id.toString().startsWith('temp-') ? obj.id : `${obj.employeeName}-${obj.date}-${obj.timestamp}-${obj.type}`;
+                    return arr.findIndex(m => (m.id && !m.id.toString().startsWith('temp-') ? m.id : `${m.employeeName}-${m.date}-${m.timestamp}-${m.type}`) === key) === pos;
                 });
 
                 setData(uniqueExceptions);
@@ -84,14 +86,14 @@ const TrackingReports = () => {
                     department: log.user?.department?.name || log.department || 'N/A',
                     date: log.timestamp ? new Date(log.timestamp).toLocaleDateString() : new Date().toLocaleDateString(),
                     distance: log.distance || '0 km',
-                    firstPingTime: log.firstPingTime || log.timestamp ? new Date(log.timestamp).toLocaleTimeString() : '--:--',
-                    lastPingTime: log.lastPingTime || log.timestamp ? new Date(log.timestamp).toLocaleTimeString() : '--:--',
+                    firstPingTime: log.firstPingTime || (log.timestamp ? new Date(log.timestamp).toLocaleTimeString() : '--:--'),
+                    lastPingTime: log.lastPingTime || (log.timestamp ? new Date(log.timestamp).toLocaleTimeString() : '--:--'),
                     workingTime: log.workingTime || null
                 }));
 
-                // Deduplicate by ID
                 const uniqueMovements = movements.filter((obj: any, pos: number, arr: any[]) => {
-                    return arr.map(mapObj => mapObj.id).indexOf(obj.id) === pos;
+                    const key = obj.id && !obj.id.toString().startsWith('temp-') ? obj.id : `${obj.employeeName}-${obj.date}-${obj.firstPingTime}-${obj.lastPingTime}`;
+                    return arr.findIndex(m => (m.id && !m.id.toString().startsWith('temp-') ? m.id : `${m.employeeName}-${m.date}-${m.firstPingTime}-${m.lastPingTime}`) === key) === pos;
                 });
 
                 setData(uniqueMovements);
@@ -135,36 +137,6 @@ const TrackingReports = () => {
         setEmployee('');
         setDepartment('');
         setTimeout(fetchReportData, 0);
-    };
-
-    const exportToCSV = async () => {
-        try {
-            const query = new URLSearchParams();
-            if (dateFrom) query.append('startDate', dateFrom);
-            if (dateTo) query.append('endDate', dateTo);
-            if (employee) query.append('employee', employee);
-            if (department) query.append('department', department);
-
-            let endpoint = '';
-            if (selectedReport === 'geofence_violation') {
-                endpoint = `/tracking-exceptions/export?${query.toString()}`;
-            } else {
-                endpoint = `/tracking/history/export?${query.toString()}`;
-            }
-
-            const res = await api.get(endpoint, { responseType: 'blob' });
-            const url = window.URL.createObjectURL(new Blob([res.data]));
-            const a = document.createElement('a');
-            a.href = url;
-            // Since our backend generates CSVs currently, we stick to .csv extension
-            // A future iteration might use xlsx library in the backend to send standard excels.
-            a.download = `${selectedReport}_report_${new Date().toISOString().split('T')[0]}.csv`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        } catch (error) {
-            console.error('Export failed', error);
-        }
     };
 
     const currentReport = reportTypes.find(r => r.key === selectedReport)!;
@@ -254,17 +226,37 @@ const TrackingReports = () => {
                     <h2 className="et-title">Tracking Reports</h2>
                     <p className="et-subtitle">Generate and export employee tracking reports</p>
                 </div>
-                <div className="et-actions">
-                    <button className="et-btn et-btn-secondary" onClick={() => exportToCSV()}>
-                        <Download size={16} /> Export Excel
-                    </button>
-                    <button className="et-btn et-btn-primary" onClick={() => exportToCSV()}>
-                        <Download size={16} /> Export PDF
-                    </button>
+                <div className="et-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <ImportButton
+                        onImport={(imported) => {
+                            console.log('Imported Tracking:', imported);
+                            alert(`Imported ${imported.length} records. Backend sync pending.`);
+                        }}
+                        label="Import Data"
+                    />
+                    <ExportButtons
+                        data={data.map(row => selectedReport === 'geofence_violation' ? ({
+                            "Employee": row.employeeName,
+                            "Dept": row.department,
+                            "Date": row.date,
+                            "Type": row.type,
+                            "Time": row.timestamp,
+                            "Status": row.status,
+                            "Severity": row.severity
+                        }) : ({
+                            "Employee": row.employeeName,
+                            "Dept": row.department,
+                            "Date": row.date,
+                            "First Ping": row.firstPingTime,
+                            "Last Ping": row.lastPingTime,
+                            "Distance": row.distance
+                        }))}
+                        fileName={`${selectedReport}_report_${dateFrom}_${dateTo}`}
+                        title={`${currentReport.label} Report`}
+                    />
                 </div>
             </div>
 
-            {/* Report Type Selector */}
             <div className="et-report-type">
                 {reportTypes.map(report => (
                     <div
@@ -283,7 +275,6 @@ const TrackingReports = () => {
                 ))}
             </div>
 
-            {/* Filters */}
             <div className="et-filters">
                 <div className="et-filter-group">
                     <label>Date From</label>
@@ -308,16 +299,15 @@ const TrackingReports = () => {
                     </select>
                 </div>
                 <div className="et-filter-buttons">
-                    <button className="et-btn et-btn-primary" onClick={handleGenerate}>
-                        <Filter size={16} /> Generate
+                    <button className="btn-primary" onClick={handleGenerate} disabled={loading}>
+                        <Filter size={16} /> {loading ? 'Generating...' : 'Generate Report'}
                     </button>
-                    <button className="et-btn et-btn-danger" onClick={handleReset}>
-                        <RefreshCcw size={16} /> Reset
+                    <button className="et-btn-danger" onClick={handleReset}>
+                        <RefreshCcw size={16} /> Reset Filters
                     </button>
                 </div>
             </div>
 
-            {/* Report Header */}
             <div className="et-card" style={{ marginBottom: 16, padding: 16 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                     <div style={{ width: 40, height: 40, borderRadius: 10, background: '#eff6ff', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -332,7 +322,6 @@ const TrackingReports = () => {
                 </div>
             </div>
 
-            {/* Quick Stats for Selected Report */}
             <div className="et-kpi-grid" style={{ marginBottom: 16, gridTemplateColumns: 'repeat(4, 1fr)' }}>
                 {[
                     { label: 'Total Records', value: stats.totalRecords, icon: FileText, color: '#3b82f6', bg: '#eff6ff' },
@@ -352,15 +341,9 @@ const TrackingReports = () => {
                 ))}
             </div>
 
-            {/* Report Table */}
             <div className="et-card et-stagger-2">
                 <div className="et-card-header">
                     <h3 className="et-card-title">Report Data</h3>
-                    <div style={{ display: 'flex', gap: 8 }}>
-                        <button className="et-btn et-btn-sm et-btn-secondary" onClick={() => exportToCSV()}>
-                            <Download size={12} /> CSV
-                        </button>
-                    </div>
                 </div>
                 <div className="et-table-wrap">
                     {renderTable()}

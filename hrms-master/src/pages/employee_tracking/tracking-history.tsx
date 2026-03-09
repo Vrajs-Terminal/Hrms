@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import api from '../../lib/axios';
 import {
-    MapPin, Calendar, User, Filter, RefreshCcw, Download,
+    MapPin, Calendar, User, Filter, RefreshCcw,
     Clock, Route, Navigation, ChevronRight
 } from 'lucide-react';
+import ExportButtons from '../../components/ExportButtons';
+import ImportButton from '../../components/ImportButton';
 import './employee-tracking.css';
 
 interface HistoryEvent {
@@ -125,27 +127,6 @@ const TrackingHistory = () => {
         setTimeout(fetchHistory, 0); // Need to wait for state to update
     };
 
-    const exportToCSV = async () => {
-        try {
-            const params = new URLSearchParams();
-            if (dateFrom) params.append('startDate', dateFrom);
-            if (dateTo) params.append('endDate', dateTo);
-            if (employee && employee !== 'All Employees') params.append('employeeName', employee);
-            if (department && department !== 'All Departments') params.append('department', department);
-
-            const res = await api.get(`/tracking/history/export?${params.toString()}`, { responseType: 'blob' });
-            const url = window.URL.createObjectURL(new Blob([res.data]));
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `tracking_history_${formatDateObj(new Date())}.csv`;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
-        } catch (error) {
-            console.error('Failed to export CSV', error);
-        }
-    };
 
     const getEventDotColor = (type: string) => {
         const map: Record<string, string> = {
@@ -171,12 +152,29 @@ const TrackingHistory = () => {
                     <h2 className="et-title">Tracking History</h2>
                     <p className="et-subtitle">Employee travel history, daily movement, and distance tracking</p>
                 </div>
-                <div className="et-actions">
-                    <button className="et-btn et-btn-outline" onClick={exportToCSV}>
-                        <Download size={16} /> Export CSV
-                    </button>
-                    <button className="et-btn et-btn-primary" onClick={handleApplyFilters} disabled={loading}>
-                        <RefreshCcw size={16} className={loading ? 'fa-spin' : ''} /> {loading ? 'Loading...' : 'Refresh'}
+                <div className="et-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <ImportButton
+                        onImport={(imported) => {
+                            console.log('Imported History:', imported);
+                            alert(`Imported ${imported.length} records. Sync pending.`);
+                        }}
+                        label="Import"
+                    />
+                    <ExportButtons
+                        data={historyData.map(row => ({
+                            "Date": row.date,
+                            "Employee": row.employee,
+                            "Dept": row.department,
+                            "Distance": row.distance,
+                            "Work Time": row.workTime,
+                            "Locations": row.locations,
+                            "Field Visits": row.fieldVisits
+                        }))}
+                        fileName={`Tracking_History_${dateFrom}_${dateTo}`}
+                        title="Tracking History Report"
+                    />
+                    <button className="et-btn-refresh btn-secondary" onClick={fetchHistory} disabled={loading}>
+                        <RefreshCcw size={16} className={loading ? 'fa-spin' : ''} /> Refresh
                     </button>
                 </div>
             </div>
@@ -206,11 +204,11 @@ const TrackingHistory = () => {
                     </select>
                 </div>
                 <div className="et-filter-buttons">
-                    <button className="et-btn et-btn-primary" onClick={handleApplyFilters}>
-                        <Filter size={16} /> Apply
+                    <button className="btn-primary" onClick={handleApplyFilters}>
+                        <Filter size={16} /> Apply Filters
                     </button>
-                    <button className="et-btn et-btn-danger" onClick={resetFilters}>
-                        <RefreshCcw size={16} /> Reset
+                    <button className="et-btn-danger" onClick={resetFilters}>
+                        <RefreshCcw size={16} /> Reset Filters
                     </button>
                 </div>
             </div>

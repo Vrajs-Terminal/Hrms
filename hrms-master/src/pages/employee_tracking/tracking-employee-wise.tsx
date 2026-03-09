@@ -142,14 +142,17 @@ const TrackingEmployeeWise = () => {
                     <h2 className="et-title">Tracking — Employee Wise</h2>
                     <p className="et-subtitle">Configure per-employee tracking settings, frequency, and privacy rules</p>
                 </div>
-                <div className="et-actions" style={{ display: 'flex', gap: 8 }}>
-                    <button className="et-btn et-btn-outline" onClick={exportToCSV}>
-                        <Download size={16} /> Export CSV
+                <div className="et-actions" style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                    <button className="et-btn-refresh btn-secondary" onClick={fetchConfigs} disabled={loading}>
+                        <RefreshCcw size={16} className={loading ? 'fa-spin' : ''} /> Refresh List
                     </button>
-                    <button className="et-btn et-btn-success" onClick={enableAll}>
+                    <button className="btn-secondary" onClick={exportToCSV}>
+                        <Download size={16} /> Export
+                    </button>
+                    <button className="et-btn-success" onClick={enableAll}>
                         <Eye size={16} /> Enable All
                     </button>
-                    <button className="et-btn et-btn-danger" onClick={disableAll}>
+                    <button className="et-btn-danger" onClick={disableAll}>
                         <EyeOff size={16} /> Disable All
                     </button>
                 </div>
@@ -275,8 +278,8 @@ const TrackingEmployeeWise = () => {
                     </select>
                 </div>
                 <div className="et-filter-buttons">
-                    <button className="et-btn et-btn-danger" onClick={() => { setSearchQuery(''); setDeptFilter(''); setStatusFilter(''); }}>
-                        <RefreshCcw size={16} /> Reset
+                    <button className="et-btn-danger" onClick={() => { setSearchQuery(''); setDeptFilter(''); setStatusFilter(''); }}>
+                        <RefreshCcw size={16} /> Reset All Filters
                     </button>
                 </div>
             </div>

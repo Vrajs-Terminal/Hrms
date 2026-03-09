@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Clock, Plus } from 'lucide-react';
+import ExportButtons from '../../components/ExportButtons';
 import './attendance.css';
 import { useAttendanceRequests, formatDate, timeAgo, getStatusBadge } from './useAttendanceHooks';
 
@@ -22,7 +23,20 @@ const OvertimeRequest = () => {
     <div className="attendance-module-container">
       <div className="attendance-header">
         <div><h2 className="attendance-title">Overtime Request</h2><p className="attendance-subtitle">Submit overtime work requests for approval.</p></div>
-        <div className="attendance-actions"><button className="btn-primary" onClick={() => setShowForm(!showForm)}><Plus size={16} /> New Request</button></div>
+        <div className="attendance-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <ExportButtons
+            data={requests.map((r: any) => ({
+              "Date": formatDate(r.date),
+              "Hours": r.requested_data?.hours || '--',
+              "Reason": r.reason,
+              "Status": r.status,
+              "Submitted": timeAgo(r.createdAt)
+            }))}
+            fileName="Overtime_Requests_Log"
+            title="Overtime Requests Report"
+          />
+          <button className="btn-primary" onClick={() => setShowForm(!showForm)}><Plus size={16} /> New Request</button>
+        </div>
       </div>
       {msg && <div style={{ padding: '12px 16px', borderRadius: 8, marginBottom: 16, background: msg.type === 'success' ? '#f0fdf4' : '#fef2f2', color: msg.type === 'success' ? '#16a34a' : '#dc2626', fontSize: 13 }}>{msg.text}</div>}
       {showForm && (

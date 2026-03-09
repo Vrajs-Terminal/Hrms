@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import api from '../../lib/axios';
 import {
     MapPin, Plus, Edit2, Trash2, X, Check, Download,
-    Target, Crosshair, Shield, AlertCircle
+    Target, Crosshair, Shield, AlertCircle, RefreshCcw
 } from 'lucide-react';
 import './employee-tracking.css';
 
@@ -161,11 +161,14 @@ const GeofenceSettings = () => {
                         <h2 className="et-title">Geo-Fence Settings</h2>
                         <p className="et-subtitle">Configure office locations and geofence boundaries for attendance tracking</p>
                     </div>
-                    <div className="et-actions">
-                        <button className="et-btn et-btn-outline" onClick={exportToCSV}>
-                            <Download size={16} /> Export CSV
+                    <div className="et-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        <button className="et-btn-refresh btn-secondary" onClick={fetchGeofences} disabled={loading}>
+                            <RefreshCcw size={16} className={loading ? 'fa-spin' : ''} /> Refresh
                         </button>
-                        <button className="et-btn et-btn-primary" onClick={openAddModal}>
+                        <button className="btn-secondary" onClick={exportToCSV}>
+                            <Download size={16} /> Export
+                        </button>
+                        <button className="btn-primary" onClick={openAddModal}>
                             <Plus size={16} /> Add Geofence
                         </button>
                     </div>
@@ -401,8 +404,8 @@ const GeofenceSettings = () => {
                             </div>
                         </div>
                         <div className="et-modal-footer">
-                            <button className="et-btn et-btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
-                            <button className="et-btn et-btn-primary" onClick={handleSave} disabled={!formData.name || !formData.latitude || !formData.longitude}>
+                            <button className="btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
+                            <button className="btn-primary" onClick={handleSave} disabled={!formData.name || !formData.latitude || !formData.longitude}>
                                 {editMode ? 'Update Geofence' : 'Create Geofence'}
                             </button>
                         </div>

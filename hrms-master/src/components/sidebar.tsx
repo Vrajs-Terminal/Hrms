@@ -12,6 +12,7 @@ import {
     RefreshCcw,
     Megaphone,
     ClipboardList,
+    FileText,
     BarChart2,
     Factory,
     BookOpen,
@@ -110,6 +111,11 @@ function Sidebar({ isOpen }: SidebarProps) {
                 { name: "Tracking Employee Wise", path: "/tracking-employee-wise" },
             ]
         },
+        {
+            name: "Daily Work Report",
+            path: "/daily-work-report",
+            icon: FileText
+        },
         { name: "Core HRMS", path: "/core-hrms", icon: Users },
         { name: "Finance & Accounting", path: "/finance", icon: Calculator },
         { name: "Productivity & Tracking", path: "/productivity", icon: Activity },
@@ -157,7 +163,7 @@ function Sidebar({ isOpen }: SidebarProps) {
                             }
                         });
 
-                        // Force "Attendance" to definitively reside at pos 3 seamlessly overriding backend cache drops
+                        // Force "Attendance" to definitively reside at pos 3
                         const attendanceIndex = newOrderedList.findIndex(m => m.name === "Attendance");
                         if (attendanceIndex !== -1 && attendanceIndex !== 2) {
                             const [attendanceItem] = newOrderedList.splice(attendanceIndex, 1);
@@ -166,20 +172,28 @@ function Sidebar({ isOpen }: SidebarProps) {
 
                         // Force "Employee Tracking" to definitively reside at pos 4
                         const trackingIndex = newOrderedList.findIndex(m => m.name === "Employee Tracking");
-                        console.log("CACHE_BUSTER_123_FORCE_NEW_CHUCK", trackingIndex);
                         if (trackingIndex !== -1 && trackingIndex !== 3) {
                             const [trackingItem] = newOrderedList.splice(trackingIndex, 1);
                             newOrderedList.splice(3, 0, trackingItem);
                         }
 
-                        // Fallback: Ensure Employee Tracking is ALWAYS present if somehow swallowed
-                        const finalTrackingCheck = newOrderedList.findIndex(m => m.name === "Employee Tracking");
-                        if (finalTrackingCheck === -1) {
-                            const fallbackItem = menuItems.find(m => m.name === "Employee Tracking");
-                            if (fallbackItem) newOrderedList.splice(3, 0, fallbackItem);
+                        // Force "Daily Work Report" to definitively reside at pos 5
+                        const dwrIndex = newOrderedList.findIndex(m => m.name === "Daily Work Report");
+                        if (dwrIndex !== -1 && dwrIndex !== 4) {
+                            const [dwrItem] = newOrderedList.splice(dwrIndex, 1);
+                            newOrderedList.splice(4, 0, dwrItem);
                         }
 
-                        console.log("CACHE_BUSTER_456_FINAL_LIST", newOrderedList.map(i => i.name));
+                        // Fallback: Ensure critical modules are present
+                        if (!newOrderedList.find(m => m.name === "Employee Tracking")) {
+                            const item = menuItems.find(m => m.name === "Employee Tracking");
+                            if (item) newOrderedList.splice(3, 0, item);
+                        }
+                        if (!newOrderedList.find(m => m.name === "Daily Work Report")) {
+                            const item = menuItems.find(m => m.name === "Daily Work Report");
+                            if (item) newOrderedList.splice(4, 0, item);
+                        }
+
                         setDynamicMenuItems(newOrderedList);
                     }
                 }
@@ -196,7 +210,7 @@ function Sidebar({ isOpen }: SidebarProps) {
         return () => {
             window.removeEventListener('menuOrderChanged', fetchMenuOrder);
         };
-         
+
     }, []);
 
     const isActive = (path?: string) => {

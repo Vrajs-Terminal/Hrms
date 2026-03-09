@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Search, GraduationCap, Calendar, Edit2, X, Save, History, Loader2 } from 'lucide-react';
+import ExportButtons from '../../components/ExportButtons';
+import ImportButton from '../../components/ImportButton';
 import './assign-employee-grade.css';
 
 interface EmployeeGrade {
@@ -53,23 +55,15 @@ export default function AssignEmployeeGrade() {
     const fetchData = async () => {
         setIsLoading(true);
         try {
-            // 1. Fetch Users
-            // Since we need User table mapped to employee grades, we'll fetch from a user or combined endpoint
-            // Usually we would have a dedicated endpoint for users, let's assume we can hit `/api/companies/users` or similar.
-            // Wait, we don't have a specific `GET /api/users` created. Let's create an endpoint in `employee-grades.ts` or reuse an existing.
-            // Oh, wait, the User model is tied to EmployeeGrade. Let's create a quick endpoint inside employee-grades for users if it doesn't exist,
-            // OR we can just hit auth/users if it exists. Re-evaluating. We need the users list.
-            const userRes = await fetch('/api/auth/users'); // fallback relying on standard pattern
+            const userRes = await fetch('/api/auth/users');
             const users = userRes.ok ? await userRes.json() : [];
 
-            // 2. Fetch Grades
             const gradeRes = await fetch('/api/employee-grades');
             const gradesData = await gradeRes.json();
 
             setAvailableGrades(gradesData);
 
-            // Map Users to EmployeeGrade format
-            const mappedUsers = Array.isArray(users) ? users.map((u: { id: number, employee_id?: string, name: string, branch?: { name: string }, department?: { name: string }, employeeGrade?: { name: string } }) => ({
+            const mappedUsers = Array.isArray(users) ? users.map((u: any) => ({
                 id: u.id.toString(),
                 employeeId: u.employee_id || `EMP-${String(u.id).padStart(3, '0')}`,
                 employeeName: u.name,
@@ -89,7 +83,7 @@ export default function AssignEmployeeGrade() {
     const handleAssignClick = (emp: EmployeeGrade) => {
         setSelectedEmployee(emp);
         setNewGrade('');
-        setEffectiveDate(new Date().toISOString().split('T')[0]); // Default to today
+        setEffectiveDate(new Date().toISOString().split('T')[0]);
         setRemarks('');
         setIsModalOpen(true);
     };
@@ -127,7 +121,7 @@ export default function AssignEmployeeGrade() {
             });
 
             if (res.ok) {
-                await fetchData(); // Refresh data
+                await fetchData();
                 setIsModalOpen(false);
             } else {
                 const err = await res.json();
@@ -199,18 +193,38 @@ export default function AssignEmployeeGrade() {
             <div className="table-card">
                 <div className="table-header-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <h2>Employee Grades</h2>
-                    <button
-                        className="btn-add"
-                        onClick={() => {
-                            setSelectedEmployee(null);
-                            setNewGrade('');
-                            setEffectiveDate(new Date().toISOString().split('T')[0]);
-                            setRemarks('');
-                            setIsModalOpen(true);
-                        }}
-                    >
-                        <Edit2 size={16} /> Assign Grade Limit
-                    </button>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                        <ImportButton
+                            onImport={(data) => {
+                                console.log('Imported Grades:', data);
+                                alert(`Imported ${data.length} grade assignments.`);
+                            }}
+                            label="Import"
+                        />
+                        <ExportButtons
+                            data={filteredData.map(emp => ({
+                                "Employee ID": emp.employeeId,
+                                "Name": emp.employeeName,
+                                "Branch": emp.branch,
+                                "Dept": emp.department,
+                                "Current Grade": emp.currentGrade
+                            }))}
+                            fileName={`Employee_Grades_${new Date().toISOString().split('T')[0]}`}
+                            title="Employee Grade Assignments"
+                        />
+                        <button
+                            className="btn-add"
+                            onClick={() => {
+                                setSelectedEmployee(null);
+                                setNewGrade('');
+                                setEffectiveDate(new Date().toISOString().split('T')[0]);
+                                setRemarks('');
+                                setIsModalOpen(true);
+                            }}
+                        >
+                            <Edit2 size={16} /> Assign Grade Limit
+                        </button>
+                    </div>
                 </div>
                 <table className="data-table">
                     <thead>
@@ -391,7 +405,7 @@ export default function AssignEmployeeGrade() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {gradeHistory.map(hist => (
+                                        {gradeHistory.map((hist: any) => (
                                             <tr key={hist.id}>
                                                 <td style={{ fontWeight: 500 }}>{hist.grade?.name || 'Unknown'}</td>
                                                 <td>{new Date(hist.effective_from).toLocaleDateString()}</td>

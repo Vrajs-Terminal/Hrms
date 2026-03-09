@@ -50,12 +50,17 @@ model User {
   trackingConfig              TrackingConfig?
   trackingLogs                TrackingLog[]
   trackingExceptions          TrackingException[]
+  dailyWorks                  DailyWork[]
+
+  designation_id Int?
+  designation    Designation? @relation(fields: [designation_id], references: [id])
 
   @@index([branch_id], map: "User_branch_id_fkey")
   @@index([department_id], map: "User_department_id_fkey")
   @@index([employee_level_id])
   @@index([employee_grade_id])
   @@index([shift_id])
+  @@index([designation_id])
 }
 
 // ... existing models ...
@@ -181,6 +186,7 @@ model Designation {
   sub_department_id Int
   order_index       Int           @default(0)
   subDepartment     SubDepartment @relation(fields: [sub_department_id], references: [id], onDelete: Cascade)
+  users             User[]
 
   @@unique([name, sub_department_id])
   @@index([sub_department_id], map: "Designation_sub_department_id_fkey")
@@ -506,4 +512,45 @@ model TrackingException {
   @@index([status])
   @@index([type])
   @@index([createdAt])
+}
+
+model DailyWork {
+  id                  Int      @id @default(autoincrement())
+  user_id             Int
+  work_date           DateTime @db.Date
+  check_in_time       DateTime?
+  check_out_time      DateTime?
+  total_work_hours    Float    @default(0.0)
+  total_distance      Float    @default(0.0)
+  tasks_completed     Int      @default(0)
+  break_time_mins     Int      @default(0)
+  work_type           String   @default("Field") // Office, Field
+  status              String   @default("Pending") // Pending, Approved, Rejected, Correction Requested
+  admin_remark        String?  @db.Text
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  user                User           @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  activities          WorkActivity[]
+
+  @@unique([user_id, work_date])
+  @@index([user_id])
+  @@index([work_date])
+  @@index([status])
+}
+
+model WorkActivity {
+  id            Int       @id @default(autoincrement())
+  daily_work_id Int
+  activity_time DateTime  @default(now())
+  latitude      String?
+  longitude     String?
+  activity_type String    // Check In, Client Visit, Lunch Break, Field Visit, Check Out, etc.
+  location      String?
+  notes         String?   @db.Text
+  createdAt     DateTime  @default(now())
+
+  dailyWork     DailyWork @relation(fields: [daily_work_id], references: [id], onDelete: Cascade)
+
+  @@index([daily_work_id])
 }

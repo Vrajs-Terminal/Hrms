@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { Filter, Calendar, MapPin, Building, Download } from 'lucide-react';
+import { Filter, Calendar, MapPin, Building } from 'lucide-react';
+import ExportButtons from '../../components/ExportButtons';
+import ImportButton from '../../components/ImportButton';
 import './attendance.css';
 import { useAttendanceRecords, useAttendanceData, formatDate, getInitials, getAvatarColor, getStatusBadge } from './useAttendanceHooks';
 
@@ -18,8 +20,26 @@ const AbsentEmployees = () => {
           <h2 className="attendance-title">Absent Employees</h2>
           <p className="attendance-subtitle">View and manage employees who are absent on a specific date.</p>
         </div>
-        <div className="attendance-actions">
-          <button className="btn-secondary"><Download size={16} /> Export List</button>
+        <div className="attendance-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <ImportButton
+            onImport={(data) => {
+              console.log('Imported Absentees:', data);
+              alert(`Imported ${data.length} records.`);
+            }}
+            label="Import"
+          />
+          <ExportButtons
+            data={records.map(r => ({
+              "Employee": r.user?.name,
+              "ID": `EMP-${r.user_id}`,
+              "Dept": r.user?.department?.name || 'N/A',
+              "Branch": r.user?.branch?.name || 'N/A',
+              "Date": formatDate(r.date),
+              "Status": r.status
+            }))}
+            fileName={`Absent_Employees_${date}`}
+            title="Absent Employees Report"
+          />
           <button className="btn-primary" onClick={() => window.location.href = '#/add-attendance'}>Mark Attendance</button>
         </div>
       </div>

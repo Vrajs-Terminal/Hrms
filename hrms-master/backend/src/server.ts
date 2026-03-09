@@ -3,6 +3,8 @@ dotenv.config();
 
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 import prisma from './lib/prismaClient';
 
 import authRoutes from './routes/auth';
@@ -34,14 +36,26 @@ import geofencesRoutes from './routes/geofences';
 import trackingRoutes from './routes/tracking';
 import trackingExceptionsRoutes from './routes/tracking-exceptions';
 import trackingConfigRoutes from './routes/tracking-config';
+import dailyWorkReportsRoutes from './routes/daily-work-reports';
 
 const app = express();
 
 const PORT = process.env.PORT || 5000;
 
-// Middleware
+// Security Middleware
+app.use(helmet()); // Secure HTTP headers
 app.use(cors()); // Allow frontend to talk to backend
 app.use(express.json()); // Allow us to receive JSON from React
+
+// Rate Limiting
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 1000, // Limit each IP to 1000 requests per windowMs
+    message: 'Too many requests from this IP, please try again after 15 minutes',
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+app.use('/api/', limiter); // Apply to all /api/ endpoints
 
 // Mount API Routes
 app.use('/api/auth', authRoutes);
@@ -73,6 +87,7 @@ app.use('/api/geofences', geofencesRoutes);
 app.use('/api/tracking', trackingRoutes);
 app.use('/api/tracking-exceptions', trackingExceptionsRoutes);
 app.use('/api/tracking-config', trackingConfigRoutes);
+app.use('/api/daily-work-reports', dailyWorkReportsRoutes);
 
 // Basic test route
 app.get('/api/health', (req, res) => {

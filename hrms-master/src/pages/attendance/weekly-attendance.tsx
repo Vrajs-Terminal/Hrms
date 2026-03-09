@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Filter, ChevronLeft, ChevronRight } from 'lucide-react';
+import ExportButtons from '../../components/ExportButtons';
 import './attendance.css';
 import { useAttendanceRecords, getInitials, getAvatarColor, getStatusBadge } from './useAttendanceHooks';
 
@@ -35,9 +36,20 @@ const WeeklyAttendance = () => {
           <h2 className="attendance-title">Weekly Attendance</h2>
           <p className="attendance-subtitle">Week: {weekStart} to {weekEnd}</p>
         </div>
-        <div className="attendance-actions">
+        <div className="attendance-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
           <button className="btn-secondary" onClick={prevWeek}><ChevronLeft size={16} /> Prev</button>
           <button className="btn-secondary" onClick={nextWeek}>Next <ChevronRight size={16} /></button>
+          <ExportButtons
+            data={Object.values(grouped).map((g: any) => {
+              const row: any = { "Employee": g.user?.name, "Dept": g.user?.department?.name || 'N/A' };
+              dayHeaders.forEach(d => {
+                row[d] = g.days[d] ? `${g.days[d].status} (${g.days[d].total_working_hours?.toFixed(1) || 0}h)` : '-';
+              });
+              return row;
+            })}
+            fileName={`Weekly_Attendance_${weekStart}_${weekEnd}`}
+            title="Weekly Attendance Report"
+          />
           <button className="btn-apply" onClick={handleFilter}><Filter size={16} /> Refresh</button>
         </div>
       </div>

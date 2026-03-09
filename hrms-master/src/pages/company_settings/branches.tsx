@@ -3,6 +3,8 @@ import {
     Plus, Map, ArrowUp, ArrowDown, GripVertical, Trash2, AlertTriangle, X
 } from 'lucide-react';
 import api from '../../lib/axios';
+import ExportButtons from '../../components/ExportButtons';
+import ImportButton from '../../components/ImportButton';
 import './branches.css';
 
 interface Branch {
@@ -115,7 +117,22 @@ export default function Branches() {
                     <h1>Branches</h1>
                     <p>Manage all your company branches and locations</p>
                 </div>
-                <div className="actions-row">
+                <div className="actions-row" style={{ display: 'flex', gap: '8px' }}>
+                    <ImportButton
+                        onImport={(data) => {
+                            console.log('Imported Branches:', data);
+                        }}
+                        label="Import"
+                    />
+                    <ExportButtons
+                        data={branches.map(b => ({
+                            "Name": b.name,
+                            "Code": b.code,
+                            "Type": b.type
+                        }))}
+                        fileName="Branches_List"
+                        title="Company Branches"
+                    />
                     <button className={`btn-secondary ${isReordering ? 'active-reorder' : ''}`} onClick={() => setIsReordering(!isReordering)}>
                         <GripVertical size={16} />
                         {isReordering ? 'Done Reordering' : 'Change Order'}

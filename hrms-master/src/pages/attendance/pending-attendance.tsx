@@ -1,7 +1,10 @@
 import { useState } from 'react';
-import { Filter, Download, Edit, RefreshCcw } from 'lucide-react';
+import { Filter, Edit, RefreshCcw } from 'lucide-react';
+import ExportButtons from '../../components/ExportButtons';
+import ImportButton from '../../components/ImportButton';
 import './attendance.css';
 import { useAttendanceRecords, useAttendanceData, formatTime, formatDate, getInitials, getAvatarColor } from './useAttendanceHooks';
+
 const PendingAttendance = () => {
   const { employees } = useAttendanceData();
   const [startDate, setStartDate] = useState(new Date(new Date().setDate(new Date().getDate() - 30)).toISOString().split('T')[0]);
@@ -18,8 +21,25 @@ const PendingAttendance = () => {
           <h2 className="attendance-title">Pending Attendance</h2>
           <p className="attendance-subtitle">Review unverified or flagged punch records needing admin attention.</p>
         </div>
-        <div className="attendance-actions">
-          <button className="btn-secondary"><Download size={16} /> Export Issue Log</button>
+        <div className="attendance-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <ImportButton
+            onImport={(data) => {
+              console.log('Imported Pending:', data);
+              alert(`Imported ${data.length} records. Integration pending.`);
+            }}
+            label="Import Records"
+          />
+          <ExportButtons
+            data={records.map(row => ({
+              "Employee": row.user?.name,
+              "Date": formatDate(row.date),
+              "In Time": formatTime(row.in_time),
+              "Out Time": formatTime(row.out_time),
+              "Issue": row.remarks || 'Missing Out Punch'
+            }))}
+            fileName={`Pending_Attendance_${startDate}_${endDate}`}
+            title="Pending Attendance Issue Log"
+          />
           <button className="btn-primary" onClick={handleFilter}><RefreshCcw size={16} /> Refresh</button>
         </div>
       </div>

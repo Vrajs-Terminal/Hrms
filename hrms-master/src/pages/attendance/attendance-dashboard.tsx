@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import {
   Users, UserCheck, UserX, Clock, CalendarDays,
-  Coffee, Home, AlertTriangle, Download,
+  Coffee, Home, AlertTriangle,
   Filter, RefreshCcw, ChevronRight, ArrowUpRight
 } from 'lucide-react';
+import ExportButtons from '../../components/ExportButtons';
 import {
   PieChart, Pie, Cell, BarChart, Bar, XAxis,
   CartesianGrid, Tooltip, ResponsiveContainer
@@ -80,13 +81,23 @@ const AttendanceDashboard = () => {
           <h2 className="attendance-title">Attendance Dashboard</h2>
           <p className="attendance-subtitle">Real-time overview of employee attendance status.</p>
         </div>
-        <div className="attendance-actions">
+        <div className="attendance-actions" style={{ display: 'flex', gap: '8px' }}>
           <button className="btn-secondary" onClick={() => window.location.href = '#/add-attendance'}>
             Mark Manual Attendance
           </button>
-          <button className="btn-primary">
-            <Download size={16} /> Export PDF
-          </button>
+          <ExportButtons
+            data={recentPunches.map(r => ({
+              "Employee": r.user?.name,
+              "ID": `EMP-${r.user_id}`,
+              "Dept": r.user?.department?.name || 'N/A',
+              "Branch": r.user?.branch?.name || 'N/A',
+              "In Time": formatTime(r.in_time),
+              "Out Time": formatTime(r.out_time),
+              "Status": r.status
+            }))}
+            fileName={`Attendance_Summary_${date}`}
+            title={`Attendance Summary - ${date}`}
+          />
         </div>
       </div>
 

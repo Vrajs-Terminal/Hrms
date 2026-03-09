@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Download, Filter } from 'lucide-react';
+import { Filter } from 'lucide-react';
+import ExportButtons from '../../components/ExportButtons';
 import './attendance.css';
 import { useAttendanceRecords, getInitials, getAvatarColor } from './useAttendanceHooks';
 
@@ -42,7 +43,19 @@ const MonthWiseAttendance = () => {
           <p className="attendance-subtitle">Monthly attendance summary per employee for {monthNames[month]} {year}.</p>
         </div>
         <div className="attendance-actions">
-          <button className="btn-primary"><Download size={16} /> Export</button>
+          <ExportButtons
+            data={Object.values(grouped).map((g: any) => ({
+              "Employee": g.user?.name,
+              "Dept": g.user?.department?.name || 'N/A',
+              "Present": g.summary.present,
+              "Absent": g.summary.absent,
+              "Late": g.summary.late,
+              "Half Day": g.summary.halfDay,
+              "Total Hours": g.summary.totalHours.toFixed(1)
+            }))}
+            fileName={`MonthWise_Attendance_${year}_${month}`}
+            title="Monthly Attendance Summary"
+          />
         </div>
       </div>
 

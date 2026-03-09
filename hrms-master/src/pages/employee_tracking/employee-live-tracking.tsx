@@ -121,12 +121,12 @@ const EmployeeLiveTracking = () => {
                     <h2 className="et-title">Employee Live Tracking</h2>
                     <p className="et-subtitle">Monitor real-time location and status of all employees</p>
                 </div>
-                <div className="et-actions">
-                    <button className="et-btn et-btn-secondary" onClick={resetFilters}>
-                        <RefreshCcw size={16} /> Reset
-                    </button>
-                    <button className="et-btn et-btn-primary" onClick={fetchLiveTracking} disabled={loading}>
+                <div className="et-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <button className="et-btn-refresh btn-secondary" onClick={fetchLiveTracking} disabled={loading}>
                         <RefreshCcw size={16} className={loading ? 'fa-spin' : ''} /> Refresh Live Data
+                    </button>
+                    <button className="et-btn-danger btn-secondary" onClick={resetFilters}>
+                        <RefreshCcw size={16} /> Reset View
                     </button>
                 </div>
             </div>

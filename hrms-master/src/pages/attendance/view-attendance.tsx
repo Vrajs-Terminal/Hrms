@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import {
-  Search, Filter, Download, ChevronRight, ChevronLeft,
+  Search, Filter, ChevronRight, ChevronLeft,
   Calendar, Clock, Building, MapPin
 } from 'lucide-react';
+import ExportButtons from '../../components/ExportButtons';
+import ImportButton from '../../components/ImportButton';
 import './attendance.css';
 import api from '../../lib/axios';
 
@@ -68,8 +70,30 @@ const ViewAttendance = () => {
           <h2 className="attendance-title">View Attendance</h2>
           <p className="attendance-subtitle">Detailed employee punch logs and daily records.</p>
         </div>
-        <div className="attendance-actions">
-          <button className="btn-secondary"><Download size={16} /> Export CSV</button>
+        <div className="attendance-actions" style={{ display: 'flex', gap: '8px' }}>
+          <ImportButton
+            onImport={(data) => {
+              console.log('Imported Attendance:', data);
+              alert(`Parsed ${data.length} records. Integration with attendance API would happen here.`);
+            }}
+            label="Import Attendance"
+          />
+          <ExportButtons
+            data={filteredData.map(r => ({
+              "Employee": r.user?.name,
+              "ID": `EMP-${r.user_id}`,
+              "Dept": r.user?.department?.name || 'N/A',
+              "Branch": r.user?.branch?.name || 'N/A',
+              "Date": formatDate(r.date),
+              "In Time": formatTime(r.in_time),
+              "Out Time": formatTime(r.out_time),
+              "Work Hours": r.total_working_hours?.toFixed(1) || '0.0',
+              "Status": r.status,
+              "Source": r.source
+            }))}
+            fileName={`Attendance_Report_${startDate || 'all'}_${endDate || 'all'}`}
+            title="Attendance Report"
+          />
           <button className="btn-primary" onClick={() => window.location.href = '#/add-attendance'}>+ Add Record</button>
         </div>
       </div>
