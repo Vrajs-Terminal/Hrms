@@ -1,5 +1,5 @@
 import React from 'react';
-import { Download, FileText, Table } from 'lucide-react';
+import { FileText, Table } from 'lucide-react';
 import { exportToExcel, exportToPDF } from '../utils/exportUtils';
 
 interface ExportButtonsProps {
