@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Download, RefreshCcw, AlertTriangle } from 'lucide-react';
+import { Download, RefreshCcw, AlertTriangle , Flag} from 'lucide-react';
 import './attendance.css';
 import { useAttendanceRecords, formatDate, getInitials, getAvatarColor } from './useAttendanceHooks';
 
@@ -12,7 +12,7 @@ const PendingFlags = () => {
     return (
         <div className="attendance-module-container">
             <div className="attendance-header">
-                <div><h2 className="attendance-title">Pending Flags & Exceptions</h2><p className="attendance-subtitle">Review attendance exceptions, flags and system warnings.</p></div>
+                <div><h2 className="attendance-title"><Flag className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Pending Flags & Exceptions</h2><p className="attendance-subtitle">Review attendance exceptions, flags and system warnings.</p></div>
                 <div className="attendance-actions"><button className="btn-secondary"><Download size={16} /> Export Issue Log</button><button className="btn-primary" onClick={() => fetchRecords({ start_date: startDate, end_date: endDate, status: 'Pending' })}><RefreshCcw size={16} /> Refresh</button></div>
             </div>
 

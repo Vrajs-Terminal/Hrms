@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import {
   Search, Filter, ChevronRight, ChevronLeft,
   Calendar, Clock, Building, MapPin
-} from 'lucide-react';
+, Eye} from 'lucide-react';
 import ExportButtons from '../../components/ExportButtons';
 import ImportButton from '../../components/ImportButton';
 import './attendance.css';
@@ -67,7 +67,7 @@ const ViewAttendance = () => {
     <div className="attendance-module-container">
       <div className="attendance-header">
         <div>
-          <h2 className="attendance-title">View Attendance</h2>
+          <h2 className="attendance-title"><Eye className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />View Attendance</h2>
           <p className="attendance-subtitle">Detailed employee punch logs and daily records.</p>
         </div>
         <div className="attendance-actions" style={{ display: 'flex', gap: '8px' }}>

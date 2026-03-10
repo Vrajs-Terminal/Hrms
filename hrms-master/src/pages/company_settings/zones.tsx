@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, GripVertical, Trash2, Edit2, Check, X, Building } from 'lucide-react';
+import { Plus, GripVertical, Trash2, Edit2, Check, X, Building , Map} from 'lucide-react';
 import axios from '../../lib/axios';
 import './zones.css';
 
@@ -149,7 +149,7 @@ export default function Zones() {
         <div className="setup-container">
             <div className="setup-header">
                 <div>
-                    <h1>Zones</h1>
+                    <h1><Map className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Zones</h1>
                     <p>Manage top-level organizational zones (e.g. North, South, Global)</p>
                 </div>
                 <div className="actions-row">

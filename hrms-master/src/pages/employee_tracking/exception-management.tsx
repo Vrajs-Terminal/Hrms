@@ -4,7 +4,7 @@ import {
     AlertTriangle, Clock, MapPin, WifiOff,
     Activity, Check, X, MessageCircle,
     RefreshCcw, Shield, Eye, Download
-} from 'lucide-react';
+, ShieldAlert} from 'lucide-react';
 import './employee-tracking.css';
 
 
@@ -157,7 +157,7 @@ const ExceptionManagement = () => {
         <div className="et-container">
             <div className="et-header">
                 <div>
-                    <h2 className="et-title">Exception Management</h2>
+                    <h2 className="et-title"><ShieldAlert className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Exception Management</h2>
                     <p className="et-subtitle">Review and manage tracking alerts, violations, and exceptions</p>
                 </div>
                 <div className="et-actions" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>

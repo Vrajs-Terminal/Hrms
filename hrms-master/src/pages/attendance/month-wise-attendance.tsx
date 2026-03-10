@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Filter } from 'lucide-react';
+import { Filter , CalendarDays} from 'lucide-react';
 import ExportButtons from '../../components/ExportButtons';
 import './attendance.css';
 import { useAttendanceRecords, getInitials, getAvatarColor } from './useAttendanceHooks';
@@ -39,7 +39,7 @@ const MonthWiseAttendance = () => {
     <div className="attendance-module-container">
       <div className="attendance-header">
         <div>
-          <h2 className="attendance-title">Month Wise Attendance</h2>
+          <h2 className="attendance-title"><CalendarDays className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Month Wise Attendance</h2>
           <p className="attendance-subtitle">Monthly attendance summary per employee for {monthNames[month]} {year}.</p>
         </div>
         <div className="attendance-actions">

@@ -4,7 +4,7 @@ import {
     Users, Search, Shield, Eye, EyeOff,
     Settings, Bell, Timer, Sun,
     Info, RefreshCcw, Download
-} from 'lucide-react';
+, User} from 'lucide-react';
 import './employee-tracking.css';
 
 interface TrackedEmployee {
@@ -139,7 +139,7 @@ const TrackingEmployeeWise = () => {
         <div className="et-container">
             <div className="et-header">
                 <div>
-                    <h2 className="et-title">Tracking — Employee Wise</h2>
+                    <h2 className="et-title"><User className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Tracking — Employee Wise</h2>
                     <p className="et-subtitle">Configure per-employee tracking settings, frequency, and privacy rules</p>
                 </div>
                 <div className="et-actions" style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>

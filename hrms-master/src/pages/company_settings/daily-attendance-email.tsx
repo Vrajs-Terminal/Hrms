@@ -163,7 +163,7 @@ export default function DailyAttendanceEmail() {
         <div className="email-setting-layout">
             <div className="table-card">
                 <div className="table-header-title">
-                    <h2>Daily Attendance Email Settings</h2>
+                    <h2><Mail className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Daily Attendance Email Settings</h2>
                     <div className="header-actions">
                         <button className="btn-secondary" onClick={() => {
                             const activeSetting = settings.find(s => s.status === 'Active');

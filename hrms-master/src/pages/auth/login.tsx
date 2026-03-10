@@ -3,7 +3,7 @@ import { useAuthStore } from '../../store/useAuthStore';
 import api from '../../lib/axios';
 import { useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo.png';
-import { Mail, Lock, ArrowRight, UserPlus, X, User, ArrowLeft, Key, ShieldCheck } from 'lucide-react';
+import { Mail, Lock, ArrowRight, UserPlus, X, User, ArrowLeft, Key, ShieldCheck , LogIn} from 'lucide-react';
 import meshBg from '../../assets/image-mesh-gradient.png';
 import './login.css';
 
@@ -211,7 +211,7 @@ export default function Login() {
                     <div className="view-panel fade-in">
                         <div className="login-header">
                             <img src={logo} alt="MineHR Solutions" className="login-logo" />
-                            <h2>Welcome Back</h2>
+                            <h2><LogIn className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Welcome Back</h2>
                             <p>Enter your credentials to access the dashboard</p>
                         </div>
 

@@ -21,7 +21,7 @@ const WeekOffExchangeRequest = () => {
     return (
         <div className="attendance-module-container">
             <div className="attendance-header">
-                <div><h2 className="attendance-title">Week-Off Exchange</h2><p className="attendance-subtitle">Request to work on a week-off and take another day off.</p></div>
+                <div><h2 className="attendance-title"><RefreshCw className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Week-Off Exchange</h2><p className="attendance-subtitle">Request to work on a week-off and take another day off.</p></div>
                 <div className="attendance-actions"><button className="btn-primary" onClick={() => setShowForm(!showForm)}><Plus size={16} /> New Exchange</button></div>
             </div>
             {msg && <div style={{ padding: '12px 16px', borderRadius: 8, marginBottom: 16, background: msg.type === 'success' ? '#f0fdf4' : '#fef2f2', color: msg.type === 'success' ? '#16a34a' : '#dc2626', fontSize: 13 }}>{msg.text}</div>}

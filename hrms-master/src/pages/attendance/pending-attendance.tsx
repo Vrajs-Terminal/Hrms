@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Filter, Edit, RefreshCcw } from 'lucide-react';
+import { Filter, Edit, RefreshCcw , Clock} from 'lucide-react';
 import ExportButtons from '../../components/ExportButtons';
 import ImportButton from '../../components/ImportButton';
 import './attendance.css';
@@ -18,7 +18,7 @@ const PendingAttendance = () => {
     <div className="attendance-module-container">
       <div className="attendance-header">
         <div>
-          <h2 className="attendance-title">Pending Attendance</h2>
+          <h2 className="attendance-title"><Clock className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Pending Attendance</h2>
           <p className="attendance-subtitle">Review unverified or flagged punch records needing admin attention.</p>
         </div>
         <div className="attendance-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>

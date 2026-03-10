@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { GripVertical, Save, ChevronUp, ChevronDown, LayoutDashboard, Settings, Users, Calculator, Activity, RefreshCcw, Megaphone, ClipboardList, BarChart2, Factory, BookOpen, Monitor, Grid, Headphones, Loader2, MapPin, FileText } from 'lucide-react';
+import { GripVertical, Save, ChevronUp, ChevronDown, LayoutDashboard, Settings, Users, Calculator, Activity, RefreshCcw, Megaphone, ClipboardList, BarChart2, Factory, BookOpen, Monitor, Grid, Headphones, Loader2, MapPin, FileText, ListOrdered, Map } from 'lucide-react';
 import './admin-menu-reordering.css';
 
 interface MenuItem {
@@ -16,18 +16,19 @@ const getDefaultMenuItems = (): MenuItem[] => {
         { id: '3', name: 'Attendance', iconName: 'ClipboardList', order: 3 },
         { id: '4', name: 'Employee Tracking', iconName: 'MapPin', order: 4 },
         { id: '17', name: 'Daily Work Report', iconName: 'FileText', order: 5 },
-        { id: '5', name: 'Core HRMS', iconName: 'Users', order: 6 },
-        { id: '6', name: 'Finance & Accounting', iconName: 'Calculator', order: 7 },
-        { id: '7', name: 'Productivity & Tracking', iconName: 'Activity', order: 7 },
-        { id: '8', name: 'CRM', iconName: 'RefreshCcw', order: 8 },
-        { id: '9', name: 'Effective Communication', iconName: 'Megaphone', order: 9 },
-        { id: '10', name: 'Orders & Visits', iconName: 'ClipboardList', order: 10 },
-        { id: '11', name: 'Analytics & Reports', iconName: 'BarChart2', order: 11 },
-        { id: '12', name: 'Industry Modules', iconName: 'Factory', order: 12 },
-        { id: '13', name: 'Knowledge Center', iconName: 'BookOpen', order: 13 },
-        { id: '14', name: 'Assets & Resources', iconName: 'Monitor', order: 14 },
-        { id: '15', name: 'Other Utilities', iconName: 'Grid', order: 15 },
-        { id: '16', name: 'Contact Support Team', iconName: 'Headphones', order: 17 },
+        { id: '18', name: 'Visit Management', iconName: 'Map', order: 6 },
+        { id: '5', name: 'Core HRMS', iconName: 'Users', order: 7 },
+        { id: '6', name: 'Finance & Accounting', iconName: 'Calculator', order: 8 },
+        { id: '7', name: 'Productivity & Tracking', iconName: 'Activity', order: 9 },
+        { id: '8', name: 'CRM', iconName: 'RefreshCcw', order: 10 },
+        { id: '9', name: 'Effective Communication', iconName: 'Megaphone', order: 11 },
+        { id: '10', name: 'Orders & Visits', iconName: 'ClipboardList', order: 12 },
+        { id: '11', name: 'Analytics & Reports', iconName: 'BarChart2', order: 13 },
+        { id: '12', name: 'Industry Modules', iconName: 'Factory', order: 14 },
+        { id: '13', name: 'Knowledge Center', iconName: 'BookOpen', order: 15 },
+        { id: '14', name: 'Assets & Resources', iconName: 'Monitor', order: 16 },
+        { id: '15', name: 'Other Utilities', iconName: 'Grid', order: 17 },
+        { id: '16', name: 'Contact Support Team', iconName: 'Headphones', order: 18 },
     ];
 };
 
@@ -49,6 +50,7 @@ const getIconComponent = (iconName: string) => {
         case 'Headphones': return Headphones;
         case 'MapPin': return MapPin;
         case 'FileText': return FileText;
+        case 'Map': return Map;
         default: return Grid;
     }
 };
@@ -113,6 +115,13 @@ export default function AdminMenuReordering() {
                     if (dwrIndex !== -1 && dwrIndex !== 4) {
                         const [dwrItem] = fetchedItems.splice(dwrIndex, 1);
                         fetchedItems.splice(4, 0, dwrItem);
+                    }
+
+                    // Force "Visit Management" to definitively reside at pos 6 (index 5)
+                    const visitIndex = fetchedItems.findIndex(m => m.name === "Visit Management");
+                    if (visitIndex !== -1 && visitIndex !== 5) {
+                        const [visitItem] = fetchedItems.splice(visitIndex, 1);
+                        fetchedItems.splice(5, 0, visitItem);
                     }
 
                     // Re-evaluate orders to ensure they are strictly sequential
@@ -188,7 +197,7 @@ export default function AdminMenuReordering() {
             <div className="reorder-container">
                 <div className="reorder-header">
                     <div className="reorder-header-info">
-                        <h2>Admin Menu Reordering</h2>
+                        <h2><ListOrdered className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Admin Menu Reordering</h2>
                         <p>Customize the order of modules in the left sidebar.</p>
                     </div>
                     <button className="btn-primary" onClick={handleSave} disabled={isLoading || isSaving}>

@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { Plus, GripVertical, Trash2, Edit2, Check, X, Award, FolderTree, Building } from 'lucide-react';
+import { Plus, GripVertical, Trash2, Edit2, Check, X, Award, FolderTree, Building, Briefcase } from 'lucide-react';
 import axios from '../../lib/axios';
 import './designations.css';
 
@@ -309,7 +309,7 @@ export default function Designations() {
         <div className="setup-container">
             <div className="setup-header">
                 <div>
-                    <h1>Designations</h1>
+                    <h1><Briefcase className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Designations</h1>
                     <p>Assign and manage specific job titles grouped by Sub-Departments</p>
                 </div>
                 <div className="actions-row">

@@ -28,7 +28,7 @@ const DeleteAttendance = () => {
     <div className="attendance-module-container">
       <div className="attendance-header">
         <div>
-          <h2 className="attendance-title">Delete Attendance</h2>
+          <h2 className="attendance-title"><Trash2 className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Delete Attendance</h2>
           <p className="attendance-subtitle">Permanently remove invalid punch records.</p>
         </div>
       </div>

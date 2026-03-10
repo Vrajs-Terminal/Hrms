@@ -17,7 +17,7 @@ const OvertimeApproval = () => {
     return (
         <div className="attendance-module-container">
             <div className="attendance-header">
-                <div><h2 className="attendance-title">Overtime Approval</h2><p className="attendance-subtitle">Approve or reject overtime requests.</p></div>
+                <div><h2 className="attendance-title"><Clock className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Overtime Approval</h2><p className="attendance-subtitle">Approve or reject overtime requests.</p></div>
             </div>
             <div className="attendance-filters-bar">
                 <div className="filter-group"><label>Status</label><select value={filter} onChange={e => setFilter(e.target.value)}><option value="">All</option><option value="Pending">Pending</option><option value="Approved">Approved</option><option value="Rejected">Rejected</option></select></div>

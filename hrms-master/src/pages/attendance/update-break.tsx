@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Clock } from 'lucide-react';
+import { Plus, Clock , Coffee} from 'lucide-react';
 import './attendance.css';
 import { useDocumentRequests, formatDate, timeAgo, getStatusBadge } from './useAttendanceHooks';
 
@@ -29,7 +29,7 @@ const UpdateBreak = () => {
     <div className="attendance-module-container">
       <div className="attendance-header">
         <div>
-          <h2 className="attendance-title">Break Adjustment</h2>
+          <h2 className="attendance-title"><Coffee className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Break Adjustment</h2>
           <p className="attendance-subtitle">Request manual adjustments for missed or incorrect break logs.</p>
         </div>
         <div className="attendance-actions">

@@ -205,7 +205,7 @@ export default function IDCardTemplates() {
         <div className="id-card-layout">
             <div className="table-card">
                 <div className="table-header-title">
-                    <h2>ID Card Templates</h2>
+                    <h2><CreditCard className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />ID Card Templates</h2>
                     <div className="header-actions">
                         <button className="btn-primary" onClick={handleAddClick}>
                             <Plus size={16} /> Add Template

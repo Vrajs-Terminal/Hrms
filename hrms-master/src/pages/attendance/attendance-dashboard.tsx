@@ -3,7 +3,7 @@ import {
   Users, UserCheck, UserX, Clock, CalendarDays,
   Coffee, Home, AlertTriangle,
   Filter, RefreshCcw, ChevronRight, ArrowUpRight
-} from 'lucide-react';
+, BarChart2} from 'lucide-react';
 import ExportButtons from '../../components/ExportButtons';
 import {
   PieChart, Pie, Cell, BarChart, Bar, XAxis,
@@ -78,7 +78,7 @@ const AttendanceDashboard = () => {
     <div className="attendance-module-container">
       <div className="attendance-header">
         <div>
-          <h2 className="attendance-title">Attendance Dashboard</h2>
+          <h2 className="attendance-title"><BarChart2 className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Attendance Dashboard</h2>
           <p className="attendance-subtitle">Real-time overview of employee attendance status.</p>
         </div>
         <div className="attendance-actions" style={{ display: 'flex', gap: '8px' }}>

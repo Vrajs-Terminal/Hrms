@@ -16,7 +16,7 @@ const PreviousDateAttendance = () => {
     <div className="attendance-module-container">
       <div className="attendance-header">
         <div>
-          <h2 className="attendance-title">Previous Date Attendance</h2>
+          <h2 className="attendance-title"><History className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Previous Date Attendance</h2>
           <p className="attendance-subtitle">Review historical attendance logs for any past date.</p>
         </div>
         <div className="attendance-actions">

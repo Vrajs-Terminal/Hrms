@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2 } from 'lucide-react';
+import { Plus, Edit2, Trash2 , Network} from 'lucide-react';
 import api from '../../lib/axios';
 import { Building2 } from 'lucide-react';
 import './sister-companies.css';
@@ -88,7 +88,7 @@ export default function SisterCompanies() {
         <div className="sister-companies-container">
             <div className="sc-header">
                 <div>
-                    <h1>Sister Companies</h1>
+                    <h1><Network className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Sister Companies</h1>
                     <p>Manage all companies under your organization</p>
                 </div>
                 <button className="btn-add" onClick={() => {

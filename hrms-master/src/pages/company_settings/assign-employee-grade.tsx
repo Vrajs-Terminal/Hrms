@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, GraduationCap, Calendar, Edit2, X, Save, History, Loader2 } from 'lucide-react';
+import { Search, GraduationCap, Calendar, Edit2, X, Save, History, Loader2 , UserCheck} from 'lucide-react';
 import ExportButtons from '../../components/ExportButtons';
 import ImportButton from '../../components/ImportButton';
 import './assign-employee-grade.css';
@@ -192,7 +192,7 @@ export default function AssignEmployeeGrade() {
 
             <div className="table-card">
                 <div className="table-header-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <h2>Employee Grades</h2>
+                    <h2><UserCheck className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Employee Grades</h2>
                     <div style={{ display: 'flex', gap: '8px' }}>
                         <ImportButton
                             onImport={(data) => {

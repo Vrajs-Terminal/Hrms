@@ -4,7 +4,7 @@ import {
     MapPin, Search, RefreshCcw,
     Battery, BatteryMedium, BatteryLow,
     Wifi, WifiOff, Clock, User
-} from 'lucide-react';
+, Navigation} from 'lucide-react';
 import './employee-tracking.css';
 
 interface EmployeeLive {
@@ -118,7 +118,7 @@ const EmployeeLiveTracking = () => {
         <div className="et-container">
             <div className="et-header">
                 <div>
-                    <h2 className="et-title">Employee Live Tracking</h2>
+                    <h2 className="et-title"><Navigation className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Employee Live Tracking</h2>
                     <p className="et-subtitle">Monitor real-time location and status of all employees</p>
                 </div>
                 <div className="et-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>

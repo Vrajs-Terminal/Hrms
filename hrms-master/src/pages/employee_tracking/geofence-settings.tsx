@@ -4,7 +4,7 @@ import api from '../../lib/axios';
 import {
     MapPin, Plus, Edit2, Trash2, X, Check, Download,
     Target, Crosshair, Shield, AlertCircle, RefreshCcw
-} from 'lucide-react';
+, Focus} from 'lucide-react';
 import './employee-tracking.css';
 
 interface Geofence {
@@ -158,7 +158,7 @@ const GeofenceSettings = () => {
             <div className="et-container">
                 <div className="et-header">
                     <div>
-                        <h2 className="et-title">Geo-Fence Settings</h2>
+                        <h2 className="et-title"><Focus className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Geo-Fence Settings</h2>
                         <p className="et-subtitle">Configure office locations and geofence boundaries for attendance tracking</p>
                     </div>
                     <div className="et-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>

@@ -223,7 +223,7 @@ const TrackingReports = () => {
         <div className="et-container">
             <div className="et-header">
                 <div>
-                    <h2 className="et-title">Tracking Reports</h2>
+                    <h2 className="et-title"><FileText className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Tracking Reports</h2>
                     <p className="et-subtitle">Generate and export employee tracking reports</p>
                 </div>
                 <div className="et-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>

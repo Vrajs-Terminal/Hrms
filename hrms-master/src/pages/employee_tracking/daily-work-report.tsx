@@ -10,7 +10,7 @@ import {
     FileText,
     MapPin,
     RefreshCcw
-} from 'lucide-react';
+, BarChart} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import ExportButtons from '../../components/ExportButtons';
 import ImportButton from '../../components/ImportButton';
@@ -110,7 +110,7 @@ const DailyWorkReport: React.FC = () => {
         <div className="et-container">
             <div className="et-header">
                 <div>
-                    <h1 className="et-title">Daily Work Report</h1>
+                    <h1 className="et-title"><BarChart className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Daily Work Report</h1>
                     <p className="et-subtitle">Comprehensive tracking for employee field and office activities</p>
                 </div>
                 <div className="et-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>

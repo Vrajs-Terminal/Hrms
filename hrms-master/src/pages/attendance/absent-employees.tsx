@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Filter, Calendar, MapPin, Building } from 'lucide-react';
+import { Filter, Calendar, MapPin, Building , UserMinus} from 'lucide-react';
 import ExportButtons from '../../components/ExportButtons';
 import ImportButton from '../../components/ImportButton';
 import './attendance.css';
@@ -17,7 +17,7 @@ const AbsentEmployees = () => {
     <div className="attendance-module-container">
       <div className="attendance-header">
         <div>
-          <h2 className="attendance-title">Absent Employees</h2>
+          <h2 className="attendance-title"><UserMinus className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Absent Employees</h2>
           <p className="attendance-subtitle">View and manage employees who are absent on a specific date.</p>
         </div>
         <div className="attendance-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>

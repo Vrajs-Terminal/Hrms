@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, GitMerge } from 'lucide-react';
+import { Plus, Edit2, Trash2, GitMerge , Layers} from 'lucide-react';
 import api from '../../lib/axios';
 import './employee-levels.css';
-import { Layers } from 'lucide-react';
 
 interface EmployeeLevel {
     id: number;
@@ -102,7 +101,7 @@ export default function EmployeeLevels() {
         <div className="el-container">
             <div className="el-header">
                 <div>
-                    <h1>Employee Levels</h1>
+                    <h1><Layers className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Employee Levels</h1>
                     <p>Manage the reporting hierarchy structure for all employees</p>
                 </div>
                 <div className="el-header-actions">

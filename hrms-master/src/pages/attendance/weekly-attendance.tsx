@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Filter, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Filter, ChevronLeft, ChevronRight , Calendar} from 'lucide-react';
 import ExportButtons from '../../components/ExportButtons';
 import './attendance.css';
 import { useAttendanceRecords, getInitials, getAvatarColor, getStatusBadge } from './useAttendanceHooks';
@@ -33,7 +33,7 @@ const WeeklyAttendance = () => {
     <div className="attendance-module-container">
       <div className="attendance-header">
         <div>
-          <h2 className="attendance-title">Weekly Attendance</h2>
+          <h2 className="attendance-title"><Calendar className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Weekly Attendance</h2>
           <p className="attendance-subtitle">Week: {weekStart} to {weekEnd}</p>
         </div>
         <div className="attendance-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>

@@ -67,7 +67,7 @@ export default function EmployeeGrades() {
         <div className="eg-container">
             <div className="eg-header">
                 <div>
-                    <h1>Employee Grades</h1>
+                    <h1><Award className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Employee Grades</h1>
                     <p>Configure grade categories linking to Expense, Travel, and Flight limits</p>
                 </div>
                 <button className="btn-add" onClick={() => {

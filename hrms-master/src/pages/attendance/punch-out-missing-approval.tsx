@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CheckCircle, XCircle, Clock } from 'lucide-react';
+import { CheckCircle, XCircle, Clock , CheckSquare} from 'lucide-react';
 import './attendance.css';
 import { useAttendanceRequests, formatDate, getInitials, getAvatarColor, getStatusBadge } from './useAttendanceHooks';
 
@@ -19,7 +19,7 @@ const PunchOutMissingApproval = () => {
     <div className="attendance-module-container">
       <div className="attendance-header">
         <div>
-          <h2 className="attendance-title">Punch Out Missing Approval</h2>
+          <h2 className="attendance-title"><CheckSquare className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Punch Out Missing Approval</h2>
           <p className="attendance-subtitle">Review and approve/reject missing punch-out requests.</p>
         </div>
       </div>

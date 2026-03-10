@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Clock } from 'lucide-react';
+import { Clock , AlertCircle} from 'lucide-react';
 import './attendance.css';
 import { useAttendanceRequests, formatDate, timeAgo, getStatusBadge } from './useAttendanceHooks';
 
@@ -23,7 +23,7 @@ const PunchOutMissingRequest = () => {
     <div className="attendance-module-container">
       <div className="attendance-header">
         <div>
-          <h2 className="attendance-title">Punch Out Missing Request</h2>
+          <h2 className="attendance-title"><AlertCircle className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Punch Out Missing Request</h2>
           <p className="attendance-subtitle">Submit a request to correct a missing punch-out time.</p>
         </div>
         <div className="attendance-actions">

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Phone, Plus, Edit2, Trash2, X, Save, AlertTriangle, Shield, Flame, Info, Loader2 } from 'lucide-react';
+import { Phone, Plus, Edit2, Trash2, X, Save, AlertTriangle, Shield, Flame, Info, Loader2 , PhoneCall} from 'lucide-react';
 import './emergency-numbers.css';
 import './assign-employee-grade.css'; // Reuse table and modal styles
 
@@ -150,7 +150,7 @@ export default function EmergencyNumbers() {
         <div className="emergency-layout">
             <div className="table-card">
                 <div className="table-header-title">
-                    <h2>Emergency Contact Numbers</h2>
+                    <h2><PhoneCall className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Emergency Contact Numbers</h2>
                     <button className="btn-primary" onClick={handleAddClick}>
                         <Plus size={16} /> Add Emergency Number
                     </button>

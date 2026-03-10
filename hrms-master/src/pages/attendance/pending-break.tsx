@@ -1,4 +1,4 @@
-import { Coffee, Play, Square, Clock } from 'lucide-react';
+import { Coffee, Play, Square, Clock , Hourglass} from 'lucide-react';
 import './attendance.css';
 import { useBreaks, formatTime } from './useAttendanceHooks';
 
@@ -11,7 +11,7 @@ const PendingBreak = () => {
     <div className="attendance-module-container">
       <div className="attendance-header">
         <div>
-          <h2 className="attendance-title">Pending & Active Breaks</h2>
+          <h2 className="attendance-title"><Hourglass className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Pending & Active Breaks</h2>
           <p className="attendance-subtitle">Track your current break status and total time taken today.</p>
         </div>
       </div>

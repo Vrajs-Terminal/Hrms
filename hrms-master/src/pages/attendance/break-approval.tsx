@@ -1,4 +1,4 @@
-import { Check, X, Clock } from 'lucide-react';
+import { Check, X, Clock , Coffee} from 'lucide-react';
 import './attendance.css';
 import { useDocumentRequests, formatDate, timeAgo, getStatusBadge, getAvatarColor, getInitials } from './useAttendanceHooks';
 
@@ -20,7 +20,7 @@ const BreakApproval = () => {
     <div className="attendance-module-container">
       <div className="attendance-header">
         <div>
-          <h2 className="attendance-title">Break Approvals</h2>
+          <h2 className="attendance-title"><Coffee className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Break Approvals</h2>
           <p className="attendance-subtitle">Review and manage manual break adjustment requests from your team.</p>
         </div>
         <div className="attendance-actions">

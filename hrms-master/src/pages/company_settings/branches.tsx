@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {
     Plus, Map, ArrowUp, ArrowDown, GripVertical, Trash2, AlertTriangle, X
-} from 'lucide-react';
+, GitBranch} from 'lucide-react';
 import api from '../../lib/axios';
 import ExportButtons from '../../components/ExportButtons';
 import ImportButton from '../../components/ImportButton';
@@ -114,7 +114,7 @@ export default function Branches() {
         <div className="branches-container setup-container">
             <div className="branches-header setup-header">
                 <div>
-                    <h1>Branches</h1>
+                    <h1><GitBranch className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Branches</h1>
                     <p>Manage all your company branches and locations</p>
                 </div>
                 <div className="actions-row" style={{ display: 'flex', gap: '8px' }}>

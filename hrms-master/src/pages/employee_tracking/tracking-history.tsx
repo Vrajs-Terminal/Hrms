@@ -149,7 +149,7 @@ const TrackingHistory = () => {
         <div className="et-container">
             <div className="et-header">
                 <div>
-                    <h2 className="et-title">Tracking History</h2>
+                    <h2 className="et-title"><MapPin className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Tracking History</h2>
                     <p className="et-subtitle">Employee travel history, daily movement, and distance tracking</p>
                 </div>
                 <div className="et-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>

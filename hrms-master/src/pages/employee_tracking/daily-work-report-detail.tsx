@@ -12,7 +12,7 @@ import {
     X,
     MessageCircle,
     Info
-} from 'lucide-react';
+, Search} from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../lib/axios';
 import './employee-tracking.css';
@@ -75,7 +75,7 @@ const DailyWorkReportDetail: React.FC = () => {
     if (!report) return (
         <div style={{ padding: '100px', textAlign: 'center' }}>
             <AlertTriangle size={48} color="#ef4444" style={{ margin: '0 auto 16px' }} />
-            <h3>Report Not Found</h3>
+            <h3><Search className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Report Not Found</h3>
             <button className="et-btn et-btn-secondary" onClick={() => navigate(-1)}>Go Back</button>
         </div>
     );

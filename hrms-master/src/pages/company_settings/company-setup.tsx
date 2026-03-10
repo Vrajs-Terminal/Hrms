@@ -92,7 +92,7 @@ export default function CompanySetup() {
         <div className="setup-container">
             <div className="setup-header">
                 <div>
-                    <h1>Company Setup</h1>
+                    <h1><Building className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Company Setup</h1>
                     <p>Manage your official company information and branding</p>
                 </div>
                 <button className="btn-save" onClick={handleSave}>

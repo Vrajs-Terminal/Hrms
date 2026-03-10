@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Upload, FileText, Save } from 'lucide-react';
+import { Upload, FileText, Save , Users} from 'lucide-react';
 import './attendance.css';
 import api from '../../lib/axios';
 import { useAttendanceData } from './useAttendanceHooks';
@@ -48,7 +48,7 @@ const BulkAttendance = () => {
         <div className="attendance-module-container">
             <div className="attendance-header">
                 <div>
-                    <h2 className="attendance-title">Bulk Attendance</h2>
+                    <h2 className="attendance-title"><Users className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Bulk Attendance</h2>
                     <p className="attendance-subtitle">Upload CSV or add multiple attendance records at once.</p>
                 </div>
             </div>

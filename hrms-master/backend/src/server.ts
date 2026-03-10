@@ -37,6 +37,7 @@ import trackingRoutes from './routes/tracking';
 import trackingExceptionsRoutes from './routes/tracking-exceptions';
 import trackingConfigRoutes from './routes/tracking-config';
 import dailyWorkReportsRoutes from './routes/daily-work-reports';
+import visitRoutes from './routes/visit';
 
 const app = express();
 
@@ -88,6 +89,7 @@ app.use('/api/tracking', trackingRoutes);
 app.use('/api/tracking-exceptions', trackingExceptionsRoutes);
 app.use('/api/tracking-config', trackingConfigRoutes);
 app.use('/api/daily-work-reports', dailyWorkReportsRoutes);
+app.use('/api/visits', visitRoutes);
 
 // Basic test route
 app.get('/api/health', (req, res) => {

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Filter, Download } from 'lucide-react';
+import { Filter, Download , Edit2} from 'lucide-react';
 import './attendance.css';
 import { useAttendanceRecords, useAttendanceData, formatTime, formatDate, getInitials, getAvatarColor, getStatusBadge } from './useAttendanceHooks';
 import api from '../../lib/axios';
@@ -39,7 +39,7 @@ const UpdateAttendance = () => {
   return (
     <div className="attendance-module-container">
       <div className="attendance-header">
-        <div><h2 className="attendance-title">Update Attendance</h2><p className="attendance-subtitle">Modify existing punch records or status.</p></div>
+        <div><h2 className="attendance-title"><Edit2 className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Update Attendance</h2><p className="attendance-subtitle">Modify existing punch records or status.</p></div>
         <div className="attendance-actions"><button className="btn-secondary"><Download size={16} /> Export Logs</button></div>
       </div>
 

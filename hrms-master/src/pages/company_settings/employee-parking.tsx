@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { QrCode, CreditCard, Plus, Upload, Search, Edit2, Trash2, X, Save, Car, Loader2, Download } from 'lucide-react';
+import { QrCode, CreditCard, Plus, Upload, Search, Edit2, Trash2, X, Save, Car, Loader2, Download , Truck} from 'lucide-react';
 import { QRCodeSVG, QRCodeCanvas } from 'qrcode.react';
 import './employee-parking.css';
 import './assign-employee-grade.css'; // Reuse utility classes like table styles
@@ -204,7 +204,7 @@ export default function EmployeeParking() {
 
             <div className="table-card">
                 <div className="table-header-title">
-                    <h2>Parking Allocations</h2>
+                    <h2><Truck className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Parking Allocations</h2>
                     <div className="header-actions">
                         <button className="btn-secondary">
                             <Upload size={16} /> Bulk Assign

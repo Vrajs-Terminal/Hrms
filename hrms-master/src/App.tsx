@@ -57,6 +57,12 @@ import TrackingEmployeeWise from "./pages/employee_tracking/tracking-employee-wi
 import DailyWorkReport from "./pages/employee_tracking/daily-work-report.tsx";
 import DailyWorkReportDetail from "./pages/employee_tracking/daily-work-report-detail.tsx";
 
+import VisitDashboard from "./pages/visit_management/visit-dashboard";
+import VisitPlanning from "./pages/visit_management/visit-planning";
+import VisitCheckInOut from "./pages/visit_management/visit-check-in-out";
+import VisitApprovals from "./pages/visit_management/visit-approvals";
+import VisitSettings from "./pages/visit_management/visit-settings";
+
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
@@ -133,6 +139,12 @@ function App() {
               <Route path="/tracking-employee-wise" element={<TrackingEmployeeWise />} />
               <Route path="/daily-work-report" element={<DailyWorkReport />} />
               <Route path="/daily-work-report/:id" element={<DailyWorkReportDetail />} />
+
+              <Route path="/visit-dashboard" element={<VisitDashboard />} />
+              <Route path="/visit-planning" element={<VisitPlanning />} />
+              <Route path="/visit-check-in-out" element={<VisitCheckInOut />} />
+              <Route path="/visit-approvals" element={<VisitApprovals />} />
+              <Route path="/visit-settings" element={<VisitSettings />} />
 
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

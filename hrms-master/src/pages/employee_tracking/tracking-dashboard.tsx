@@ -4,7 +4,7 @@ import {
     Users, UserCheck, MapPin, Briefcase, Clock,
     AlertTriangle, ArrowUpRight, ChevronRight,
     RefreshCcw, Map
-} from 'lucide-react';
+, Activity} from 'lucide-react';
 import ExportButtons from '../../components/ExportButtons';
 import './employee-tracking.css';
 
@@ -73,7 +73,7 @@ const TrackingDashboard = () => {
             {/* Header */}
             <div className="et-header">
                 <div>
-                    <h2 className="et-title">Tracking Dashboard</h2>
+                    <h2 className="et-title"><Activity className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Tracking Dashboard</h2>
                     <p className="et-subtitle">Real-time overview of employee location & activity • {new Date(date).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
                 </div>
                 <div className="et-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>

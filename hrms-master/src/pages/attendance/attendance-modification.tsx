@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Calendar, Edit3 } from 'lucide-react';
+import { Plus, Calendar, Edit3 , Settings2} from 'lucide-react';
 import ExportButtons from '../../components/ExportButtons';
 import './attendance.css';
 import { useAttendanceRequests, formatDate, timeAgo, getStatusBadge } from './useAttendanceHooks';
@@ -22,7 +22,7 @@ const AttendanceModification = () => {
   return (
     <div className="attendance-module-container">
       <div className="attendance-header">
-        <div><h2 className="attendance-title">Attendance Modification</h2><p className="attendance-subtitle">Request changes to past attendance records.</p></div>
+        <div><h2 className="attendance-title"><Settings2 className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Attendance Modification</h2><p className="attendance-subtitle">Request changes to past attendance records.</p></div>
         <div className="attendance-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
           <ExportButtons
             data={requests.map((r: any) => ({

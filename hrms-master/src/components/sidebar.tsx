@@ -23,6 +23,7 @@ import {
     ChevronRight,
     ChevronDown,
     MapPin,
+    Map,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -112,6 +113,17 @@ function Sidebar({ isOpen }: SidebarProps) {
             ]
         },
         {
+            name: "Visit Management",
+            icon: Map,
+            subItems: [
+                { name: "Visit Dashboard", path: "/visit-dashboard" },
+                { name: "Visit Planning", path: "/visit-planning" },
+                { name: "Check-In / Out", path: "/visit-check-in-out" },
+                { name: "Visit Approvals", path: "/visit-approvals" },
+                { name: "Visit Settings", path: "/visit-settings" },
+            ]
+        },
+        {
             name: "Daily Work Report",
             path: "/daily-work-report",
             icon: FileText
@@ -184,6 +196,13 @@ function Sidebar({ isOpen }: SidebarProps) {
                             newOrderedList.splice(4, 0, dwrItem);
                         }
 
+                        // Force "Visit Management" right after Employee Tracking
+                        const visitIndex = newOrderedList.findIndex(m => m.name === "Visit Management");
+                        if (visitIndex !== -1 && visitIndex !== 5) {
+                            const [visitItem] = newOrderedList.splice(visitIndex, 1);
+                            newOrderedList.splice(5, 0, visitItem);
+                        }
+
                         // Fallback: Ensure critical modules are present
                         if (!newOrderedList.find(m => m.name === "Employee Tracking")) {
                             const item = menuItems.find(m => m.name === "Employee Tracking");
@@ -192,6 +211,10 @@ function Sidebar({ isOpen }: SidebarProps) {
                         if (!newOrderedList.find(m => m.name === "Daily Work Report")) {
                             const item = menuItems.find(m => m.name === "Daily Work Report");
                             if (item) newOrderedList.splice(4, 0, item);
+                        }
+                        if (!newOrderedList.find(m => m.name === "Visit Management")) {
+                            const item = menuItems.find(m => m.name === "Visit Management");
+                            if (item) newOrderedList.splice(5, 0, item);
                         }
 
                         setDynamicMenuItems(newOrderedList);

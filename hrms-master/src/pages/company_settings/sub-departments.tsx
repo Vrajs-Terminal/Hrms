@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { Plus, GripVertical, Trash2, Edit2, Check, X, FolderTree } from 'lucide-react';
+import { Plus, GripVertical, Trash2, Edit2, Check, X, FolderTree , List} from 'lucide-react';
 import axios from '../../lib/axios';
 import './sub-departments.css';
 
@@ -194,7 +194,7 @@ export default function SubDepartments() {
         <div className="setup-container">
             <div className="setup-header">
                 <div>
-                    <h1>Sub-Departments</h1>
+                    <h1><List className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Sub-Departments</h1>
                     <p>Organize sub-teams beneath their respective parent Departments.</p>
                 </div>
                 <div className="actions-row">

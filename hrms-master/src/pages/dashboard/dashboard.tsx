@@ -7,7 +7,7 @@ import {
     Receipt, Shuffle, Landmark, Smartphone, Home, History, ScanFace, UserCog,
     PlusCircle, Hourglass, FileText, Users, Briefcase, IndianRupee, ArrowUpRight,
     CheckCircle2, Plus, FileBarChart, Building, Layers
-} from 'lucide-react';
+, LayoutDashboard} from 'lucide-react';
 import { useState, useEffect } from 'react';
 import api from '../../lib/axios';
 
@@ -41,7 +41,7 @@ function Dashboard() {
                 {/* Dashboard Header */}
                 <div className="dashboard-header-title">
                     <div>
-                        <h1>Dashboard Overview</h1>
+                        <h1><LayoutDashboard className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Dashboard Overview</h1>
                         <p>Welcome back! Here is what's happening today across your organization.</p>
                     </div>
                 </div>

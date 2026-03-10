@@ -39,6 +39,10 @@ model User {
   attendanceRequests          AttendanceRequest[] @relation("RequestUser")
   approvedRequests            AttendanceRequest[] @relation("RequestApprover")
   
+  // Visit Management
+  visits                      Visit[] @relation("VisitUser")
+  approved_visits             Visit[] @relation("VisitApprover")
+
   // New Silos for Dynamic Dashboard
   expenses                    ExpenseRequest[]
   breakLogs                   BreakLog[]
@@ -553,4 +557,55 @@ model WorkActivity {
   dailyWork     DailyWork @relation(fields: [daily_work_id], references: [id], onDelete: Cascade)
 
   @@index([daily_work_id])
+}
+
+// ==========================================
+// Phase 7: Visit Management Module
+// ==========================================
+
+model Visit {
+  id                   Int       @id @default(autoincrement())
+  user_id              Int
+  date                 DateTime  @db.Date
+  client_name          String
+  client_contact       String?
+  company_name         String?
+  city                 String?
+  address              String?   @db.Text
+  purpose              String?   @db.Text
+  priority_level       String    @default("Medium") // High, Medium, Low
+  remarks              String?   @db.Text
+  
+  // Status: Draft, Planned, Checked-In, Completed, Cancelled, Pending Approval
+  status               String    @default("Draft")
+
+  // Check-In Data
+  check_in_time        DateTime?
+  check_in_latitude    String?
+  check_in_longitude   String?
+  check_in_photo_url   String?
+
+  // Check-Out Data
+  check_out_time       DateTime?
+  check_out_latitude   String?
+  check_out_longitude  String?
+  work_summary         String?   @db.Text
+  next_follow_up_date  DateTime? @db.Date
+  document_url         String?
+  customer_signature_url String?
+
+  // Approval Data
+  approver_id          Int?
+  approval_status      String? // Approved, Rejected, Reson Requested
+  approval_comments    String? @db.Text
+
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  user                 User      @relation("VisitUser", fields: [user_id], references: [id], onDelete: Cascade)
+  approver             User?     @relation("VisitApprover", fields: [approver_id], references: [id], onDelete: SetNull)
+
+  @@index([user_id])
+  @@index([date])
+  @@index([status])
 }

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { MessageCircle, Edit2, Trash2, X, Save, Send, Activity, Loader2 } from 'lucide-react';
+import { MessageCircle, Edit2, Trash2, X, Save, Send, Activity, Loader2 , MessageSquare} from 'lucide-react';
 import './whatsapp-alerts.css';
 import './assign-employee-grade.css'; // Reuse table and modal styles
 
@@ -158,7 +158,7 @@ export default function WhatsAppAlerts() {
         <div className="whatsapp-layout">
             <div className="table-card">
                 <div className="table-header-title">
-                    <h2>WhatsApp Alerts</h2>
+                    <h2><MessageSquare className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />WhatsApp Alerts</h2>
                     <div className="header-actions">
                         <button className="btn-secondary" onClick={() => {
                             const activeAlert = alerts.find(a => a.status === 'Active');

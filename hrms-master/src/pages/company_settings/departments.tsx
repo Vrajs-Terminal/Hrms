@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {
     Plus, GripVertical, Building2, Layers, ChevronLeft, ChevronRight, Trash2
-} from 'lucide-react';
+, Grid} from 'lucide-react';
 import api from '../../lib/axios';
 import ExportButtons from '../../components/ExportButtons';
 import ImportButton from '../../components/ImportButton';
@@ -138,7 +138,7 @@ export default function Departments() {
         <div className="dept-container setup-container">
             <div className="dept-header setup-header">
                 <div>
-                    <h1>Departments</h1>
+                    <h1><Grid className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Departments</h1>
                     <p>Organize internal departments linked to specific branches</p>
                 </div>
                 <div className="actions-row" style={{ display: 'flex', gap: '8px' }}>

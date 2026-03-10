@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Check, Building, LayoutTemplate, UserPlus, Trash2, Key } from 'lucide-react';
+import { Check, Building, LayoutTemplate, UserPlus, Trash2, Key , Shield} from 'lucide-react';
 import api from '../../lib/axios';
 import './admin-rights.css';
 
@@ -166,7 +166,7 @@ export default function AdminRights() {
         <div className="ar-container">
             <div className="ar-header">
                 <div>
-                    <h1>Roles & Privileges</h1>
+                    <h1><Shield className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Roles & Privileges</h1>
                     <p>Configure data access silos and restrictions for Admin users</p>
                 </div>
                 <div className="actions-row">

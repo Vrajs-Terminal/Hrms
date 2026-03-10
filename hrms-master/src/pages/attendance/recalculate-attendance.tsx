@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { RefreshCw, CheckCircle, AlertTriangle } from 'lucide-react';
+import { RefreshCw, CheckCircle, AlertTriangle , Calculator} from 'lucide-react';
 import './attendance.css';
 import { useAttendanceData } from './useAttendanceHooks';
 import api from '../../lib/axios';
@@ -34,7 +34,7 @@ const RecalculateAttendance = () => {
     <div className="attendance-module-container">
       <div className="attendance-header">
         <div>
-          <h2 className="attendance-title">Recalculate Attendance</h2>
+          <h2 className="attendance-title"><Calculator className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Recalculate Attendance</h2>
           <p className="attendance-subtitle">Re-evaluate working hours, late minutes, and overtime based on latest shift rules.</p>
         </div>
       </div>

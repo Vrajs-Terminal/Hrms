@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Clock, Plus } from 'lucide-react';
+import { Clock, Plus , Timer} from 'lucide-react';
 import ExportButtons from '../../components/ExportButtons';
 import './attendance.css';
 import { useAttendanceRequests, formatDate, timeAgo, getStatusBadge } from './useAttendanceHooks';
@@ -22,7 +22,7 @@ const OvertimeRequest = () => {
   return (
     <div className="attendance-module-container">
       <div className="attendance-header">
-        <div><h2 className="attendance-title">Overtime Request</h2><p className="attendance-subtitle">Submit overtime work requests for approval.</p></div>
+        <div><h2 className="attendance-title"><Timer className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Overtime Request</h2><p className="attendance-subtitle">Submit overtime work requests for approval.</p></div>
         <div className="attendance-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
           <ExportButtons
             data={requests.map((r: any) => ({

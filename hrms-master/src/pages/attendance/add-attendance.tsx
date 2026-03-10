@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import {
   Clock, CalendarDays, User, Building,
   Save, Watch, AlertTriangle, Info
-} from 'lucide-react';
+, PlusCircle} from 'lucide-react';
 import './attendance.css';
 import api from '../../lib/axios';
 
@@ -62,7 +62,7 @@ const AddAttendance = () => {
     <div className="attendance-module-container">
       <div className="attendance-header">
         <div>
-          <h2 className="attendance-title">Add Manual Attendance</h2>
+          <h2 className="attendance-title"><PlusCircle className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Add Manual Attendance</h2>
           <p className="attendance-subtitle">Manually override or insert a missing punch record for an employee.</p>
         </div>
       </div>
