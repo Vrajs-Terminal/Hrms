@@ -47,15 +47,14 @@
     background: transparent;
 }
 
-.logo-container {
+.brand-container {
     display: flex;
-    justify-content: flex-start;
+    justify-content: center;
     margin-bottom: 24px;
-
 }
 
-.sidebar-logo {
-    max-width: 200px;
+.brand-icon {
+    width: 200px;
     height: auto;
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
@@ -83,21 +82,30 @@
     cursor: pointer;
     position: relative;
     overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
 }
 
-/* Glassmorphism Hover Effect */
 .user-profile:hover {
-    border-color: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.4);
     background: rgba(255, 255, 255, 0.15);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     transform: translateY(-2px);
-    color: #ffffff;
 }
 
 .user-detail {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
+}
+
+.profile-icon {
+    color: #ffffff;
+}
+
+.company-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+    white-space: nowrap;
 }
 
 .profile-icon {

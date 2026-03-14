@@ -46,8 +46,8 @@ router.post('/', async (req, res) => {
             }
         });
 
+        await logActivity(null, 'CREATED', 'PARKING_SLOT', `Created Slot ${slot_number}`);
         res.status(201).json(newSlot);
-        logActivity(null, 'CREATED', 'PARKING_SLOT', `Created Slot ${slot_number}`);
     } catch (error: any) {
         if (error.code === 'P2002') {
             // Handle unique constraint violations
@@ -83,8 +83,8 @@ router.put('/:id', async (req, res) => {
             }
         });
 
+        await logActivity(null, 'UPDATED', 'PARKING_SLOT', `Updated Slot ${slot_number}`);
         res.json(updatedSlot);
-        logActivity(null, 'UPDATED', 'PARKING_SLOT', `Updated Slot ${slot_number}`);
     } catch (error: any) {
         if (error.code === 'P2002') {
             if (error.meta?.target?.includes('slot_number')) {
@@ -108,8 +108,8 @@ router.delete('/:id', async (req, res) => {
             where: { id: parseInt(id) }
         });
 
+        await logActivity(null, 'DELETED', 'PARKING_SLOT', `Deleted Slot #${id}`);
         res.status(204).send();
-        logActivity(null, 'DELETED', 'PARKING_SLOT', `Deleted Slot #${id}`);
     } catch (error) {
         console.error("Error deleting parking slot:", error);
         res.status(500).json({ error: "Failed to delete parking slot" });

@@ -1,18 +1,13 @@
 import "./header.css";
-import { useState, useEffect, useRef, useCallback } from "react";
-import { Search, Bell, User, PanelLeftClose, LogOut, Settings, Keyboard, Plus, Pencil, Trash2, RefreshCw, ChevronDown } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Search, Bell, User, Users, PanelLeftClose, LogOut, Settings, Keyboard, Plus, Pencil, Trash2, RefreshCw, ChevronDown, Building, LayoutTemplate, Hash, Shield } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
+import { useNotificationStore } from "../store/useNotificationStore";
 import api from "../lib/axios";
+import KeyboardShortcutsModal from "./KeyboardShortcutsModal";
 
-interface Notification {
-    id: number;
-    action: string;
-    entity_type: string;
-    entity_name: string;
-    details?: string | null;
-    createdAt: string;
-    user?: { id: number; name: string; email: string } | null;
-}
+
+
 
 interface HeaderProps {
     toggleSidebar: () => void;
@@ -24,33 +19,39 @@ function Header({ toggleSidebar, isSidebarOpen }: HeaderProps) {
     const [showProfileMenu, setShowProfileMenu] = useState(false);
     const [showNotifications, setShowNotifications] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
-    const [notifications, setNotifications] = useState<Notification[]>([]);
-    const [notifCount, setNotifCount] = useState(0);
-    const [isLoadingNotifs, setIsLoadingNotifs] = useState(false);
+
+    // Notification Store
+    const {
+        notifications,
+        hasUnread,
+        isLoading: isLoadingNotifs,
+        fetchNotifications,
+        markAsRead
+    } = useNotificationStore();
+
+    // Modal State
+    const [showShortcuts, setShowShortcuts] = useState(false);
+
+    // Search State
+    const [searchQuery, setSearchQuery] = useState("");
+    const [searchResults, setSearchResults] = useState<any[]>([]);
+    const [isSearching, setIsSearching] = useState(false);
+    const [showSearchResults, setShowSearchResults] = useState(false);
+
     const user = useAuthStore(state => state.user);
     const logout = useAuthStore(state => state.logout);
 
     const profileRef = useRef<HTMLDivElement>(null);
     const notifRef = useRef<HTMLDivElement>(null);
 
-    const fetchNotifications = useCallback(async (limit = 5) => {
-        setIsLoadingNotifs(true);
-        try {
-            const res = await api.get(`/notifications?limit=${limit}`);
-            setNotifications(res.data);
-            setNotifCount(res.data.length);
-        } catch (err) {
-            console.error('Failed to fetch notifications');
-        } finally {
-            setIsLoadingNotifs(false);
-        }
-    }, []);
+    const isAdmin = user?.role === "Admin" || user?.role === "SuperAdmin";
 
     useEffect(() => {
-        fetchNotifications(5);
-        const interval = setInterval(() => fetchNotifications(5), 30000);
+        if (!isAdmin) return;
+        fetchNotifications(15); // Increased for bar
+        const interval = setInterval(() => fetchNotifications(15), 15000);
         return () => clearInterval(interval);
-    }, [fetchNotifications]);
+    }, [fetchNotifications, isAdmin]);
 
     useEffect(() => {
         const services = [
@@ -117,168 +118,220 @@ function Header({ toggleSidebar, isSidebarOpen }: HeaderProps) {
         return `${days}d ago`;
     };
 
-    const handleBellClick = () => {
-        const opening = !showNotifications;
-        setShowNotifications(opening);
-        setShowProfileMenu(false);
-        if (opening) {
-            setIsExpanded(false);
-            fetchNotifications(5);
+
+    // Universal Search Logic
+    useEffect(() => {
+        const timer = setTimeout(async () => {
+            if (searchQuery.length > 1) {
+                setIsSearching(true);
+                setShowSearchResults(true);
+                try {
+                    const res = await api.get(`/search?q=${searchQuery}`);
+                    setSearchResults(res.data.results);
+                } catch (err) {
+                    console.error("Search failed", err);
+                } finally {
+                    setIsSearching(false);
+                }
+            } else {
+                setSearchResults([]);
+                setShowSearchResults(false);
+            }
+        }, 300);
+
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
+
+    const handleSearchResultClick = (path: string) => {
+        window.location.hash = path;
+        setShowSearchResults(false);
+        setSearchQuery("");
+    };
+
+    const getResultIcon = (type: string) => {
+        switch (type) {
+            case 'Module': return <LayoutTemplate size={16} />;
+            case 'Admin': return <Shield size={16} />;
+            case 'Employee': return <User size={16} />;
+            case 'Branch': return <Building size={16} />;
+            case 'Department': return <Users size={16} />;
+            default: return <Hash size={16} />;
         }
     };
 
-    const handleViewAll = () => {
-        setIsExpanded(true);
-        fetchNotifications(100);
-    };
-
-    const handleCollapse = () => {
-        setIsExpanded(false);
-        fetchNotifications(5);
+    const handleSearch = (value: string) => {
+        setSearchQuery(value);
+        if (value.length > 1) {
+            setShowSearchResults(true);
+        } else {
+            setShowSearchResults(false);
+        }
     };
 
     return (
-        <header className="header">
-            {/* Left: Sidebar Toggle Button */}
-            <button
-                className={`menu-toggle-btn ${!isSidebarOpen ? 'closed' : ''}`}
-                onClick={toggleSidebar}
-                aria-label="Toggle Sidebar"
-            >
-                <PanelLeftClose
-                    size={24}
-                    className={`menu-icon-btn ${!isSidebarOpen ? 'rotate-180' : ''}`}
-                />
-            </button>
-            {/* Search Bar - Rotates services */}
-            <div className="search-container">
-                <Search size={18} className="search-icon" />
-                <input
-                    type="text"
-                    placeholder={placeholderText}
-                    className="search-input"
-                />
-            </div>
+        <header className="header-container">
+            <div className="header-main-row">
+                <div className="header-left">
+                    <button className="menu-toggle-btn" onClick={toggleSidebar} title={isSidebarOpen ? "Close Sidebar" : "Open Sidebar"}>
+                        <PanelLeftClose size={20} className={`menu-icon-btn ${!isSidebarOpen ? 'rotate-180' : ''}`} />
+                    </button>
 
-            <div className="header-spacer"></div>
+                    <div className="search-wrapper">
+                        <div className="search-container">
+                            <Search className="search-icon" size={18} />
+                            <input
+                                type="text"
+                                className="search-input"
+                                placeholder={placeholderText}
+                                value={searchQuery}
+                                onChange={(e) => handleSearch(e.target.value)}
+                            />
+                        </div>
 
-            {/* Notification Menu */}
-            <div className="notifications-wrapper" ref={notifRef}>
-                <div
-                    className="notifications"
-                    onClick={handleBellClick}
-                >
-                    <Bell size={20} className="bell-icon" />
-                    {notifCount > 0 && <div className="notification-dot" />}
+                        {showSearchResults && (
+                            <div className="search-results-dropdown">
+                                <div className="search-results-scroll">
+                                    {isSearching ? (
+                                        <div className="search-no-results">Searching...</div>
+                                    ) : searchResults.length > 0 ? (
+                                        searchResults.map((result, idx) => (
+                                            <div
+                                                key={idx}
+                                                className="search-result-item"
+                                                onClick={() => {
+                                                    handleSearchResultClick(result.path);
+                                                }}
+                                            >
+                                                <div className={`result-icon-type color-${result.type.toLowerCase()}`}>
+                                                    {getResultIcon(result.type)}
+                                                </div>
+                                                <div className="result-info">
+                                                    <div className="result-title">{result.title}</div>
+                                                    <div className="result-subtitle">
+                                                        <span className="result-category">{result.type}</span>
+                                                        <span className="result-separator">•</span>
+                                                        <span className="result-meta">{result.subtitle}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="search-no-results">No services or employees found</div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
-                {showNotifications && (
-                    <div className={`dropdown-menu notifications-dropdown ${isExpanded ? 'notif-expanded' : ''}`}>
-                        <div className="dropdown-header">
-                            <h4>Notifications</h4>
-                            <div className="notif-header-actions">
-                                {notifCount > 0 && <span className="badge">{notifCount} Recent</span>}
-                                <button
-                                    className="notif-refresh-btn"
-                                    onClick={(e) => { e.stopPropagation(); fetchNotifications(isExpanded ? 100 : 5); }}
-                                    title="Refresh"
-                                >
-                                    <RefreshCw size={14} className={isLoadingNotifs ? 'spin' : ''} />
-                                </button>
+                <div className="header-right-group">
+
+                    {/* Admin Only Notification Bell */}
+                    {isAdmin && (
+                        <div className="notifications-wrapper" ref={notifRef}>
+                            <div className="notifications" onClick={() => {
+                                setShowNotifications(!showNotifications);
+                                if (!showNotifications) markAsRead();
+                            }}>
+                                <Bell size={20} className="bell-icon" />
+                                {hasUnread && <span className="notification-dot"></span>}
+                            </div>
+
+                            {showNotifications && (
+                                <div className={`dropdown-menu notifications-dropdown ${isExpanded ? 'notif-expanded' : ''}`}>
+                                    <div className="dropdown-header">
+                                        <h4>Activities</h4>
+                                        <div className="notif-header-actions">
+                                            <button
+                                                className={`notif-refresh-btn ${isLoadingNotifs ? 'spin' : ''}`}
+                                                onClick={(e) => { e.stopPropagation(); fetchNotifications(isExpanded ? 100 : 5); }}
+                                                disabled={isLoadingNotifs}
+                                            >
+                                                <RefreshCw size={14} />
+                                            </button>
+                                            <span className="badge">{notifications.length} New</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="notif-scroll-area">
+                                        {notifications.length > 0 ? (
+                                            notifications.map((notif) => (
+                                                <div key={notif.id} className="dropdown-item notif-item">
+                                                    <div className={`notif-icon ${getActionColor(notif.action)}`}>
+                                                        {getActionIcon(notif.action)}
+                                                    </div>
+                                                    <div className="notif-text">
+                                                        <p>
+                                                            <strong>{notif.user?.name || 'System'}</strong> {notif.action.toLowerCase()} {formatEntityType(notif.entity_type)}{' '}
+                                                            <span className="notif-entity-name">"{notif.entity_name}"</span>
+                                                        </p>
+                                                        <span className="notif-meta">{timeAgo(notif.createdAt)}</span>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className="notif-empty">
+                                                <Bell size={24} />
+                                                <p>No new notifications</p>
+                                                <span>All caught up!</span>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="notif-footer">
+                                        <button onClick={() => setIsExpanded(!isExpanded)} className="notif-collapse-btn">
+                                            {isExpanded ? 'Show Less' : 'View All Activities'}
+                                            <ChevronDown size={14} style={{ transform: isExpanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.3s' }} />
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Profile Section */}
+                    <div className="user-profile-wrapper" ref={profileRef}>
+                        <div className="user-profile-header" onClick={() => setShowProfileMenu(!showProfileMenu)}>
+                            <div className="header-user-name">
+                                {user?.name || "Guest USER"}
+                            </div>
+                            <div className={`user-avatar-header ${isAdmin ? 'premium-navy' : ''}`}>
+                                {isAdmin ? <Shield size={20} /> : <User size={20} />}
                             </div>
                         </div>
 
-                        <div className="dropdown-content notif-scroll-area">
-                            {notifications.length === 0 ? (
-                                <div className="notif-empty">
-                                    <Bell size={28} style={{ color: '#cbd5e1', marginBottom: 8 }} />
-                                    <p>No activity yet</p>
-                                    <span>Changes will appear here</span>
+                        {showProfileMenu && (
+                            <div className="dropdown-menu profile-dropdown">
+                                <div className="dropdown-header profile-header-info">
+                                    <p className="ph-name">{user?.name}</p>
+                                    <p className="ph-email">{user?.email}</p>
                                 </div>
-                            ) : (
-                                notifications.map((notif) => (
-                                    <div key={notif.id} className="dropdown-item notif-item">
-                                        <div className={`notif-icon ${getActionColor(notif.action)}`}>
-                                            {getActionIcon(notif.action)}
-                                        </div>
-                                        <div className="notif-text">
-                                            <p>
-                                                <strong>{notif.action.toLowerCase()}</strong>{' '}
-                                                {formatEntityType(notif.entity_type)}{' '}
-                                                <span className="notif-entity-name">"{notif.entity_name}"</span>
-                                            </p>
-                                            <span className="notif-meta">
-                                                {notif.user?.name && <>{notif.user.name} · </>}
-                                                {timeAgo(notif.createdAt)}
-                                            </span>
-                                        </div>
-                                    </div>
-                                ))
-                            )}
-                        </div>
-
-                        <div className="dropdown-footer notif-footer">
-                            {!isExpanded ? (
-                                <button onClick={handleViewAll}>
-                                    View all notifications
-                                </button>
-                            ) : (
-                                <button onClick={handleCollapse} className="notif-collapse-btn">
-                                    <ChevronDown size={14} style={{ transform: 'rotate(180deg)' }} />
-                                    <span>Show less</span>
-                                </button>
-                            )}
-                        </div>
-                    </div>
-                )}
-            </div>
-
-            {/* User Profile - Rightmost */}
-            <div className="user-profile-wrapper" ref={profileRef}>
-                <div
-                    className="user-profile-header"
-                    onClick={() => {
-                        setShowProfileMenu(!showProfileMenu);
-                        setShowNotifications(false);
-                        setIsExpanded(false);
-                    }}
-                >
-                    <span className="header-user-name">{user?.name || "User Name"}</span>
-                    <div className="user-avatar-header premium-navy">
-                        <User size={20} />
+                                <div className="dropdown-content">
+                                    <button className="dropdown-item">
+                                        <User size={18} /> My Profile
+                                    </button>
+                                    <button className="dropdown-item">
+                                        <Settings size={18} /> Account Settings
+                                    </button>
+                                    <button className="dropdown-item" onClick={() => setShowShortcuts(true)}>
+                                        <Keyboard size={18} /> Keyboard Shortcuts
+                                    </button>
+                                    <div className="dropdown-divider"></div>
+                                    <button className="dropdown-item logout-action" onClick={logout}>
+                                        <LogOut size={18} /> Sign Out
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
-
-                {showProfileMenu && (
-                    <div className="dropdown-menu profile-dropdown">
-                        <div className="dropdown-header profile-header-info">
-                            <p className="ph-name">{user?.name || "User Name"}</p>
-                            <p className="ph-email">{user?.email || "employee@minehr.com"}</p>
-                        </div>
-                        <div className="dropdown-content">
-                            <button className="dropdown-item">
-                                <User size={18} />
-                                <span>My Profile</span>
-                            </button>
-                            <button className="dropdown-item">
-                                <Settings size={18} />
-                                <span>Account Settings</span>
-                            </button>
-                            <button className="dropdown-item">
-                                <Keyboard size={18} />
-                                <span>Keyboard Shortcuts</span>
-                            </button>
-
-                            <div className="dropdown-divider"></div>
-
-                            <button className="dropdown-item logout-action" onClick={logout}>
-                                <LogOut size={18} />
-                                <span>Sign out</span>
-                            </button>
-                        </div>
-                    </div>
-                )}
             </div>
+
+            <KeyboardShortcutsModal
+                isOpen={showShortcuts}
+                onClose={() => setShowShortcuts(false)}
+            />
+
         </header>
     );
 }

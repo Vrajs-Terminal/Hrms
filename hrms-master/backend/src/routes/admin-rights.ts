@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import prisma from '../lib/prismaClient';
+import { logActivity } from '../services/activityLogger';
 
 const router = Router();
 
@@ -56,6 +57,8 @@ router.put('/:userId/branches', async (req, res) => {
             }
         }
 
+        const adminUser = (req as any).user;
+        await logActivity(adminUser?.id || null, 'UPDATED', 'ADMIN_RIGHTS', `Updated branch restrictions for user #${userId}`);
         res.json({ message: 'Branch restrictions updated' });
     } catch (error) {
         res.status(500).json({ error: 'Failed to update branch restrictions' });
@@ -81,9 +84,29 @@ router.put('/:userId/departments', async (req, res) => {
             }
         }
 
+        const adminUser = (req as any).user;
+        await logActivity(adminUser?.id || null, 'UPDATED', 'ADMIN_RIGHTS', `Updated department restrictions for user #${userId}`);
         res.json({ message: 'Department restrictions updated' });
     } catch (error) {
         res.status(500).json({ error: 'Failed to update department restrictions' });
+    }
+});
+
+// Update module permissions for an admin or employee
+router.put('/:userId/permissions', async (req, res) => {
+    const { userId } = req.params;
+    const { permissions } = req.body;
+
+    try {
+        await (prisma.user as any).update({
+            where: { id: Number(userId) },
+            data: { permissions }
+        });
+        const adminUser = (req as any).user;
+        await logActivity(adminUser?.id || null, 'UPDATED', 'ADMIN_RIGHTS', `Updated module permissions for user #${userId}`);
+        res.json({ message: 'Permissions updated successfully' });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to update module permissions' });
     }
 });
 

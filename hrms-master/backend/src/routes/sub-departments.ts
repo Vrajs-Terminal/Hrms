@@ -47,8 +47,9 @@ router.post('/bulk', async (req, res) => {
             skipDuplicates: true // Will skip if unique constraint (name + dept) fails
         });
 
+        const user = (req as any).user;
+        await Promise.all(names.map((n: string) => logActivity(user?.id || null, 'CREATED', 'SUB_DEPARTMENT', n.trim())));
         res.status(201).json({ message: 'Sub-Departments created successfully' });
-        names.forEach((n: string) => logActivity(null, 'CREATED', 'SUB_DEPARTMENT', n.trim()));
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to create sub-departments' });
@@ -67,8 +68,9 @@ router.put('/:id', async (req, res) => {
             where: { id: parseInt(id) },
             data: { name: name.trim() }
         });
+        const user = (req as any).user;
+        await logActivity(user?.id || null, 'UPDATED', 'SUB_DEPARTMENT', updated.name);
         res.json(updated);
-        logActivity(null, 'UPDATED', 'SUB_DEPARTMENT', updated.name);
     } catch (error) {
         res.status(500).json({ error: 'Failed to update sub-department' });
     }
@@ -90,7 +92,9 @@ router.put('/action/reorder', async (req, res) => {
             })
         );
 
+        const user = (req as any).user;
         await prisma.$transaction(transaction);
+        await logActivity(user?.id || null, 'REORDERED', 'SUB_DEPARTMENT', 'Reordered sub-departments');
         res.json({ message: 'Reordered successfully' });
     } catch (error) {
         res.status(500).json({ error: 'Failed to reorder sub-departments' });
@@ -113,8 +117,9 @@ router.delete('/:id', async (req, res) => {
             return res.status(400).json({ error: 'Cannot delete a Sub-Department containing active Designations. Reassign them first.' });
         }
 
+        const user = (req as any).user;
         await prisma.subDepartment.delete({ where: { id: parseInt(id) } });
-        logActivity(null, 'DELETED', 'SUB_DEPARTMENT', subDept.name);
+        await logActivity(user?.id || null, 'DELETED', 'SUB_DEPARTMENT', subDept.name);
         res.json({ message: 'Sub-Department deleted successfully' });
     } catch (error) {
         res.status(500).json({ error: 'Failed to delete sub-department' });

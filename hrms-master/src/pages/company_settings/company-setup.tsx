@@ -25,7 +25,11 @@ export default function CompanySetup() {
         facebook: '',
         linkedin: '',
         youtube: '',
-        location: ''
+        location: '',
+        logo: '',
+        thumbnail: '',
+        photo: '',
+        login_bg: ''
     });
     const [isLoading, setIsLoading] = useState(true);
 
@@ -33,25 +37,33 @@ export default function CompanySetup() {
         const fetchCompany = async () => {
             try {
                 const res = await api.get('/company');
+                const settingsRes = await api.get('/settings/COMPANY_BRANDING');
+
+                const branding = settingsRes.data?.value || {};
+
                 if (res.data) {
                     setFormData({
                         companyName: res.data.name || '',
                         websiteUrl: res.data.website || '',
-                        timeZone: 'Asia/Kolkata', // Hardcoded as extra fields aren't in schema yet
-                        address: '',
-                        email: '',
-                        contact: '',
-                        hrEmail: '',
-                        pincode: '',
-                        gst: '',
-                        pan: '',
-                        tan: '',
-                        currency: 'INR (₹)',
-                        instagram: '',
-                        facebook: '',
-                        linkedin: '',
-                        youtube: '',
-                        location: ''
+                        timeZone: branding.timeZone || 'Asia/Kolkata',
+                        address: branding.address || '',
+                        email: branding.email || '',
+                        contact: branding.contact || '',
+                        hrEmail: branding.hrEmail || '',
+                        pincode: branding.pincode || '',
+                        gst: res.data.tax_info || '',
+                        pan: branding.pan || '',
+                        tan: branding.tan || '',
+                        currency: branding.currency || 'INR (₹)',
+                        instagram: branding.instagram || '',
+                        facebook: branding.facebook || '',
+                        linkedin: branding.linkedin || '',
+                        youtube: branding.youtube || '',
+                        location: branding.location || '',
+                        logo: branding.logo || '',
+                        thumbnail: branding.thumbnail || '',
+                        photo: branding.photo || '',
+                        login_bg: branding.login_bg || ''
                     });
                 }
             } catch (error) {
@@ -63,6 +75,17 @@ export default function CompanySetup() {
         fetchCompany();
     }, []);
 
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setFormData(prev => ({ ...prev, [field]: reader.result as string }));
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setFormData({
             ...formData,
@@ -73,11 +96,24 @@ export default function CompanySetup() {
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
+            // Save main company info
             await api.put('/company', {
                 name: formData.companyName,
                 website: formData.websiteUrl,
                 tax_info: formData.gst
             });
+
+            // Save branding and extra details to Settings
+            await api.post('/settings', {
+                key: 'COMPANY_BRANDING',
+                value: {
+                    ...formData
+                }
+            });
+
+            // Notify components (like Sidebar) to refresh branding
+            window.dispatchEvent(new Event('brandingChanged'));
+
             alert('Company setup saved successfully!');
         } catch (error: any) {
             alert(error.response?.data?.error || 'Failed to save company settings');
@@ -106,26 +142,26 @@ export default function CompanySetup() {
                     <div className="setup-card">
                         <h3><ImageIcon size={18} color="#3b82f6" /> Company Branding</h3>
                         <div className="image-upload-grid">
-                            <div className="image-upload-box">
-                                <ImageIcon className="upload-icon" size={24} />
+                            <label className="image-upload-box" style={{ cursor: 'pointer' }}>
+                                <input type="file" hidden accept="image/*" onChange={e => handleFileChange(e, 'logo')} />
+                                {formData.logo ? <img src={formData.logo} style={{ width: '100%', height: '100%', objectFit: 'contain' }} /> : <ImageIcon className="upload-icon" size={24} />}
                                 <p>Company Logo</p>
-                                <span>Main dashboard logo</span>
-                            </div>
-                            <div className="image-upload-box">
-                                <ImageIcon className="upload-icon" size={24} />
+                            </label>
+                            <label className="image-upload-box" style={{ cursor: 'pointer' }}>
+                                <input type="file" hidden accept="image/*" onChange={e => handleFileChange(e, 'thumbnail')} />
+                                {formData.thumbnail ? <img src={formData.thumbnail} style={{ width: '100%', height: '100%', objectFit: 'contain' }} /> : <ImageIcon className="upload-icon" size={24} />}
                                 <p>Thumbnail Logo</p>
-                                <span>Compact view</span>
-                            </div>
-                            <div className="image-upload-box">
-                                <Briefcase className="upload-icon" size={24} />
+                            </label>
+                            <label className="image-upload-box" style={{ cursor: 'pointer' }}>
+                                <input type="file" hidden accept="image/*" onChange={e => handleFileChange(e, 'photo')} />
+                                {formData.photo ? <img src={formData.photo} style={{ width: '100%', height: '100%', objectFit: 'contain' }} /> : <Briefcase className="upload-icon" size={24} />}
                                 <p>Company Photo</p>
-                                <span>Profile display</span>
-                            </div>
-                            <div className="image-upload-box">
-                                <Monitor className="upload-icon" size={24} />
+                            </label>
+                            <label className="image-upload-box" style={{ cursor: 'pointer' }}>
+                                <input type="file" hidden accept="image/*" onChange={e => handleFileChange(e, 'login_bg')} />
+                                {formData.login_bg ? <img src={formData.login_bg} style={{ width: '100%', height: '100%', objectFit: 'contain' }} /> : <Monitor className="upload-icon" size={24} />}
                                 <p>Login Screen</p>
-                                <span>Background image</span>
-                            </div>
+                            </label>
                         </div>
                     </div>
 

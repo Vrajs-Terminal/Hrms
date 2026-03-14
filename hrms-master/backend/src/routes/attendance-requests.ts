@@ -30,7 +30,7 @@ router.post('/', authenticateToken, async (req, res) => {
             }
         });
 
-        logActivity(user.id, 'CREATED', 'ATTENDANCE_REQUEST', request_type);
+        await logActivity(user.id, 'CREATED', 'ATTENDANCE_REQUEST', request_type);
         res.status(201).json({ message: `${request_type} request submitted successfully`, request });
     } catch (error: any) {
         res.status(500).json({ error: 'Failed to submit request', details: error.message });
@@ -100,10 +100,7 @@ router.put('/:id/review', authenticateToken, async (req, res) => {
             }
         });
 
-        logActivity(user.id, 'UPDATED', 'ATTENDANCE_REQUEST', `Request #${id} marked as ${status}`);
-
-        // TODO in Phase 3/4: If 'Approved', we actually run the Recalculation engine on the attendanceRecord.
-
+        await logActivity(user.id, 'UPDATED', 'ATTENDANCE_REQUEST', `Request #${id} marked as ${status}`);
         res.json({ message: `Request successfully ${status.toLowerCase()}`, request });
     } catch (error: any) {
         res.status(500).json({ error: 'Failed to review request', details: error.message });
@@ -131,6 +128,7 @@ router.delete('/:id', authenticateToken, async (req, res) => {
         }
 
         await prisma.attendanceRequest.delete({ where: { id: parseInt(id as string) } });
+        await logActivity(user.id, 'DELETED', 'ATTENDANCE_REQUEST', `Cancelled request #${id}`);
 
         res.json({ message: 'Request cancelled successfully.' });
     } catch (error: any) {

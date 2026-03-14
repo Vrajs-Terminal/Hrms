@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2 , Network} from 'lucide-react';
+import { Plus, Edit2, Trash2, Network } from 'lucide-react';
 import api from '../../lib/axios';
 import { Building2 } from 'lucide-react';
 import './sister-companies.css';
@@ -166,12 +166,12 @@ export default function SisterCompanies() {
                             />
                         </div>
                         <div className="form-group">
-                            <label>Company Code</label>
+                            <label>Company Code (Optional)</label>
                             <input
                                 type="text"
                                 value={formData.code}
                                 onChange={e => setFormData({ ...formData, code: e.target.value })}
-                                placeholder="e.g. MHR-01"
+                                placeholder="e.g. MHR-01 (Optional)"
                             />
                         </div>
                         <div className="form-group">

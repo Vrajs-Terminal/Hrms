@@ -1,5 +1,6 @@
 import express from 'express';
 import prisma from '../lib/prismaClient';
+import { logActivity } from '../services/activityLogger';
 
 const router = express.Router();
 
@@ -34,6 +35,7 @@ router.post('/', async (req, res) => {
             }
         });
 
+        await logActivity(null, 'CREATED', 'ATTENDANCE_EMAIL_SETTING', report_name);
         res.status(201).json(newSetting);
     } catch (error) {
         console.error("Error creating email setting:", error);
@@ -59,6 +61,7 @@ router.put('/:id', async (req, res) => {
             }
         });
 
+        await logActivity(null, 'UPDATED', 'ATTENDANCE_EMAIL_SETTING', report_name);
         res.json(updatedSetting);
     } catch (error) {
         console.error("Error updating email setting:", error);
@@ -71,9 +74,13 @@ router.delete('/:id', async (req, res) => {
     try {
         const { id } = req.params;
 
+        const setting = await prisma.dailyAttendanceEmail.findUnique({ where: { id: parseInt(id) } });
         await prisma.dailyAttendanceEmail.delete({
             where: { id: parseInt(id) }
         });
+        if (setting) {
+            await logActivity(null, 'DELETED', 'ATTENDANCE_EMAIL_SETTING', setting.report_name);
+        }
 
         res.status(204).send();
     } catch (error) {

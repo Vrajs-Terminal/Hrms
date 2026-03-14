@@ -152,7 +152,7 @@ router.patch('/:id/status', authenticateToken, async (req, res) => {
             }
         });
 
-        logActivity(null, 'UPDATED', 'DAILY_WORK_REPORT', `Updated report ${id} status to ${status}`);
+        await logActivity(null, 'UPDATED', 'DAILY_WORK_REPORT', `Updated report ${id} status to ${status}`);
         res.json(updatedReport);
     } catch (error: any) {
         res.status(500).json({ error: 'Failed to update report status', details: error.message });

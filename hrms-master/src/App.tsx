@@ -62,6 +62,8 @@ import VisitPlanning from "./pages/visit_management/visit-planning";
 import VisitCheckInOut from "./pages/visit_management/visit-check-in-out";
 import VisitApprovals from "./pages/visit_management/visit-approvals";
 import VisitSettings from "./pages/visit_management/visit-settings";
+import AccountSettings from "./pages/account_settings/account-settings";
+import GlobalSpinner from "./components/GlobalSpinner";
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -74,6 +76,7 @@ function App() {
   if (!isAuthenticated) {
     return (
       <Router>
+        <GlobalSpinner />
         <Login />
       </Router>
     );
@@ -81,6 +84,7 @@ function App() {
 
   return (
     <Router>
+      <GlobalSpinner />
       <div className="app-layout">
         <Sidebar isOpen={isSidebarOpen} />
         <div className="main-area">
@@ -145,6 +149,7 @@ function App() {
               <Route path="/visit-check-in-out" element={<VisitCheckInOut />} />
               <Route path="/visit-approvals" element={<VisitApprovals />} />
               <Route path="/visit-settings" element={<VisitSettings />} />
+              <Route path="/account-settings" element={<AccountSettings />} />
 
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

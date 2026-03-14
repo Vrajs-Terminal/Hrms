@@ -70,8 +70,9 @@ router.post('/', async (req, res) => {
                 order_index: nextOrder
             }
         });
+        const user = (req as any).user;
+        await logActivity(user?.id || null, 'CREATED', 'DEPARTMENT', department.name, { branch_id: department.branch_id });
         res.status(201).json(department);
-        logActivity(null, 'CREATED', 'DEPARTMENT', department.name, { branch_id: department.branch_id });
     } catch (error) {
         res.status(500).json({ error: 'Failed to create department' });
     }
@@ -81,8 +82,9 @@ router.post('/', async (req, res) => {
 router.delete('/:id', async (req, res) => {
     const { id } = req.params;
     try {
+        const user = (req as any).user;
         await prisma.department.delete({ where: { id: parseInt(id) } });
-        logActivity(null, 'DELETED', 'DEPARTMENT', `Department #${id}`);
+        await logActivity(user?.id || null, 'DELETED', 'DEPARTMENT', `Department #${id}`);
         res.json({ message: 'Department deleted successfully' });
     } catch (error) {
         res.status(500).json({ error: 'Failed to delete department' });

@@ -33,7 +33,7 @@ router.post('/', authenticateToken, async (req, res) => {
                 punchRule: punchRule || 'inside_only'
             }
         });
-        logActivity(null, 'CREATED', 'GEOFENCE', name);
+        await logActivity(null, 'CREATED', 'GEOFENCE', name);
         res.status(201).json(geofence);
     } catch (error: any) {
         res.status(500).json({ error: 'Failed to create geofence', details: error.message });
@@ -49,7 +49,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
             where: { id: parseInt(id) },
             data: { name, latitude, longitude, radius, punchRule }
         });
-        logActivity(null, 'UPDATED', 'GEOFENCE', name);
+        await logActivity(null, 'UPDATED', 'GEOFENCE', name);
         res.json(geofence);
     } catch (error: any) {
         res.status(500).json({ error: 'Failed to update geofence', details: error.message });
@@ -63,7 +63,7 @@ router.delete('/:id', authenticateToken, async (req, res) => {
         const gf = await prisma.geofence.findUnique({ where: { id: parseInt(id) } });
         if (!gf) return res.status(404).json({ error: 'Geofence not found' });
         await prisma.geofence.delete({ where: { id: parseInt(id) } });
-        logActivity(null, 'DELETED', 'GEOFENCE', gf.name);
+        await logActivity(null, 'DELETED', 'GEOFENCE', gf.name);
         res.json({ message: 'Geofence deleted successfully' });
     } catch (error: any) {
         res.status(500).json({ error: 'Failed to delete geofence', details: error.message });
@@ -80,6 +80,7 @@ router.patch('/:id/toggle', authenticateToken, async (req, res) => {
             where: { id: parseInt(id) },
             data: { status: gf.status === 'Active' ? 'Inactive' : 'Active' }
         });
+        await logActivity(null, 'UPDATED', 'GEOFENCE', `${gf.name} toggled to ${updated.status}`);
         res.json(updated);
     } catch (error: any) {
         res.status(500).json({ error: 'Failed to toggle geofence', details: error.message });

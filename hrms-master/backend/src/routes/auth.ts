@@ -43,7 +43,8 @@ router.post('/login', async (req, res) => {
                 id: user.id,
                 name: user.name,
                 email: user.email,
-                role: user.role
+                role: user.role,
+                permissions: (user as any).permissions
             }
         });
 
@@ -72,8 +73,8 @@ router.post('/setup-admin', async (req, res) => {
             }
         });
 
+        await logActivity(admin.id, 'CREATED', 'USER', admin.name, { role: 'Admin', email });
         res.status(201).json({ message: 'Admin created successfully', admin: { id: admin.id, name: admin.name } });
-        logActivity(admin.id, 'CREATED', 'USER', admin.name, { role: 'Admin', email });
     } catch (error: any) {
         res.status(500).json({ error: 'Failed to create admin', details: error.message });
     }
@@ -103,8 +104,37 @@ router.post('/add-user', async (req, res) => {
             }
         });
 
+        // Send Welcome Email if requested
+        if (req.body.sendEmail) {
+            try {
+                if (process.env.SMTP_HOST) {
+                    await transporter.sendMail({
+                        from: `"MineHR System" <${process.env.SMTP_USER || 'noreply@minehr.com'}>`,
+                        to: email,
+                        subject: 'Welcome to MineHR - Your Account Details',
+                        text: `Welcome ${name}!\n\nYour account has been created with role: ${role}.\nYour login password is: ${password}\n\nPlease login at: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`,
+                        html: `
+                            <h2>Welcome to MineHR, ${name}!</h2>
+                            <p>Your administrator has created an account for you.</p>
+                            <ul>
+                                <li><b>Email:</b> ${email}</li>
+                                <li><b>Role:</b> ${role}</li>
+                                <li><b>Temporary Password:</b> ${password}</li>
+                            </ul>
+                            <p>Please login and change your password immediately.</p>
+                        `
+                    });
+                } else {
+                    console.log(`\n\n=== DEV LOG: WELCOME EMAIL NOT SENT (SMTP UNCONFIGURED). PASSWORD FOR ${email} IS ${password} ===\n\n`);
+                }
+            } catch (emailErr) {
+                console.error('Failed to send welcome email:', emailErr);
+            }
+        }
+
+        const adminUser = (req as any).user;
+        await logActivity(adminUser?.id || null, 'CREATED', 'USER', newUser.name, { role, email });
         res.status(201).json({ message: 'User created successfully', user: { id: newUser.id, name: newUser.name } });
-        logActivity(null, 'CREATED', 'USER', newUser.name, { role, email });
     } catch (error: any) {
         res.status(500).json({ error: 'Failed to create user', details: error.message });
     }
@@ -116,8 +146,9 @@ router.delete('/user/:id', async (req, res) => {
         await prisma.user.delete({
             where: { id: parseInt(req.params.id) }
         });
+        const adminUser = (req as any).user;
+        await logActivity(adminUser?.id || null, 'DELETED', 'USER', `User #${req.params.id}`);
         res.json({ message: 'User deleted successfully' });
-        logActivity(null, 'DELETED', 'USER', `User #${req.params.id}`);
     } catch (error: any) {
         res.status(500).json({ error: 'Failed to delete user', details: error.message });
     }
@@ -135,8 +166,9 @@ router.put('/user/:id/password', async (req, res) => {
             where: { id: parseInt(req.params.id) },
             data: { password_hash }
         });
+        const adminUser = (req as any).user;
+        await logActivity(adminUser?.id || null, 'UPDATED', 'USER', `User #${req.params.id}`, { action: 'Password Reset' });
         res.json({ message: 'Password updated successfully' });
-        logActivity(null, 'UPDATED', 'USER', `User #${req.params.id}`, { action: 'Password Reset' });
     } catch (error: any) {
         res.status(500).json({ error: 'Failed to update password', details: error.message });
     }
@@ -197,8 +229,8 @@ router.post('/forgot-password', async (req, res) => {
             console.error('Failed to send email (SMTP likely unconfigured):', emailErr);
         }
 
+        await logActivity(user.id, 'REQUESTED', 'PASSWORD_RESET', 'User requested password reset OTP');
         res.json({ message: 'OTP generated and sent successfully.' });
-        logActivity(user.id, 'REQUESTED', 'PASSWORD_RESET', 'User requested password reset OTP');
     } catch (error: any) {
         res.status(500).json({ error: 'Failed to process forgot password request', details: error.message });
     }
@@ -255,10 +287,98 @@ router.post('/reset-password', async (req, res) => {
             }
         });
 
+        await logActivity(user.id, 'UPDATED', 'USER', 'User successfully reset their password via OTP');
         res.json({ message: 'Password has been reset successfully. You can now login.' });
-        logActivity(user.id, 'UPDATED', 'USER', 'User successfully reset their password via OTP');
     } catch (error: any) {
         res.status(500).json({ error: 'Failed to reset password', details: error.message });
+    }
+});
+
+// 1. Request OTP for Login
+router.post('/send-login-otp', async (req, res) => {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: 'Email is required' });
+
+    try {
+        const user = await prisma.user.findUnique({ where: { email } });
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Generate a 6-digit OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const expiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+        await prisma.user.update({
+            where: { email },
+            data: {
+                resetPasswordOtp: otp,
+                resetPasswordOtpExpiry: expiry
+            }
+        });
+
+        console.log(`\n\n=== DEV LOG: LOGIN OTP FOR ${email} IS ${otp} ===\n\n`);
+
+        if (process.env.SMTP_HOST) {
+            await transporter.sendMail({
+                from: `"MineHR System" <${process.env.SMTP_USER || 'noreply@minehr.com'}>`,
+                to: email,
+                subject: 'MineHR - Login OTP',
+                text: `Your OTP for login is: ${otp}. It is valid for 10 minutes.`,
+                html: `<b>Your OTP for login is:</b> <h1>${otp}</h1><p>It is valid for 10 minutes.</p>`
+            });
+        }
+
+        await logActivity(user.id, 'REQUESTED', 'LOGIN_OTP', 'User requested login OTP');
+        res.json({ message: 'OTP sent successfully.' });
+    } catch (error: any) {
+        res.status(500).json({ error: 'Failed to send login OTP', details: error.message });
+    }
+});
+
+// 2. Login with OTP
+router.post('/login-with-otp', async (req, res) => {
+    const { email, otp } = req.body;
+    if (!email || !otp) return res.status(400).json({ error: 'Email and OTP are required' });
+
+    try {
+        const user = await prisma.user.findUnique({ where: { email } });
+
+        if (!user || user.resetPasswordOtp !== otp) {
+            return res.status(400).json({ error: 'Invalid or expired OTP' });
+        }
+
+        if (!user.resetPasswordOtpExpiry || user.resetPasswordOtpExpiry < new Date()) {
+            return res.status(400).json({ error: 'OTP has expired' });
+        }
+
+        // Clear OTP
+        await prisma.user.update({
+            where: { id: user.id },
+            data: { resetPasswordOtp: null, resetPasswordOtpExpiry: null }
+        });
+
+        // Generate JWT Token
+        const token = jwt.sign(
+            { id: user.id, email: user.email, role: user.role },
+            JWT_SECRET,
+            { expiresIn: '1d' }
+        );
+
+        await logActivity(user.id, 'LOGIN', 'USER', 'User logged in via OTP');
+        res.json({
+            message: 'Login successful',
+            token,
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                permissions: (user as any).permissions
+            }
+        });
+    } catch (error: any) {
+        res.status(500).json({ error: 'Failed to login with OTP', details: error.message });
     }
 });
 

@@ -1,5 +1,6 @@
 import express from 'express';
 import prisma from '../lib/prismaClient';
+import { logActivity } from '../services/activityLogger';
 
 const router = express.Router();
 
@@ -36,6 +37,7 @@ router.post('/', async (req, res) => {
             }
         });
 
+        await logActivity(null, 'CREATED', 'EMERGENCY_NUMBER', contact_name);
         res.status(201).json(newContact);
     } catch (error) {
         console.error("Error creating emergency number:", error);
@@ -59,6 +61,7 @@ router.put('/:id', async (req, res) => {
             }
         });
 
+        await logActivity(null, 'UPDATED', 'EMERGENCY_NUMBER', contact_name);
         res.json(updatedContact);
     } catch (error) {
         console.error("Error updating emergency number:", error);
@@ -71,9 +74,13 @@ router.delete('/:id', async (req, res) => {
     try {
         const { id } = req.params;
 
+        const contact = await prisma.emergencyNumber.findUnique({ where: { id: parseInt(id) } });
         await prisma.emergencyNumber.delete({
             where: { id: parseInt(id) }
         });
+        if (contact) {
+            await logActivity(null, 'DELETED', 'EMERGENCY_NUMBER', contact.contact_name);
+        }
 
         res.status(204).send();
     } catch (error) {

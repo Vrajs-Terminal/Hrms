@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import {
     Plus, Map, ArrowUp, ArrowDown, GripVertical, Trash2, AlertTriangle, X
-, GitBranch} from 'lucide-react';
+    , GitBranch
+} from 'lucide-react';
 import api from '../../lib/axios';
 import ExportButtons from '../../components/ExportButtons';
 import ImportButton from '../../components/ImportButton';
@@ -58,15 +59,17 @@ export default function Branches() {
 
     const handleAddBranch = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (newBranch.name && newBranch.code) {
-            try {
-                const res = await api.post('/branches', newBranch);
-                setBranches([...branches, res.data]);
-                setNewBranch({ name: '', code: '', type: 'Metro' });
-            } catch (error: unknown) {
-                const msg = error instanceof Error ? error.message : 'Failed to add branch';
-                alert(msg);
-            }
+        try {
+            // Ensure name is present, code is optional
+            const res = await api.post('/branches', {
+                ...newBranch,
+                code: newBranch.code || null
+            });
+            setBranches([...branches, res.data]);
+            setNewBranch({ name: '', code: '', type: 'Metro' });
+        } catch (error: unknown) {
+            const msg = error instanceof Error ? error.message : 'Failed to add branch';
+            alert(msg);
         }
     };
 
@@ -119,10 +122,32 @@ export default function Branches() {
                 </div>
                 <div className="actions-row" style={{ display: 'flex', gap: '8px' }}>
                     <ImportButton
-                        onImport={(data) => {
-                            console.log('Imported Branches:', data);
+                        onImport={async (data) => {
+                            try {
+                                if (!Array.isArray(data)) return;
+                                // Map data fields (handle different possible headers)
+                                const branchesToImport = data.map(row => ({
+                                    name: row.Name || row.name || row.branch_name,
+                                    code: row.Code || row.code || row.branch_code || null,
+                                    type: (row.Type || row.type || 'Metro').toString().includes('Metro') ? 'Metro' : 'Non-Metro'
+                                })).filter(b => b.name);
+
+                                if (branchesToImport.length === 0) {
+                                    alert('No valid branches found in the file.');
+                                    return;
+                                }
+
+                                const res = await api.post('/branches/bulk', { branches: branchesToImport });
+                                if (res.data) {
+                                    alert(`Successfully imported ${res.data.count || branchesToImport.length} branches.`);
+                                    fetchBranches();
+                                }
+                            } catch (err) {
+                                console.error('Import failed', err);
+                                alert('Failed to import branches. Please check the file format.');
+                            }
                         }}
-                        label="Import"
+                        label="Import CSV"
                     />
                     <ExportButtons
                         data={branches.map(b => ({
@@ -152,7 +177,7 @@ export default function Branches() {
                                     </div>
                                     <div className="bi-details">
                                         <h4>{branch.name}</h4>
-                                        <p>Code: {branch.code}</p>
+                                        <p>Code: {branch.code || 'N/A'}</p>
                                     </div>
                                 </div>
 
@@ -208,12 +233,11 @@ export default function Branches() {
                             />
                         </div>
                         <div className="form-group">
-                            <label>Branch Code *</label>
+                            <label>Branch Code (Optional)</label>
                             <input
                                 type="text"
                                 value={newBranch.code}
                                 onChange={(e) => setNewBranch({ ...newBranch, code: e.target.value })}
-                                required
                                 placeholder="e.g. DEL-01"
                             />
                         </div>

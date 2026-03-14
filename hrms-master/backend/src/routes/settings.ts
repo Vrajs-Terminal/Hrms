@@ -1,5 +1,6 @@
 import express from 'express';
 import prisma from '../lib/prismaClient';
+import { logActivity } from '../services/activityLogger';
 
 const router = express.Router();
 
@@ -34,6 +35,7 @@ router.put('/:key', async (req, res) => {
             create: { key, value }
         });
 
+        await logActivity(null, 'UPDATED', 'COMPANY_SETTING', key);
         res.json(upsertedSetting);
     } catch (error) {
         console.error("Error saving setting:", error);

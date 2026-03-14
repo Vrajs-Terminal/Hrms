@@ -41,8 +41,8 @@ router.post('/', authenticateToken, async (req, res) => {
                 status: 'Pending'
             }
         });
+        await logActivity(user.id, 'CREATED', 'DOCUMENT_REQUEST', request_type);
         res.status(201).json(request);
-        logActivity(user.id, 'CREATED', 'DOCUMENT_REQUEST', request_type);
     } catch (error) {
         res.status(500).json({ error: 'Failed to create document request' });
     }
@@ -66,8 +66,8 @@ router.put('/:id/status', authenticateToken, async (req, res) => {
                 approver_id: approver.id
             }
         });
+        await logActivity(approver.id, 'UPDATED', 'DOCUMENT_REQUEST', `${updated.request_type} - ${status}`);
         res.json(updated);
-        logActivity(approver.id, 'UPDATED', 'DOCUMENT_REQUEST', `${updated.request_type} - ${status}`);
     } catch (error) {
         res.status(500).json({ error: 'Failed' });
     }

@@ -1,5 +1,6 @@
 import express from 'express';
 import prisma from '../lib/prismaClient';
+import { logActivity } from '../services/activityLogger';
 
 const router = express.Router();
 
@@ -37,6 +38,7 @@ router.post('/', async (req, res) => {
             }
         });
 
+        await logActivity(null, 'CREATED', 'ID_CARD_TEMPLATE', template_name);
         res.status(201).json(newTemplate);
     } catch (error) {
         console.error("Error creating ID card template:", error);
@@ -61,6 +63,7 @@ router.put('/:id', async (req, res) => {
             }
         });
 
+        await logActivity(null, 'UPDATED', 'ID_CARD_TEMPLATE', template_name);
         res.json(updatedTemplate);
     } catch (error) {
         console.error("Error updating ID card template:", error);
@@ -73,9 +76,13 @@ router.delete('/:id', async (req, res) => {
     try {
         const { id } = req.params;
 
+        const template = await prisma.idCardTemplate.findUnique({ where: { id: parseInt(id) } });
         await prisma.idCardTemplate.delete({
             where: { id: parseInt(id) }
         });
+        if (template) {
+            await logActivity(null, 'DELETED', 'ID_CARD_TEMPLATE', template.template_name);
+        }
 
         res.status(204).send();
     } catch (error) {

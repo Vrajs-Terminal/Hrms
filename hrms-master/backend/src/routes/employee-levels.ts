@@ -62,8 +62,8 @@ router.post('/', async (req, res) => {
             },
             include: { parent: true }
         });
+        await logActivity(null, 'CREATED', 'EMPLOYEE_LEVEL', level.name);
         res.status(201).json(level);
-        logActivity(null, 'CREATED', 'EMPLOYEE_LEVEL', level.name);
     } catch (error) {
         res.status(500).json({ error: 'Failed to create level' });
     }
@@ -100,8 +100,8 @@ router.put('/:id', async (req, res) => {
             data: { name, parent_id: parent_id || null },
             include: { parent: true }
         });
+        await logActivity(null, 'UPDATED', 'EMPLOYEE_LEVEL', level.name);
         res.json(level);
-        logActivity(null, 'UPDATED', 'EMPLOYEE_LEVEL', level.name);
     } catch (error) {
         res.status(500).json({ error: 'Failed to update level' });
     }
@@ -118,7 +118,7 @@ router.delete('/:id', async (req, res) => {
         }
 
         await prisma.employeeLevel.delete({ where: { id: Number(id) } });
-        logActivity(null, 'DELETED', 'EMPLOYEE_LEVEL', `Level #${id}`);
+        await logActivity(null, 'DELETED', 'EMPLOYEE_LEVEL', `Level #${id}`);
         res.json({ message: 'Deleted successfully' });
     } catch (error) {
         res.status(500).json({ error: 'Failed to delete level' });

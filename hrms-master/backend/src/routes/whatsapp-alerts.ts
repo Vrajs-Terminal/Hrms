@@ -1,5 +1,6 @@
 import express from 'express';
 import prisma from '../lib/prismaClient';
+import { logActivity } from '../services/activityLogger';
 
 const router = express.Router();
 
@@ -33,6 +34,7 @@ router.post('/', async (req, res) => {
             }
         });
 
+        await logActivity(null, 'CREATED', 'WHATSAPP_ALERT', alert_name);
         res.status(201).json(newAlert);
     } catch (error) {
         console.error("Error creating whatsapp alert:", error);
@@ -57,6 +59,7 @@ router.put('/:id', async (req, res) => {
             }
         });
 
+        await logActivity(null, 'UPDATED', 'WHATSAPP_ALERT', alert_name);
         res.json(updatedAlert);
     } catch (error) {
         console.error("Error updating whatsapp alert:", error);
@@ -69,9 +72,13 @@ router.delete('/:id', async (req, res) => {
     try {
         const { id } = req.params;
 
+        const alert = await prisma.whatsAppAlert.findUnique({ where: { id: parseInt(id) } });
         await prisma.whatsAppAlert.delete({
             where: { id: parseInt(id) }
         });
+        if (alert) {
+            await logActivity(null, 'DELETED', 'WHATSAPP_ALERT', alert.alert_name);
+        }
 
         res.status(204).send();
     } catch (error) {

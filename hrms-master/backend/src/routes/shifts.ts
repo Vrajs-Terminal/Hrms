@@ -47,8 +47,7 @@ router.post('/', authenticateToken, async (req, res) => {
         });
 
         const user = (req as any).user;
-        logActivity(user.id, 'CREATED', 'SHIFT', shift.name);
-
+        await logActivity(user.id, 'CREATED', 'SHIFT', shift.name);
         res.status(201).json({ message: 'Shift created successfully', shift });
     } catch (error: any) {
         res.status(500).json({ error: 'Failed to create shift', details: error.message });
@@ -85,8 +84,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
         });
 
         const user = (req as any).user;
-        logActivity(user.id, 'UPDATED', 'SHIFT', shift.name);
-
+        await logActivity(user.id, 'UPDATED', 'SHIFT', shift.name);
         res.json({ message: 'Shift updated successfully', shift });
     } catch (error: any) {
         res.status(500).json({ error: 'Failed to update shift', details: error.message });
@@ -109,8 +107,7 @@ router.delete('/:id', authenticateToken, async (req, res) => {
         });
 
         const user = (req as any).user;
-        logActivity(user.id, 'DELETED', 'SHIFT', shift.name);
-
+        await logActivity(user.id, 'DELETED', 'SHIFT', shift.name);
         res.json({ message: 'Shift deleted successfully' });
     } catch (error: any) {
         res.status(500).json({ error: 'Failed to delete shift', details: error.message });

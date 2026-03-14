@@ -68,7 +68,7 @@ router.patch('/:userId', authenticateToken, async (req, res) => {
             }
         });
 
-        logActivity(null, 'UPDATED', 'TRACKING_CONFIG', `Updated tracking config for user #${userId}`);
+        await logActivity(null, 'UPDATED', 'TRACKING_CONFIG', `Updated tracking config for user #${userId}`);
         res.json(config);
     } catch (error: any) {
         res.status(500).json({ error: 'Failed to update tracking config', details: error.message });
@@ -93,7 +93,7 @@ router.post('/bulk', authenticateToken, async (req, res) => {
             results.push(config);
         }
 
-        logActivity(null, 'UPDATED', 'TRACKING_CONFIG', `Bulk ${enabled ? 'enabled' : 'disabled'} ${userIds.length} users`);
+        await logActivity(null, 'UPDATED', 'TRACKING_CONFIG', `Bulk ${enabled ? 'enabled' : 'disabled'} ${userIds.length} users`);
         res.json({ message: `Updated ${results.length} configs`, results });
     } catch (error: any) {
         res.status(500).json({ error: 'Failed to bulk update configs', details: error.message });

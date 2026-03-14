@@ -209,3 +209,16 @@
         grid-template-columns: 1fr;
     }
 }
+
+.form-actions {
+    display: flex;
+    justify-content: flex-start;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.sc-details h4 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}

@@ -60,7 +60,7 @@ router.patch('/:id/approve', authenticateToken, async (req, res) => {
             where: { id: parseInt(id) },
             data: { status: 'Approved', resolvedAt: new Date() }
         });
-        logActivity(null, 'UPDATED', 'TRACKING_EXCEPTION', `Approved exception #${id}`);
+        await logActivity(null, 'UPDATED', 'TRACKING_EXCEPTION', `Approved exception #${id}`);
         res.json(exception);
     } catch (error: any) {
         res.status(500).json({ error: 'Failed to approve exception', details: error.message });
@@ -75,7 +75,7 @@ router.patch('/:id/reject', authenticateToken, async (req, res) => {
             where: { id: parseInt(id) },
             data: { status: 'Rejected', resolvedAt: new Date() }
         });
-        logActivity(null, 'UPDATED', 'TRACKING_EXCEPTION', `Rejected exception #${id}`);
+        await logActivity(null, 'UPDATED', 'TRACKING_EXCEPTION', `Rejected exception #${id}`);
         res.json(exception);
     } catch (error: any) {
         res.status(500).json({ error: 'Failed to reject exception', details: error.message });
@@ -90,6 +90,7 @@ router.patch('/:id/ask-reason', authenticateToken, async (req, res) => {
             where: { id: parseInt(id) },
             data: { status: 'Asked Reason' }
         });
+        await logActivity(null, 'UPDATED', 'TRACKING_EXCEPTION', `Asked reason for exception #${id}`);
         res.json(exception);
     } catch (error: any) {
         res.status(500).json({ error: 'Failed to update exception', details: error.message });

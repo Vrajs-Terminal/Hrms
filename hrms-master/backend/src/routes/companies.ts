@@ -18,8 +18,11 @@ router.get('/', async (req, res) => {
 
 // Create a new sister company
 router.post('/', async (req, res) => {
-    const { name, code, status } = req.body;
+    let { name, code, status } = req.body;
     if (!name) return res.status(400).json({ error: 'Company Name is required' });
+
+    // Handle optional code
+    if (!code || code.trim() === '') code = null;
 
     try {
         const maxOrder = await prisma.company.aggregate({ _max: { order_index: true } });
@@ -33,13 +36,10 @@ router.post('/', async (req, res) => {
                 order_index: newOrderIndex
             }
         });
+        await logActivity(null, 'CREATED', 'COMPANY', company.name);
         res.status(201).json(company);
-        logActivity(null, 'CREATED', 'COMPANY', company.name);
     } catch (error: any) {
-        // Handle unique constraint check for code
-        if (error.code === 'P2002') {
-            return res.status(400).json({ error: 'Company Code must be unique' });
-        }
+        if (error.code === 'P2002') return res.status(400).json({ error: 'Company Code must be unique' });
         res.status(500).json({ error: 'Failed to create company' });
     }
 });
@@ -47,15 +47,18 @@ router.post('/', async (req, res) => {
 // Update a company
 router.put('/:id', async (req, res) => {
     const { id } = req.params;
-    const { name, code, status } = req.body;
+    let { name, code, status } = req.body;
+
+    // Handle optional code
+    if (!code || code.trim() === '') code = null;
 
     try {
         const company = await prisma.company.update({
             where: { id: Number(id) },
             data: { name, code, status }
         });
+        await logActivity(null, 'UPDATED', 'COMPANY', company.name);
         res.json(company);
-        logActivity(null, 'UPDATED', 'COMPANY', company.name);
     } catch (error: any) {
         if (error.code === 'P2002') return res.status(400).json({ error: 'Company Code must be unique' });
         res.status(500).json({ error: 'Failed to update company' });
@@ -74,7 +77,7 @@ router.delete('/:id', async (req, res) => {
         }
 
         await prisma.company.delete({ where: { id: Number(id) } });
-        logActivity(null, 'DELETED', 'COMPANY', `Company #${id}`);
+        await logActivity(null, 'DELETED', 'COMPANY', `Company #${id}`);
         res.json({ message: 'Company deleted successfully' });
     } catch (error) {
         res.status(500).json({ error: 'Failed to delete company' });
@@ -96,6 +99,7 @@ router.put('/reorder/update', async (req, res) => {
             })
         );
         await prisma.$transaction(transaction);
+        await logActivity(null, 'REORDERED', 'COMPANY', 'Reordered sister companies');
         res.json({ message: 'Reordered successfully' });
     } catch (error) {
         res.status(500).json({ error: 'Failed to reorder companies' });

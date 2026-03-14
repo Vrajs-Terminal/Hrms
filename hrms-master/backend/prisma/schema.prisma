@@ -15,6 +15,7 @@ model User {
   resetPasswordOtp       String?
   resetPasswordOtpExpiry DateTime?
   role                   String      @default("Admin")
+  permissions            Json?       @default("{}")
   branch_id     Int?
   department_id Int?
   createdAt     DateTime    @default(now())

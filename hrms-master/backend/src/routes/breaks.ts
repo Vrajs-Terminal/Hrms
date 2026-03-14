@@ -45,8 +45,8 @@ router.post('/start', authenticateToken, async (req, res) => {
                 status: 'Ongoing'
             }
         });
+        await logActivity(user.id, 'STARTED', 'BREAK', break_type);
         res.status(201).json(newBreak);
-        logActivity(user.id, 'STARTED', 'BREAK', break_type);
     } catch (error) {
         res.status(500).json({ error: 'Failed' });
     }
@@ -84,8 +84,8 @@ router.post('/end', authenticateToken, async (req, res) => {
             });
         }
 
+        await logActivity(user.id, 'ENDED', 'BREAK', `${activeBreak.break_type} (${durationMins} mins)`);
         res.json(updated);
-        logActivity(user.id, 'ENDED', 'BREAK', `${activeBreak.break_type} (${durationMins} mins)`);
     } catch (error) {
         res.status(500).json({ error: 'Failed' });
     }

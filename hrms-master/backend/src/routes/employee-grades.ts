@@ -29,8 +29,8 @@ router.post('/', async (req, res) => {
                 status: status || 'Active'
             }
         });
+        await logActivity(null, 'CREATED', 'EMPLOYEE_GRADE', grade.name);
         res.status(201).json(grade);
-        logActivity(null, 'CREATED', 'EMPLOYEE_GRADE', grade.name);
     } catch (error: any) {
         if (error.code === 'P2002') return res.status(400).json({ error: 'Grade code must be unique' });
         res.status(500).json({ error: 'Failed to create grade' });
@@ -47,8 +47,8 @@ router.put('/:id', async (req, res) => {
             where: { id: Number(id) },
             data: { name, code, status }
         });
+        await logActivity(null, 'UPDATED', 'EMPLOYEE_GRADE', grade.name);
         res.json(grade);
-        logActivity(null, 'UPDATED', 'EMPLOYEE_GRADE', grade.name);
     } catch (error: any) {
         if (error.code === 'P2002') return res.status(400).json({ error: 'Grade code must be unique' });
         res.status(500).json({ error: 'Failed to update grade' });
@@ -66,7 +66,7 @@ router.delete('/:id', async (req, res) => {
         }
 
         await prisma.employeeGrade.delete({ where: { id: Number(id) } });
-        logActivity(null, 'DELETED', 'EMPLOYEE_GRADE', `Grade #${id}`);
+        await logActivity(null, 'DELETED', 'EMPLOYEE_GRADE', `Grade #${id}`);
         res.json({ message: 'Deleted successfully' });
     } catch (error) {
         res.status(500).json({ error: 'Failed to delete grade' });
@@ -114,8 +114,8 @@ router.post('/assign', async (req, res) => {
             });
         });
 
+        await logActivity(null, 'ASSIGNED', 'EMPLOYEE_GRADE', `Assigned Grade ${new_grade_id} to User ${user_id}`);
         res.status(200).json({ message: 'Grade assigned successfully and history updated.' });
-        logActivity(null, 'ASSIGNED', 'EMPLOYEE_GRADE', `Assigned Grade ${new_grade_id} to User ${user_id}`);
     } catch (error) {
         console.error("Error assigning grade:", error);
         res.status(500).json({ error: 'Failed to assign employee grade.' });

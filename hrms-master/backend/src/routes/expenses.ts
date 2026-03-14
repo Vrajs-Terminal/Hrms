@@ -41,8 +41,8 @@ router.post('/', authenticateToken, async (req, res) => {
                 status: 'Pending'
             }
         });
+        await logActivity(user.id, 'CREATED', 'EXPENSE', category);
         res.status(201).json(expense);
-        logActivity(user.id, 'CREATED', 'EXPENSE', category);
     } catch (error) {
         res.status(500).json({ error: 'Failed' });
     }
@@ -62,8 +62,8 @@ router.put('/:id/status', authenticateToken, async (req, res) => {
             where: { id: parseInt(id as string) },
             data: { status }
         });
+        await logActivity(admin.id, status === 'Approved' ? 'APPROVED' : 'REJECTED', 'EXPENSE', `Expense #${id}`);
         res.json(updated);
-        logActivity(admin.id, status === 'Approved' ? 'APPROVED' : 'REJECTED', 'EXPENSE', `Expense #${id}`);
     } catch (error) {
         res.status(500).json({ error: 'Failed' });
     }

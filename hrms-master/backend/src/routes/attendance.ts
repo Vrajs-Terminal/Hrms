@@ -62,7 +62,7 @@ router.post('/web-punch', authenticateToken, async (req, res) => {
                 }
             });
 
-            logActivity(user.id, 'CREATED', 'ATTENDANCE_PUNCH_IN', 'Web Punch In');
+            await logActivity(user.id, 'CREATED', 'ATTENDANCE_PUNCH_IN', 'Web Punch In');
             return res.json({ message: 'Punched In Successfully!', record });
 
         } else if (record.in_time && !record.out_time) {
@@ -98,7 +98,7 @@ router.post('/web-punch', authenticateToken, async (req, res) => {
                 }
             });
 
-            logActivity(user.id, 'UPDATED', 'ATTENDANCE_PUNCH_OUT', 'Web Punch Out');
+            await logActivity(user.id, 'UPDATED', 'ATTENDANCE_PUNCH_OUT', 'Web Punch Out');
             return res.json({ message: 'Punched Out Successfully!', record });
 
         } else {
@@ -432,7 +432,7 @@ router.post('/manual', authenticateToken, async (req, res) => {
             }
         });
 
-        logActivity(adminUser.id, 'CREATED', 'ATTENDANCE_MANUAL', `Manual attendance for user ${user_id}`);
+        await logActivity(adminUser.id, 'CREATED', 'ATTENDANCE_MANUAL', `Manual attendance for user ${user_id}`);
         res.status(201).json({ message: 'Manual attendance added successfully', record });
     } catch (error: any) {
         res.status(500).json({ error: 'Failed to add manual attendance', details: error.message });
@@ -488,7 +488,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
             data: updateData
         });
 
-        logActivity(adminUser.id, 'UPDATED', 'ATTENDANCE_RECORD', `Updated record #${id}`);
+        await logActivity(adminUser.id, 'UPDATED', 'ATTENDANCE_RECORD', `Updated record #${id}`);
         res.json({ message: 'Attendance updated successfully', record });
     } catch (error: any) {
         res.status(500).json({ error: 'Failed to update attendance', details: error.message });
@@ -515,7 +515,7 @@ router.delete('/:id', authenticateToken, async (req, res) => {
 
         await prisma.attendanceRecord.delete({ where: { id: parseInt(id as string) } });
 
-        logActivity(adminUser.id, 'DELETED', 'ATTENDANCE_RECORD', `Deleted record for ${existing.user.name} on ${existing.date}`);
+        await logActivity(adminUser.id, 'DELETED', 'ATTENDANCE_RECORD', `Deleted record for ${existing.user.name} on ${existing.date}`);
         res.json({ message: 'Attendance record deleted successfully' });
     } catch (error: any) {
         res.status(500).json({ error: 'Failed to delete attendance', details: error.message });
@@ -571,7 +571,7 @@ router.post('/bulk', authenticateToken, async (req, res) => {
             }
         }
 
-        logActivity(adminUser.id, 'CREATED', 'ATTENDANCE_BULK', `Bulk attendance: ${created} created, ${skipped} skipped`);
+        await logActivity(adminUser.id, 'CREATED', 'ATTENDANCE_BULK', `Bulk attendance: ${created} created, ${skipped} skipped`);
         res.json({ message: `Bulk attendance processed`, created, skipped, errors });
     } catch (error: any) {
         res.status(500).json({ error: 'Failed to process bulk attendance', details: error.message });
@@ -647,7 +647,7 @@ router.post('/recalculate', authenticateToken, async (req, res) => {
             }
         }
 
-        logActivity(adminUser.id, 'UPDATED', 'ATTENDANCE_RECALCULATE', `Recalculated ${recalculated} records`);
+        await logActivity(adminUser.id, 'UPDATED', 'ATTENDANCE_RECALCULATE', `Recalculated ${recalculated} records`);
         res.json({ message: `Recalculated ${recalculated} of ${records.length} records` });
     } catch (error: any) {
         res.status(500).json({ error: 'Failed to recalculate', details: error.message });

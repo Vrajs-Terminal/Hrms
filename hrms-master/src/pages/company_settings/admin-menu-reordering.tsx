@@ -1,4 +1,22 @@
 import { useState, useEffect } from 'react';
+import api from '../../lib/axios';
+import {
+    DndContext,
+    closestCenter,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors,
+    type DragEndEvent
+} from '@dnd-kit/core';
+import {
+    arrayMove,
+    SortableContext,
+    sortableKeyboardCoordinates,
+    verticalListSortingStrategy,
+    useSortable
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Save, ChevronUp, ChevronDown, LayoutDashboard, Settings, Users, Calculator, Activity, RefreshCcw, Megaphone, ClipboardList, BarChart2, Factory, BookOpen, Monitor, Grid, Headphones, Loader2, MapPin, FileText, ListOrdered, Map } from 'lucide-react';
 import './admin-menu-reordering.css';
 
@@ -55,10 +73,83 @@ const getIconComponent = (iconName: string) => {
     }
 };
 
+interface SortableItemProps {
+    item: MenuItem;
+    index: number;
+    totalCount: number;
+    moveItem: (index: number, direction: 'up' | 'down') => void;
+}
+
+function SortableItem({ item, index, totalCount, moveItem }: SortableItemProps) {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging
+    } = useSortable({ id: item.id });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        zIndex: isDragging ? 100 : 'auto',
+        opacity: isDragging ? 0.5 : 1,
+    };
+
+    const Icon = getIconComponent(item.iconName);
+
+    return (
+        <div ref={setNodeRef} style={style} className={`menu-item-row ${isDragging ? 'dragging' : ''}`}>
+            <div className="menu-item-left">
+                <div className="drag-handle" {...attributes} {...listeners}>
+                    <GripVertical size={18} />
+                </div>
+                <div className="menu-icon-wrapper">
+                    <Icon size={18} />
+                </div>
+                <div className="menu-item-name">
+                    {item.name}
+                </div>
+            </div>
+            <div className="menu-item-actions">
+                <div className="order-badge">
+                    {item.order}
+                </div>
+                <div className="move-buttons">
+                    <button
+                        className="move-btn"
+                        disabled={index === 0}
+                        onClick={() => moveItem(index, 'up')}
+                        title="Move Up"
+                    >
+                        <ChevronUp size={16} />
+                    </button>
+                    <button
+                        className="move-btn"
+                        disabled={index === totalCount - 1}
+                        onClick={() => moveItem(index, 'down')}
+                        title="Move Down"
+                    >
+                        <ChevronDown size={16} />
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 export default function AdminMenuReordering() {
     const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
+
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    );
 
     useEffect(() => {
         fetchData();
@@ -68,71 +159,65 @@ export default function AdminMenuReordering() {
         setIsLoading(true);
         const baseItems = getDefaultMenuItems();
         try {
-            const res = await fetch('/api/settings/ADMIN_MENU_ORDER');
+            const res = await api.get('/settings/ADMIN_MENU_ORDER');
+            const data = res.data;
 
-            // Generate full fresh fallback list properly indexed
+            if (data && Array.isArray(data) && data.length > 5) {
+                const fetchedItems: MenuItem[] = [...data];
 
-            if (res.ok) {
-                const data = await res.json();
-                if (data && data.value && Array.isArray(data.value) && data.value.length > 5) {
-                    const fetchedItems: MenuItem[] = [...data.value];
+                // Self-heal: If Attendance was never saved in DB historically, inject it now!
+                const hasAttendance = fetchedItems.some(item => item.name === 'Attendance');
+                if (!hasAttendance) {
+                    const attendanceItem: MenuItem = { id: '3', name: 'Attendance', iconName: 'ClipboardList', order: 3 };
+                    // Find index of Company Settings to insert directly after
+                    const companySettingsIndex = fetchedItems.findIndex(item => item.name === 'Company Settings');
 
-                    // Self-heal: If Attendance was never saved in DB historically, inject it now!
-                    const hasAttendance = fetchedItems.some(item => item.name === 'Attendance');
-                    if (!hasAttendance) {
-                        const attendanceItem: MenuItem = { id: '3', name: 'Attendance', iconName: 'ClipboardList', order: 3 };
-                        // Find index of Company Settings to insert directly after
-                        const companySettingsIndex = fetchedItems.findIndex(item => item.name === 'Company Settings');
-
-                        if (companySettingsIndex !== -1) {
-                            fetchedItems.splice(companySettingsIndex + 1, 0, attendanceItem);
-                        } else {
-                            fetchedItems.splice(2, 0, attendanceItem); // Fallback to index 2
-                        }
-
-                        // Re-evaluate orders
-                        fetchedItems.forEach((item, i) => {
-                            item.order = i + 1;
-                        });
+                    if (companySettingsIndex !== -1) {
+                        fetchedItems.splice(companySettingsIndex + 1, 0, attendanceItem);
+                    } else {
+                        fetchedItems.splice(2, 0, attendanceItem); // Fallback to index 2
                     }
 
-                    // Check if missing any other generic items too
-                    baseItems.forEach(baseItem => {
-                        if (!fetchedItems.some(f => f.name === baseItem.name)) {
-                            fetchedItems.push({ ...baseItem, order: fetchedItems.length + 1 });
-                        }
-                    });
-
-                    // Force "Employee Tracking" to definitively reside at pos 4 (index 3)
-                    const trackingIndex = fetchedItems.findIndex(m => m.name === "Employee Tracking");
-                    if (trackingIndex !== -1 && trackingIndex !== 3) {
-                        const [trackingItem] = fetchedItems.splice(trackingIndex, 1);
-                        fetchedItems.splice(3, 0, trackingItem);
-                    }
-
-                    // Force "Daily Work Report" to definitively reside at pos 5 (index 4)
-                    const dwrIndex = fetchedItems.findIndex(m => m.name === "Daily Work Report");
-                    if (dwrIndex !== -1 && dwrIndex !== 4) {
-                        const [dwrItem] = fetchedItems.splice(dwrIndex, 1);
-                        fetchedItems.splice(4, 0, dwrItem);
-                    }
-
-                    // Force "Visit Management" to definitively reside at pos 6 (index 5)
-                    const visitIndex = fetchedItems.findIndex(m => m.name === "Visit Management");
-                    if (visitIndex !== -1 && visitIndex !== 5) {
-                        const [visitItem] = fetchedItems.splice(visitIndex, 1);
-                        fetchedItems.splice(5, 0, visitItem);
-                    }
-
-                    // Re-evaluate orders to ensure they are strictly sequential
+                    // Re-evaluate orders
                     fetchedItems.forEach((item, i) => {
                         item.order = i + 1;
                     });
-
-                    setMenuItems(fetchedItems);
-                } else {
-                    setMenuItems(baseItems);
                 }
+
+                // Check if missing any other generic items too
+                baseItems.forEach(baseItem => {
+                    if (!fetchedItems.some(f => f.name === baseItem.name)) {
+                        fetchedItems.push({ ...baseItem, order: fetchedItems.length + 1 });
+                    }
+                });
+
+                // Force "Employee Tracking" to definitively reside at pos 4 (index 3)
+                const trackingIndex = fetchedItems.findIndex(m => m.name === "Employee Tracking");
+                if (trackingIndex !== -1 && trackingIndex !== 3) {
+                    const [trackingItem] = fetchedItems.splice(trackingIndex, 1);
+                    fetchedItems.splice(3, 0, trackingItem);
+                }
+
+                // Force "Daily Work Report" to definitively reside at pos 5 (index 4)
+                const dwrIndex = fetchedItems.findIndex(m => m.name === "Daily Work Report");
+                if (dwrIndex !== -1 && dwrIndex !== 4) {
+                    const [dwrItem] = fetchedItems.splice(dwrIndex, 1);
+                    fetchedItems.splice(4, 0, dwrItem);
+                }
+
+                // Force "Visit Management" to definitively reside at pos 6 (index 5)
+                const visitIndex = fetchedItems.findIndex(m => m.name === "Visit Management");
+                if (visitIndex !== -1 && visitIndex !== 5) {
+                    const [visitItem] = fetchedItems.splice(visitIndex, 1);
+                    fetchedItems.splice(5, 0, visitItem);
+                }
+
+                // Re-evaluate orders to ensure they are strictly sequential
+                fetchedItems.forEach((item, i) => {
+                    item.order = i + 1;
+                });
+
+                setMenuItems(fetchedItems);
             } else {
                 setMenuItems(baseItems);
             }
@@ -141,6 +226,25 @@ export default function AdminMenuReordering() {
             setMenuItems(baseItems);
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const handleDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event;
+
+        if (over && active.id !== over.id) {
+            setMenuItems((items) => {
+                const oldIndex = items.findIndex((i) => i.id === active.id);
+                const newIndex = items.findIndex((i) => i.id === over.id);
+
+                const reordered = arrayMove(items, oldIndex, newIndex);
+
+                // Update order numbers sequentially
+                return reordered.map((item, i) => ({
+                    ...item,
+                    order: i + 1
+                }));
+            });
         }
     };
 
@@ -171,22 +275,13 @@ export default function AdminMenuReordering() {
     const handleSave = async () => {
         setIsSaving(true);
         try {
-            const res = await fetch('/api/settings/ADMIN_MENU_ORDER', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ value: menuItems })
-            });
-
-            if (res.ok) {
-                alert('Menu order saved successfully!');
-                // Dispatch event so Sidebar can auto-refresh
-                window.dispatchEvent(new Event('menuOrderChanged'));
-            } else {
-                alert('Failed to save menu order.');
-            }
+            await api.put('/settings/ADMIN_MENU_ORDER', menuItems);
+            alert('Menu order saved successfully!');
+            // Dispatch event so Sidebar can auto-refresh
+            window.dispatchEvent(new Event('menuOrderChanged'));
         } catch (error) {
             console.error("Error saving menu order", error);
-            alert('Network error while saving.');
+            alert('Failed to save menu order.');
         } finally {
             setIsSaving(false);
         }
@@ -212,47 +307,28 @@ export default function AdminMenuReordering() {
                             <Loader2 className="spinner" size={24} style={{ margin: '0 auto', color: '#3b82f6', animation: 'spin 1s linear infinite' }} />
                             <div style={{ marginTop: '10px' }}>Loading menu configuration...</div>
                         </div>
-                    ) : menuItems.map((item, index) => {
-                        const Icon = getIconComponent(item.iconName);
-                        return (
-                            <div key={item.id} className="menu-item-row">
-                                <div className="menu-item-left">
-                                    <div className="drag-handle" title="Drag to reorder (Coming Soon)">
-                                        <GripVertical size={18} />
-                                    </div>
-                                    <div className="menu-icon-wrapper">
-                                        <Icon size={18} />
-                                    </div>
-                                    <div className="menu-item-name">
-                                        {item.name}
-                                    </div>
-                                </div>
-                                <div className="menu-item-actions">
-                                    <div className="order-badge">
-                                        {item.order}
-                                    </div>
-                                    <div className="move-buttons">
-                                        <button
-                                            className="move-btn"
-                                            disabled={index === 0}
-                                            onClick={() => moveItem(index, 'up')}
-                                            title="Move Up"
-                                        >
-                                            <ChevronUp size={16} />
-                                        </button>
-                                        <button
-                                            className="move-btn"
-                                            disabled={index === menuItems.length - 1}
-                                            onClick={() => moveItem(index, 'down')}
-                                            title="Move Down"
-                                        >
-                                            <ChevronDown size={16} />
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })}
+                    ) : (
+                        <DndContext
+                            sensors={sensors}
+                            collisionDetection={closestCenter}
+                            onDragEnd={handleDragEnd}
+                        >
+                            <SortableContext
+                                items={menuItems.map(i => i.id)}
+                                strategy={verticalListSortingStrategy}
+                            >
+                                {menuItems.map((item, index) => (
+                                    <SortableItem
+                                        key={item.id}
+                                        item={item}
+                                        index={index}
+                                        totalCount={menuItems.length}
+                                        moveItem={moveItem}
+                                    />
+                                ))}
+                            </SortableContext>
+                        </DndContext>
+                    )}
                 </div>
             </div>
         </div>

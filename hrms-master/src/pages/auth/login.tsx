@@ -3,18 +3,21 @@ import { useAuthStore } from '../../store/useAuthStore';
 import api from '../../lib/axios';
 import { useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo.png';
-import { Mail, Lock, ArrowRight, UserPlus, X, User, ArrowLeft, Key, ShieldCheck , LogIn} from 'lucide-react';
+import { Mail, Lock, ArrowRight, UserPlus, X, User, ArrowLeft, Key, ShieldCheck, Users } from 'lucide-react';
 import meshBg from '../../assets/image-mesh-gradient.png';
 import './login.css';
 
 type AuthState = 'LOGIN' | 'FORGOT_PASSWORD' | 'VERIFY_OTP' | 'RESET_PASSWORD';
+type LoginMethod = 'PASSWORD' | 'OTP' | 'QR';
 
 export default function Login() {
     // Top-Level State
     const [view, setView] = useState<AuthState>('LOGIN');
+    const [loginMethod, setLoginMethod] = useState<LoginMethod>('PASSWORD');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [settings, setSettings] = useState<any>(null);
 
     // Login Form State
     const [email, setEmail] = useState('');
@@ -34,6 +37,19 @@ export default function Login() {
 
     const login = useAuthStore(state => state.login);
     const navigate = useNavigate();
+
+    // Load Company Settings for Branding
+    useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const res = await api.get('/settings/COMPANY_PROFILE');
+                setSettings(res.data);
+            } catch (err) {
+                console.error("Failed to load company branding", err);
+            }
+        };
+        fetchSettings();
+    }, []);
 
     // OTP Countdown Timer Logic
     useEffect(() => {
@@ -59,17 +75,30 @@ export default function Login() {
         setError('');
         setSuccess('');
 
-        if (!email.trim() || !password) {
+        if (loginMethod === 'PASSWORD' && (!email.trim() || !password)) {
             setError('Please enter both email and password');
+            return;
+        }
+
+        if (loginMethod === 'OTP' && !email.trim()) {
+            setError('Please enter your email to receive OTP');
             return;
         }
 
         setIsLoading(true);
         try {
-            const response = await api.post('/auth/login', { email, password });
-            const { token, user } = response.data;
-            login(token, user);
-            navigate('/');
+            if (loginMethod === 'PASSWORD') {
+                const response = await api.post('/auth/login', { email, password });
+                const { token, user } = response.data;
+                login(token, user);
+                navigate('/');
+            } else if (loginMethod === 'OTP') {
+                // Trigger OTP send
+                await api.post('/auth/send-login-otp', { email });
+                setResetEmail(email);
+                setCountdown(30);
+                switchView('VERIFY_OTP');
+            }
         } catch (err: any) {
             setError(err.response?.data?.error || 'Failed to login. Please try again.');
         } finally {
@@ -165,9 +194,16 @@ export default function Login() {
 
         setIsLoading(true);
         try {
-            await api.post('/auth/verify-otp', { email: resetEmail, otp });
-            setSuccess('OTP verified. Please set your new password.');
-            switchView('RESET_PASSWORD');
+            if (loginMethod === 'OTP') {
+                const response = await api.post('/auth/login-with-otp', { email: resetEmail, otp });
+                const { token, user } = response.data;
+                login(token, user);
+                navigate('/');
+            } else {
+                await api.post('/auth/verify-otp', { email: resetEmail, otp });
+                setSuccess('OTP verified. Please set your new password.');
+                switchView('RESET_PASSWORD');
+            }
         } catch (err: any) {
             setError(err.response?.data?.error || 'Invalid or expired OTP');
         } finally {
@@ -195,6 +231,7 @@ export default function Login() {
             setSuccess('Password reset successfully. You can now log in.');
             setEmail(resetEmail);
             setPassword('');
+            setLoginMethod('PASSWORD');
             switchView('LOGIN');
         } catch (err: any) {
             setError(err.response?.data?.error || 'Password reset failed');
@@ -204,78 +241,109 @@ export default function Login() {
     };
 
     return (
-        <div className="login-wrapper" style={{ backgroundImage: `linear-gradient(135deg, rgba(15, 23, 42, 0.55), rgba(30, 41, 59, 0.65)), url(${meshBg})` }}>
+        <div className="login-wrapper" style={{ backgroundImage: settings?.company_photo ? `linear-gradient(135deg, rgba(15, 23, 42, 0.7), rgba(30, 41, 59, 0.8)), url(${settings.company_photo})` : `linear-gradient(135deg, rgba(15, 23, 42, 0.55), rgba(30, 41, 59, 0.65)), url(${meshBg})` }}>
             <div className="login-card">
                 {/* ---------- LOGIN VIEW ---------- */}
                 {view === 'LOGIN' && (
                     <div className="view-panel fade-in">
                         <div className="login-header">
-                            <img src={logo} alt="MineHR Solutions" className="login-logo" />
-                            <h2><LogIn className="page-title-icon" size="1em" style={{ display: "inline-block", verticalAlign: "middle", marginRight: "8px", marginBottom: "2px" }} />Welcome Back</h2>
-                            <p>Enter your credentials to access the dashboard</p>
+                            <img src={settings?.logo_url || logo} alt="MineHR Solutions" className="login-logo" style={{ maxHeight: '80px', objectFit: 'contain' }} />
+                            <h2>Welcome Back</h2>
+                            <p>Access your {settings?.company_name || 'Organization'} Dashboard</p>
                         </div>
 
-                        <form className="login-form" onSubmit={handleLoginSubmit}>
-                            {success && <div className="login-success">{success}</div>}
-                            {error && <div className="login-error">{error}</div>}
-
-                            <div className="input-group">
-                                <label>Email Address</label>
-                                <div className="input-wrapper">
-                                    <Mail size={18} className="input-icon" />
-                                    <input
-                                        type="email"
-                                        value={email}
-                                        onChange={(e) => { setEmail(e.target.value); setError(''); }}
-                                        placeholder="Enter your email"
-                                        required
-                                        autoFocus
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="input-group">
-                                <div className="label-row">
-                                    <label>Password</label>
-                                    <button
-                                        type="button"
-                                        className="forgot-link"
-                                        onClick={() => {
-                                            setResetEmail(email); // Pre-fill if they already typed it
-                                            switchView('FORGOT_PASSWORD');
-                                        }}
-                                    >
-                                        Forgot password?
-                                    </button>
-                                </div>
-                                <div className="input-wrapper">
-                                    <Lock size={18} className="input-icon" />
-                                    <input
-                                        type="password"
-                                        value={password}
-                                        onChange={(e) => { setPassword(e.target.value); setError(''); }}
-                                        placeholder="Enter your password"
-                                        required
-                                    />
-                                </div>
-                            </div>
-
-                            <button type="submit" className="login-btn" disabled={isLoading}>
-                                <span>{isLoading ? 'Signing In...' : 'Sign In'}</span>
-                                {!isLoading && <ArrowRight size={18} />}
+                        <div className="login-methods">
+                            <button className={`method-tab ${loginMethod === 'PASSWORD' ? 'active' : ''}`} onClick={() => setLoginMethod('PASSWORD')}>
+                                <Lock size={14} /> Password
                             </button>
+                            <button className={`method-tab ${loginMethod === 'OTP' ? 'active' : ''}`} onClick={() => setLoginMethod('OTP')}>
+                                <ShieldCheck size={14} /> OTP
+                            </button>
+                            <button className={`method-tab ${loginMethod === 'QR' ? 'active' : ''}`} onClick={() => setLoginMethod('QR')}>
+                                <Key size={14} /> QR
+                            </button>
+                        </div>
 
-                            <div className="login-footer">
-                                <span>Secure Access Portal • MineHR-Solutions Pvt. Ltd.</span>
-                                <button
-                                    type="button"
-                                    onClick={() => { setIsSettingUp(true); setError(''); setSuccess(''); }}
-                                    className="setup-admin-link"
-                                >
-                                    <UserPlus size={14} /> Create First Admin Account
+                        {loginMethod !== 'QR' ? (
+                            <form className="login-form" onSubmit={handleLoginSubmit}>
+                                {success && <div className="login-success">{success}</div>}
+                                {error && <div className="login-error">{error}</div>}
+
+                                <div className="input-group">
+                                    <label>Email Address</label>
+                                    <div className="input-wrapper">
+                                        <Mail size={18} className="input-icon" />
+                                        <input
+                                            type="email"
+                                            value={email}
+                                            onChange={(e) => { setEmail(e.target.value); setError(''); }}
+                                            placeholder="Enter your email"
+                                            required
+                                            autoFocus
+                                        />
+                                    </div>
+                                </div>
+
+                                {loginMethod === 'PASSWORD' && (
+                                    <div className="input-group">
+                                        <div className="label-row">
+                                            <label>Password</label>
+                                            <button
+                                                type="button"
+                                                className="forgot-link"
+                                                onClick={() => {
+                                                    setResetEmail(email);
+                                                    switchView('FORGOT_PASSWORD');
+                                                }}
+                                            >
+                                                Forgot password?
+                                            </button>
+                                        </div>
+                                        <div className="input-wrapper">
+                                            <Lock size={18} className="input-icon" />
+                                            <input
+                                                type="password"
+                                                value={password}
+                                                onChange={(e) => { setPassword(e.target.value); setError(''); }}
+                                                placeholder="Enter your password"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+
+                                <button type="submit" className="login-btn" disabled={isLoading}>
+                                    <span>{isLoading ? 'Processing...' : (loginMethod === 'OTP' ? 'Send OTP' : 'Sign In')}</span>
+                                    {!isLoading && <ArrowRight size={18} />}
+                                </button>
+                            </form>
+                        ) : (
+                            <div className="qr-container fade-in">
+                                <div className="qr-box">
+                                    <div className="qr-placeholder">
+                                        <Users size={48} style={{ opacity: 0.2 }} />
+                                    </div>
+                                </div>
+                                <div className="qr-info">
+                                    <h4>Login with QR Code</h4>
+                                    <p>Scan the QR code with your mobile app to sign in instantly.</p>
+                                </div>
+                                <button className="login-btn btn-primary" onClick={() => setLoginMethod('PASSWORD')} style={{ width: '100%' }}>
+                                    Back to Password
                                 </button>
                             </div>
-                        </form>
+                        )}
+
+                        <div className="login-footer">
+                            <span>Secure Access Portal • MineHR-Solutions Pvt. Ltd.</span>
+                            <button
+                                type="button"
+                                onClick={() => { setIsSettingUp(true); setError(''); setSuccess(''); }}
+                                className="setup-admin-link"
+                            >
+                                <UserPlus size={14} /> Create First Admin Account
+                            </button>
+                        </div>
                     </div>
                 )}
 

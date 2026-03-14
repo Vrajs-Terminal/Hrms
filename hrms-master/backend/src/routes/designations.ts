@@ -46,8 +46,9 @@ router.post('/bulk', async (req, res) => {
             skipDuplicates: true
         });
 
+        const user = (req as any).user;
+        await Promise.all(names.map((n: string) => logActivity(user?.id || null, 'CREATED', 'DESIGNATION', n.trim())));
         res.status(201).json({ message: 'Designations created successfully' });
-        names.forEach((n: string) => logActivity(null, 'CREATED', 'DESIGNATION', n.trim()));
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to create designations' });
@@ -66,8 +67,9 @@ router.put('/:id', async (req, res) => {
             where: { id: parseInt(id) },
             data: { name: name.trim() }
         });
+        const user = (req as any).user;
+        await logActivity(user?.id || null, 'UPDATED', 'DESIGNATION', updated.name);
         res.json(updated);
-        logActivity(null, 'UPDATED', 'DESIGNATION', updated.name);
     } catch (error) {
         res.status(500).json({ error: 'Failed to update designation' });
     }
@@ -89,7 +91,9 @@ router.put('/action/reorder', async (req, res) => {
             })
         );
 
+        const user = (req as any).user;
         await prisma.$transaction(transaction);
+        await logActivity(user?.id || null, 'REORDERED', 'DESIGNATION', 'Reordered designations');
         res.json({ message: 'Reordered successfully' });
     } catch (error) {
         res.status(500).json({ error: 'Failed to reorder designations' });
@@ -102,8 +106,9 @@ router.delete('/:id', async (req, res) => {
     try {
         // Safe to delete outright as Designations are the lowest tier
         // and have no child tables dependent on them yet.
+        const user = (req as any).user;
         await prisma.designation.delete({ where: { id: parseInt(id) } });
-        logActivity(null, 'DELETED', 'DESIGNATION', `Designation #${id}`);
+        await logActivity(user?.id || null, 'DELETED', 'DESIGNATION', `Designation #${id}`);
         res.json({ message: 'Designation deleted successfully' });
     } catch (error) {
         res.status(500).json({ error: 'Failed to delete designation' });

@@ -32,12 +32,18 @@ router.get('/', optionalAuthenticateToken, async (req, res) => {
 router.post('/', async (req, res) => {
     const { name, code, type } = req.body;
 
-    if (!name || !code) {
-        return res.status(400).json({ error: 'Name and Code are required' });
+    if (!name) {
+        return res.status(400).json({ error: 'Name is required' });
     }
 
     try {
-        const existingBranch = await prisma.branch.findUnique({ where: { code } });
+        let finalCode = code;
+        if (!finalCode) {
+            // Generate a random unique code if not provided
+            finalCode = `BR-${name.substring(0, 3).toUpperCase()}-${Math.floor(Math.random() * 1000)}`;
+        }
+
+        const existingBranch = await prisma.branch.findUnique({ where: { code: finalCode } });
         if (existingBranch) {
             return res.status(400).json({ error: 'Branch code already exists' });
         }
@@ -50,14 +56,15 @@ router.post('/', async (req, res) => {
         const branch = await prisma.branch.create({
             data: {
                 name,
-                code,
+                code: finalCode,
                 type: type || 'Metro',
                 order_index: nextOrder
             },
             include: { departments: true }
         });
+        const user = (req as any).user;
+        await logActivity(user?.id || null, 'CREATED', 'BRANCH', branch.name, { code: branch.code, type: branch.type });
         res.status(201).json(branch);
-        logActivity(null, 'CREATED', 'BRANCH', branch.name, { code: branch.code, type: branch.type });
     } catch (error) {
         res.status(500).json({ error: 'Failed to create branch' });
     }
@@ -78,11 +85,58 @@ router.delete('/:id', async (req, res) => {
             return res.status(400).json({ error: 'Cannot delete branch with active departments' });
         }
 
+        const user = (req as any).user;
         await prisma.branch.delete({ where: { id: parseInt(id) } });
-        logActivity(null, 'DELETED', 'BRANCH', branch.name);
+        await logActivity(user?.id || null, 'DELETED', 'BRANCH', branch.name);
         res.json({ message: 'Branch deleted successfully' });
     } catch (error) {
         res.status(500).json({ error: 'Failed to delete branch' });
+    }
+});
+
+// Bulk Import Branches
+router.post('/bulk', async (req, res) => {
+    const { branches } = req.body;
+
+    if (!branches || !Array.isArray(branches)) {
+        return res.status(400).json({ error: 'Invalid branches data' });
+    }
+
+    try {
+        const results = await prisma.$transaction(async (tx) => {
+            let count = 0;
+            for (const b of branches) {
+                // Skip if name is missing
+                if (!b.name) continue;
+
+                let finalCode = b.code;
+                if (!finalCode) {
+                    finalCode = `BR-${b.name.substring(0, 3).toUpperCase()}-${Math.floor(Math.random() * 10000)}`;
+                }
+
+                // Check for existing code in DB
+                const existing = await tx.branch.findUnique({ where: { code: finalCode } });
+                if (existing) continue;
+
+                await tx.branch.create({
+                    data: {
+                        name: b.name,
+                        code: finalCode,
+                        type: b.type || 'Metro',
+                        order_index: 0 // Will need re-ordering
+                    }
+                });
+                count++;
+            }
+            return { count };
+        });
+
+        const user = (req as any).user;
+        await logActivity(user?.id || null, 'BULK_IMPORT', 'BRANCH', `Imported ${results.count} branches`);
+        res.json(results);
+    } catch (error) {
+        console.error('Bulk import error:', error);
+        res.status(500).json({ error: 'Failed to bulk import branches' });
     }
 });
 

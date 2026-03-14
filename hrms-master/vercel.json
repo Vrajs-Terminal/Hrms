@@ -1,8 +1,6 @@
 {
     "version": 2,
-    "regions": [
-        "sin1"
-    ],
+    "regions": ["sin1"],
     "builds": [
         {
             "src": "package.json",
@@ -13,7 +11,10 @@
         },
         {
             "src": "backend/src/server.ts",
-            "use": "@vercel/node"
+            "use": "@vercel/node",
+            "config": {
+                "includeFiles": ["backend/src/**", "backend/prisma/**"]
+            }
         }
     ],
     "rewrites": [
@@ -22,7 +23,7 @@
             "destination": "/backend/src/server.ts"
         },
         {
-            "source": "/(.*)",
+            "source": "/((?!api).*)",
             "destination": "/index.html"
         }
     ]

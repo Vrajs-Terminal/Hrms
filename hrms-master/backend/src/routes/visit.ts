@@ -55,7 +55,7 @@ router.post('/settings', authenticateToken, async (req, res) => {
             update: { value: settingsData }
         });
 
-        logActivity(adminUser.id, 'UPDATED', 'VISIT_SETTINGS', 'Updated Visit Management settings');
+        await logActivity(adminUser.id, 'UPDATED', 'VISIT_SETTINGS', 'Updated Visit Management settings');
         res.json({ message: 'Settings updated successfully', settings: updateData.value });
     } catch (error: any) {
         res.status(500).json({ error: 'Failed to update visit settings', details: error.message });
@@ -152,7 +152,7 @@ router.post('/', authenticateToken, async (req, res) => {
             }
         });
 
-        logActivity(user.id, 'CREATED', 'VISIT', `Created visit for ${client_name}`);
+        await logActivity(user.id, 'CREATED', 'VISIT', `Created visit for ${client_name}`);
         res.status(201).json({ message: 'Visit created successfully', visit: newVisit });
     } catch (error: any) {
         res.status(500).json({ error: 'Failed to create visit', details: error.message });
@@ -204,7 +204,7 @@ router.get('/', authenticateToken, async (req, res) => {
 router.put('/:id', authenticateToken, async (req, res) => {
     try {
         const user = (req as any).user;
-        const visitId = parseInt(req.params.id);
+        const visitId = parseInt(req.params.id as string);
 
         const visit = await prisma.visit.findUnique({ where: { id: visitId } });
         if (!visit) return res.status(404).json({ error: 'Visit not found' });
@@ -229,7 +229,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
             data: updateData
         });
 
-        logActivity(user.id, 'UPDATED', 'VISIT', `Updated visit #${visitId}`);
+        await logActivity(user.id, 'UPDATED', 'VISIT', `Updated visit #${visitId}`);
         res.json({ message: 'Visit updated successfully', visit: updatedVisit });
     } catch (error: any) {
         res.status(500).json({ error: 'Failed to update visit', details: error.message });
@@ -243,7 +243,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
 router.post('/:id/check-in', authenticateToken, async (req, res) => {
     try {
         const user = (req as any).user;
-        const visitId = parseInt(req.params.id);
+        const visitId = parseInt(req.params.id as string);
         const { latitude, longitude, photo_url } = req.body;
 
         const visit = await prisma.visit.findUnique({ where: { id: visitId } });
@@ -261,7 +261,7 @@ router.post('/:id/check-in', authenticateToken, async (req, res) => {
             }
         });
 
-        logActivity(user.id, 'UPDATED', 'VISIT_CHECKIN', `Checked in for visit #${visitId}`);
+        await logActivity(user.id, 'UPDATED', 'VISIT_CHECKIN', `Checked in for visit #${visitId}`);
         res.json({ message: 'Checked-in successfully', visit: updatedVisit });
     } catch (error: any) {
         res.status(500).json({ error: 'Check-in failed', details: error.message });
@@ -275,7 +275,7 @@ router.post('/:id/check-in', authenticateToken, async (req, res) => {
 router.post('/:id/check-out', authenticateToken, async (req, res) => {
     try {
         const user = (req as any).user;
-        const visitId = parseInt(req.params.id);
+        const visitId = parseInt(req.params.id as string);
         const { latitude, longitude, work_summary, next_follow_up_date, document_url, customer_signature_url } = req.body;
 
         const visit = await prisma.visit.findUnique({ where: { id: visitId } });
@@ -302,7 +302,7 @@ router.post('/:id/check-out', authenticateToken, async (req, res) => {
             }
         });
 
-        logActivity(user.id, 'UPDATED', 'VISIT_CHECKOUT', `Checked out from visit #${visitId}`);
+        await logActivity(user.id, 'UPDATED', 'VISIT_CHECKOUT', `Checked out from visit #${visitId}`);
         res.json({ message: 'Checked-out successfully', visit: updatedVisit });
     } catch (error: any) {
         res.status(500).json({ error: 'Check-out failed', details: error.message });
@@ -316,7 +316,7 @@ router.post('/:id/check-out', authenticateToken, async (req, res) => {
 router.post('/:id/approval', authenticateToken, async (req, res) => {
     try {
         const user = (req as any).user;
-        const visitId = parseInt(req.params.id);
+        const visitId = parseInt(req.params.id as string);
         const { approval_status, approval_comments } = req.body; // 'Approved', 'Rejected', 'Resubmit'
 
         if (user.role !== 'Admin' && user.role !== 'Super Admin' && user.role !== 'Manager') {
@@ -341,7 +341,7 @@ router.post('/:id/approval', authenticateToken, async (req, res) => {
             }
         });
 
-        logActivity(user.id, 'UPDATED', 'VISIT_APPROVAL', `${approval_status} visit #${visitId}`);
+        await logActivity(user.id, 'UPDATED', 'VISIT_APPROVAL', `${approval_status} visit #${visitId}`);
         res.json({ message: `Visit ${approval_status}`, visit: updatedVisit });
     } catch (error: any) {
         res.status(500).json({ error: 'Failed to process approval', details: error.message });

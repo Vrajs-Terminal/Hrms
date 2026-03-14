@@ -142,3 +142,32 @@
     opacity: 0.3;
     cursor: not-allowed;
 }
+
+/* Dragging Styles */
+.menu-item-row.dragging {
+    border-color: #3b82f6;
+    background-color: #f0f9ff;
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.15);
+    transform: scale(1.02);
+    z-index: 50;
+    pointer-events: none;
+}
+
+.drag-handle:active {
+    cursor: grabbing;
+    color: #3b82f6;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.spinner {
+    animation: spin 1s linear infinite;
+}
